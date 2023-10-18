@@ -331,6 +331,9 @@ We plan to release multiple versions of the platform, starting from simple and g
     }
     ```
 
+### v0.0.9 (iOS and Android Applications)
+The platform now offers dedicated mobile applications for both iOS and Android devices, enhancing user accessibility and engagement.
+
 ### To Do List
 
 This document outlines the main steps we need to carry out to move our project forward. This is a living document and will be updated as we make progress and refine our plans. Each step is marked as an unresolved checkbox, which we will be checking off as we complete each task.
