@@ -334,14 +334,38 @@ We plan to release multiple versions of the platform, starting from simple and g
 ### v0.0.9 (iOS and Android Applications)
 The platform now offers dedicated mobile applications for both iOS and Android devices, enhancing user accessibility and engagement.
 
-### To Do List
+## Technology Stack
+
+In order to create a highly interactive social media platform on Hedera Hashgraph, we have chosen the following technology stack:
+
+### Front-End 
+
+- **React JS**: A popular JavaScript library for building seamless user interfaces. This technology empowers developers to create complex UIs with ease, that are fast, scalable, and simple.
+
+- **Tailwind CSS**: A utility-first CSS framework packed with classes that can be composed to build any design, directly in your markup. This allows for a highly customizable, low-level CSS framework that gives the developer complete control over the designs.
+
+### Back-End
+
+- **Hedera Consensus Service (HCS)**: Hedera Consensus Service (HCS) is a feature provided by the Hedera Hashgraph Network, which is a public distributed ledger famed for rapid transaction processing and airtight, asynchronous Byzantine Fault Tolerant consensus algorithm. 
+
+Key features of the HCS include: 
+
+- **Speed**: HCS can handle an extremely high throughput of transactions—tens of thousands per second in a single network shard. This makes it an excellent choice for applications requiring fast, efficient consensus.
+
+- **Security**: Thanks to the hashgraph consensus algorithm, HCS is asynchronous Byzantine Fault Tolerant (aBFT), the highest level of security achievable for distributed systems. This makes it robust against bad actors and fault-tolerant to ensure accurate and swift consensus.
+
+- **Fairness**: It incorporates fair timestamping and transaction ordering, preventing any single party from unfairly influencing the transaction order.
+
+HCS acts as a decentralized back-end service in the iBird project, ensuring secure and trustworthy social media interactions. It brings the attributes of speed, security, and fairness from the hashgraph algorithm to applications or distributed systems requiring verifiable, ordered events..
+
+### To-Do List
 
 This document outlines the main steps we need to carry out to move our project forward. This is a living document and will be updated as we make progress and refine our plans. Each step is marked as an unresolved checkbox, which we will be checking off as we complete each task.
 
 ## Phase 1: Project Foundations
 - [x] Set up version control system (GitHub repository)
 - [x] Design the structure of the application
-- [ ] Determine technology stack to be used for development
+- [x] Determine technology stack to be used for development
 
 ## Phase 2: Development
 - [ ] Implement the base structure of the application
