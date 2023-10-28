@@ -93,7 +93,7 @@ function ReadMessages() {
             htmlFor="topicName"
             className="block text-sm font-semibold text-gray-700"
           >
-            Topic ID:
+            Thread Id:
           </label>
           <div className="mt-2">
             <input
