@@ -236,7 +236,7 @@ We plan to release multiple versions of the platform, starting from simple and g
 
 ### v0.0.6 (Tipping - ASSET and HBAR Tokens)
 
-- Users can send tips to each other using [ASSET](https://iassets.org/#token) and HBAR tokens.
+- Users can send tips to each other using [ASSET](https://www.saucerswap.finance/swap/HBAR/0.0.1991880) and HBAR tokens.
 - The platform supports peer-to-peer transactions, driving greater user engagement and monetizing content creation.
 - **Structure**:
   - Transaction
@@ -325,6 +325,11 @@ We plan to release multiple versions of the platform, starting from simple and g
 ### v0.0.9 (iOS and Android Applications)
 
 The platform now offers dedicated mobile applications for both iOS and Android devices, enhancing user accessibility and engagement.
+
+### v0.1.0 (Community Governance)
+
+- [ASSET](https://www.saucerswap.finance/swap/HBAR/0.0.1991880) Token Holders can propose and vote on platform-wide changes and updates.
+- Voting mechanism and results are handled by HCS for transparency and efficiency.
 
 ## Building Together
 
