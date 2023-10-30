@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from "react";
 import QRCode from "qrcode.react";
-import Modal, { modalProps } from "./modal";
-import { useHashConnectContext } from "../hashconnect/hashconnect";
+import Modal, { modalProps } from "../utils/modal";
+import { useHashConnectContext } from "./hashconnect";
 
 const Pair: FC<modalProps> = ({ setModal }) => {
   const { state, pairingString, connectToExtension } = useHashConnectContext();

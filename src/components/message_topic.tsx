@@ -6,7 +6,8 @@ import {
   TopicMessageSubmitTransaction,
   TransactionReceipt,
 } from "@hashgraph/sdk";
-import Modal from "./modal";
+import TransactionResponse from "../utils/transaction_response";
+import { checkIfTopicHasMessages } from "../utils/check_if_topic_has_messages";
 
 // Define a functional component named MessageTopic
 const MessageTopic = () => {
@@ -26,7 +27,8 @@ const MessageTopic = () => {
     receipt: TransactionReceipt;
   }>(null); // Data for response modal
   const [showModal, setShowModal] = useState(false); // Modal display state
-  const [hasMessages, setHasMessages] = useState(false); // Flag for checking if the topic has messages
+
+  const [hasMessages, setHasMessages] = useState(false);
 
   // Function for sending a message to the topic
   const send = async () => {
@@ -40,6 +42,7 @@ const MessageTopic = () => {
       return;
     }
 
+    setHasMessages(await checkIfTopicHasMessages(topicId));
     // Create a message object based on whether the topic has existing messages
     let messageObject;
     if (!hasMessages) {
@@ -47,6 +50,7 @@ const MessageTopic = () => {
         Identifier: "iAssets",
         Type: "Thread",
         Author: signingAccount,
+        Status: "Public",
       };
     } else {
       messageObject = { Message: message };
@@ -78,71 +82,7 @@ const MessageTopic = () => {
       setShowModal(true);
       toast(responseData.receipt.status.toString());
     } else {
-      toast.error(`${response.error}`);
-    }
-  };
-
-  // Function to fetch topic data asynchronously
-  const fetchTopicData = async (topicId: string) => {
-    try {
-      const response = await fetch(
-        `https://mainnet-public.mirrornode.hedera.com/api/v1/topics/${topicId}/messages`
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        // Set hasMessages flag based on the presence of messages
-        setHasMessages(data.messages.length > 0);
-      } else {
-        toast("Topic Not Found");
-      }
-    } catch (error) {
-      console.error("Error fetching topic data:", error);
-      toast("An error occurred while fetching topic data");
-    }
-  };
-
-  // Trigger the topic data fetch when the topicId changes
-  useEffect(() => {
-    if (topicId) {
-      fetchTopicData(topicId);
-    }
-  }, [topicId]);
-
-  // Function to copy the transaction ID to the clipboard
-  const copyToClipboard = () => {
-    if (responseData) {
-      const transactionId = responseData.transactionId;
-      navigator.clipboard
-        .writeText(transactionId)
-        .then(() => {
-          toast("Transaction ID copied to clipboard");
-        })
-        .catch((error) => {
-          console.error("Copy to clipboard failed:", error);
-        });
-    }
-  };
-
-  // Function to download the transaction ID as a text file
-  const downloadTransactionId = () => {
-    if (responseData) {
-      const transactionId = responseData.transactionId;
-      const truncatedMessage =
-        message.length > 5 ? message.substring(0, 5) + "..." : message;
-      const receiptStatus = responseData.receipt.status;
-
-      const content = `Transaction ID: ${transactionId}\nMessage: ${truncatedMessage}\nStatus: ${receiptStatus}\nTopic Id${topicId}`;
-
-      const blob = new Blob([content], { type: "text/plain" });
-      const url = URL.createObjectURL(blob);
-
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${truncatedMessage}.txt`;
-      a.click();
-      URL.revokeObjectURL(url);
-      toast("Transaction ID downloaded!");
+      toast.error(`${JSON.stringify(response.error)}`);
     }
   };
 
@@ -228,29 +168,13 @@ const MessageTopic = () => {
       </div>
 
       {showModal && responseData && (
-        <Modal setShow={setShowModal}>
-          <div>
-            <h2>
-              Transaction ID: <br /> {responseData.transactionId}
-            </h2>
-            <h2>
-              Status: <br /> {responseData.receipt.status.toString()}
-            </h2>
-
-            <button
-              className="bg-blue-500 hover-bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg mr-2"
-              onClick={copyToClipboard}
-            >
-              Copy Transaction ID
-            </button>
-            <button
-              className="bg-green-500 hover-bg-green-600 text-white font-semibold py-2 px-4 rounded-lg"
-              onClick={downloadTransactionId}
-            >
-              Download Transaction ID
-            </button>
-          </div>
-        </Modal>
+        <TransactionResponse
+          setShow={setShowModal}
+          transactionData={responseData}
+          type={"message"}
+          message={message}
+          topicId={topicId}
+        />
       )}
     </div>
   );

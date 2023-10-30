@@ -134,7 +134,7 @@ function ReadMessages() {
 
                   {/* Check if parsed message contains an "Identifier" key */}
                   {parsedMessage.Identifier && (
-                    <p className="text-white">{`${parsedMessage.Identifier}, ${parsedMessage.Type}, ${parsedMessage.Author}`}</p>
+                    <p className="text-white">{`${parsedMessage.Identifier}, ${parsedMessage.Type}, ${parsedMessage.Author}, ${parsedMessage.Status}`}</p>
                   )}
 
                   {/* Check if parsed message contains a "Message" key */}

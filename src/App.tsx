@@ -1,4 +1,4 @@
-import Navbar from "./components/navbar";
+import Navbar from "./layouts/navbar";
 import CreateTopic from "./components/create_topic";
 import MessageTopic from "./components/message_topic";
 import ReadMessages from "./components/read_message";

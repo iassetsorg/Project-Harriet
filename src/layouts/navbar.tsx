@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useHashConnectContext } from "../hashconnect/hashconnect";
-import Pair from "./pair";
+import Pair from "../hashconnect/pair";
 
 const Navbar = () => {
   const { state, pairingData, disconnect } = useHashConnectContext();

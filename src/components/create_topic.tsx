@@ -7,8 +7,7 @@ import {
   PublicKey,
 } from "@hashgraph/sdk";
 import { toast } from "react-toastify";
-import Modal from "./modal";
-
+import TransactionResponse from "../utils/transaction_response";
 // Component for Creating a Topic
 const CreateTopic = () => {
   // Use state to manage component-specific variables
@@ -69,33 +68,9 @@ const CreateTopic = () => {
       toast(responseData.receipt.status.toString());
     } else {
       // If the transaction failed, display an error message
-      toast.error(`${response.error}`);
+      toast.error(`${JSON.stringify(response.error)}`);
     }
   };
-
-  // Function to download the transaction ID
-  function downloadTransactionId(): void {
-    if (responseData && responseData.transactionId) {
-      // Create a data URI to download the transaction ID as a text file
-      const dataUri = `data:text/plain;charset=utf-8,Topic Name: ${topicMemo}\nTopic Id: ${responseData.receipt.topicId}\nTransaction Id: ${responseData.transactionId}\n`;
-      const downloadLink = document.createElement("a");
-      downloadLink.href = dataUri;
-      downloadLink.download = `${topicMemo}.txt`;
-      downloadLink.click();
-      toast("Topic ID downloaded!");
-    }
-  }
-
-  // Function to copy text to clipboard
-  function copyToClipboard(text: any): void {
-    const tempInput = document.createElement("input");
-    tempInput.value = text;
-    document.body.appendChild(tempInput);
-    tempInput.select();
-    document.execCommand("copy");
-    document.body.removeChild(tempInput);
-    toast("Copied to clipboard!");
-  }
 
   return (
     <div className="max-w-md mx-auto mt-8">
@@ -165,31 +140,13 @@ const CreateTopic = () => {
       </div>
 
       {showModal && responseData && (
-        <Modal setShow={setShowModal}>
-          <div>
-            <h2>
-              Transaction ID: <br /> {responseData.transactionId}
-            </h2>
-            <h2>
-              Status: <br /> {responseData.receipt.status.toString()}
-            </h2>
-
-            <button
-              className="bg-blue-500 hover-bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg mr-2"
-              onClick={() =>
-                copyToClipboard(String(responseData.receipt.topicId))
-              }
-            >
-              Copy Topic ID
-            </button>
-            <button
-              className="bg-green-500 hover-bg-green-600 text-white font-semibold py-2 px-4 rounded-lg"
-              onClick={downloadTransactionId}
-            >
-              Download Topic ID
-            </button>
-          </div>
-        </Modal>
+        <TransactionResponse
+          setShow={setShowModal}
+          transactionData={responseData}
+          type={"create"}
+          message={topicMemo}
+          topicId={responseData.receipt.topicId?.toString() || ""}
+        />
       )}
     </div>
   );
