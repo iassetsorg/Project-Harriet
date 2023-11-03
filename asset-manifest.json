@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/Project-Harriet/static/css/main.36da505d.css",
-    "main.js": "/Project-Harriet/static/js/main.a5fb5aba.js",
+    "main.css": "/Project-Harriet/static/css/main.a4425cfb.css",
+    "main.js": "/Project-Harriet/static/js/main.18c8d5da.js",
     "static/js/787.7c9d1943.chunk.js": "/Project-Harriet/static/js/787.7c9d1943.chunk.js",
     "index.html": "/Project-Harriet/index.html",
-    "main.36da505d.css.map": "/Project-Harriet/static/css/main.36da505d.css.map",
-    "main.a5fb5aba.js.map": "/Project-Harriet/static/js/main.a5fb5aba.js.map",
+    "main.a4425cfb.css.map": "/Project-Harriet/static/css/main.a4425cfb.css.map",
+    "main.18c8d5da.js.map": "/Project-Harriet/static/js/main.18c8d5da.js.map",
     "787.7c9d1943.chunk.js.map": "/Project-Harriet/static/js/787.7c9d1943.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.36da505d.css",
-    "static/js/main.a5fb5aba.js"
+    "static/css/main.a4425cfb.css",
+    "static/js/main.18c8d5da.js"
   ]
 }
