@@ -70,24 +70,30 @@ const TransactionResponse: FC<IProps> = ({
       {transactionData && (
         <Modal setShow={setShow}>
           <div>
-            <h2>
-              Status: <br /> {transactionData.receipt.status.toString()}
-            </h2>
-            <h2>
-              Transaction ID: <br /> {transactionData.transactionId}
-            </h2>
-            <button
-              className="bg-blue-500 hover-bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg mr-2"
-              onClick={copy}
-            >
-              Copy
-            </button>
-            <button
-              className="bg-green-500 hover-bg-green-600 text-white font-semibold py-2 px-4 rounded-lg"
-              onClick={download}
-            >
-              Download
-            </button>
+            <div className="my-3">
+              <h2>
+                <span className="text-sky-900 text-lg">Status:</span>
+                <br /> {transactionData.receipt.status.toString()}
+              </h2>
+              <h2>
+                <span className="text-sky-900 text-lg">Transaction ID:</span>
+                <br /> {transactionData.transactionId}
+              </h2>
+            </div>
+            <div className="my-3">
+              <button
+                className="bg-sky-600 hover:bg-sky-900 text-white font-semibold py-2 px-4 rounded-lg mr-2"
+                onClick={copy}
+              >
+                Copy
+              </button>
+              <button
+                className="bg-sky-600 hover:bg-sky-900 text-white font-semibold py-2 px-4 rounded-lg"
+                onClick={download}
+              >
+                Download
+              </button>
+            </div>
           </div>
         </Modal>
       )}

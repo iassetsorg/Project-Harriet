@@ -19,7 +19,7 @@ const Modal = (props: any) => {
             <button
               type="button"
               ref={cancelButtonRef}
-              className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none mr-3"
+              className="rounded-md bg-white text-sky-700 hover:text-sky-900 focus:outline-none mr-3"
               onClick={() => props.setShow(false)}
             >
               <span className="sr-only">Close</span>

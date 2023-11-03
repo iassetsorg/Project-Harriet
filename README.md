@@ -14,7 +14,7 @@ By using iBird Explorer ([GitHub link](https://github.com/iassetsorg/ibird-explo
 
 The ultimate goal is to foster a rapid, transparent, and decentralized social network, solidifying user's control on their data.
 
-### [v0.0.1-Threads](https://iassetsorg.github.io/Project-Harriet/)
+### [v0.0.2 (Interactions) is Live](https://iassetsorg.github.io/Project-Harriet/)
 
 ### Project Building Blocks
 

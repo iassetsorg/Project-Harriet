@@ -18,7 +18,7 @@ root.render(
         <App />
       </HashConnectProvider>
     </SingingProvider>
-    <ToastContainer autoClose={10000} />
+    <ToastContainer autoClose={3000} />
   </React.StrictMode>
 );
 

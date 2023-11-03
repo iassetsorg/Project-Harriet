@@ -20,10 +20,10 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 py-4 px-6 shadow-lg">
+    <nav className="bg-sky-600 py-4 px-6 shadow-lg">
       <div className="container mx-auto flex justify-between items-center">
-        <a href="/" className="text-white text-3xl font-bold">
-          Project Harriet <span className="text-blue-200 text-sm">v0.0.1</span>
+        <a href="/" className="text-white text-3xl ">
+          Project Harriet <span className="text-blue-200 text-sm">v0.0.2</span>
         </a>
         <div className="md:hidden">
           <button
@@ -66,38 +66,38 @@ const Navbar = () => {
         <div
           className={`${
             isMobileMenuOpen ? "block" : "hidden"
-          } md:hidden w-full bg-blue-500 py-4 absolute top-16 left-0 z-10`}
+          } md:hidden w-full bg-sky-600 py-4 absolute top-16 left-0 z-10`}
         >
           <a
             href="https://github.com/iassetsorg/Project-Harriet"
-            className="block text-white text-xl px-4 py-2 hover:bg-blue-400"
+            className="block text-white text-lg px-4 py-2 hover:text-sky-300"
           >
             GitHub
           </a>
           <a
             href="https://ibird.io/"
-            className="block text-white text-xl px-4 py-2 hover:bg-blue-400"
+            className="block text-white text-lg px-4 py-2 hover:text-sky-300"
           >
             iBird
           </a>
           <a
             href="https://iassets.org/"
-            className="block text-white text-xl px-4 py-2 hover:bg-blue-400"
+            className="block text-white text-lg px-4 py-2 hover:text-sky-300"
           >
             iAssets
           </a>
           {state !== "Paired" ? (
             <button
               onClick={() => setLoadModal("Pair", true)}
-              className="bg-blue-700 text-white ml-3 text-xl p-3 rounded-full hover:bg-blue-400"
+              className="bg-sky-700 text-white ml-3 text-lg p-3 rounded-full hover:bg-sky-800"
             >
-              Connect
+              CONNECT
             </button>
           ) : null}
           {state === "Paired" ? (
             <button
               onClick={() => disconnect()}
-              className="bg-blue-700 text-white ml-3 text-xl p-2 rounded-full hover:bg-blue-400"
+              className="bg-sky-700 text-white ml-3 text-lg p-2 rounded-full hover:bg-blue-800"
             >
               {pairingData?.accountIds.join(", ")}
             </button>
@@ -108,11 +108,11 @@ const Navbar = () => {
             ></Pair>
           )}
         </div>
-        <div className="md:flex space-x-4 hidden">
+        <div className="md:flex space-x-4  text-center hidden items-center">
           <a
             href="https://github.com/iassetsorg/Project-Harriet"
             target="_blank"
-            className="text-white hover:text-blue-200 text-xl"
+            className="text-white hover:text-sky-300 text-xl"
             rel="noreferrer"
           >
             GitHub
@@ -120,7 +120,7 @@ const Navbar = () => {
           <a
             href="https://ibird.io/"
             target="_blank"
-            className="text-white hover:text-blue-200 text-xl"
+            className="text-white hover:text-sky-300 text-xl"
             rel="noreferrer"
           >
             iBird
@@ -128,7 +128,7 @@ const Navbar = () => {
           <a
             href="https://iassets.org/"
             target="_blank"
-            className="text-white hover:text-blue-200 text-xl"
+            className="text-white hover:text-sky-300 text-xl"
             rel="noreferrer"
           >
             iAssets
@@ -136,15 +136,15 @@ const Navbar = () => {
           {state !== "Paired" ? (
             <button
               onClick={() => setLoadModal("Pair", true)}
-              className="bg-blue-700 text-white text-xl p-3 rounded-full hover:bg-blue-400"
+              className="bg-sky-700 text-white ml-3 text-lg p-3 rounded-full hover:bg-sky-800"
             >
-              Connect
+              CONNECT
             </button>
           ) : null}
           {state === "Paired" ? (
             <button
               onClick={() => disconnect()}
-              className="bg-blue-700 text-white text-xl p-2 rounded-full hover:bg-blue-400"
+              className="bg-sky-700 text-white ml-3 text-lg p-3 rounded-full hover:bg-sky-800"
             >
               {pairingData?.accountIds.join(", ")}
             </button>
