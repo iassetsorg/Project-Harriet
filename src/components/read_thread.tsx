@@ -19,11 +19,8 @@ function ReadThread({ topicId }: { topicId: string }) {
   };
 
   useEffect(() => {
+    fetchMessages(topicId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    return () => {
-      // Fetch messages directly
-      fetchMessages(topicId);
-    };
   }, []);
 
   // Handler for loading more messages
