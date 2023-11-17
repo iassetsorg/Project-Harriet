@@ -17,8 +17,8 @@ function Explorer() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-4 border rounded-md shadow-md mt-8">
-      <h1 className="text-2xl font-semibold mb-4">Explorer</h1>
+    <div className="max-w-md mx-auto  bg-gray-100 rounded-lg shadow-xl p-6">
+      <h1 className="text-xl font-semibold text-sky-900 mb-4">Explorer</h1>
       {loading && <Spinner />}
       {!loading &&
         messages.map((message, idx) => {
