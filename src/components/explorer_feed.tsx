@@ -9,18 +9,7 @@ function Explorer() {
     useGetData(explorerTopicID);
 
   useEffect(() => {
-    const handleLoad = () => {
-      fetchMessages(explorerTopicID);
-    };
-
-    if (document.readyState === "complete") {
-      handleLoad();
-    } else {
-      window.addEventListener("load", handleLoad);
-      return () => {
-        window.removeEventListener("load", handleLoad);
-      };
-    }
+    fetchMessages(explorerTopicID);
   }, []);
 
   const handleLoadMore = () => {

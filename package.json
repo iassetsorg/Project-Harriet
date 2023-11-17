@@ -1,7 +1,7 @@
 {
   "homepage": "https://iassetsorg.github.io/Project-Harriet",
   "name": "project_harriet",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "private": true,
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.4.2",
