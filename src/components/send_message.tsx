@@ -1,20 +1,25 @@
 // components/MessageSender.tsx
 import React, { useState } from "react";
-import useSendMessage from "./use_send_message";
+import useSendMessage from "../hooks/use_send_message";
 import TransactionResponse from "../utils/transaction_response";
-
+import { useHashConnectContext } from "../hashconnect/hashconnect";
 const SendMessages = () => {
   const [topicId, setTopicId] = useState("");
   const [message, setMessage] = useState("");
   const [memo, setMemo] = useState("");
-
+  const { pairingData } = useHashConnectContext();
+  const signingAccount = pairingData?.accountIds[0] || "";
   const [showModal, setShowModal] = useState(false); // Modal display state
   // Get the send function and response data from the custom hook
   const { send, response } = useSendMessage();
 
   const handleSend = async () => {
+    const Message = {
+      Author: signingAccount,
+      Message: message,
+    };
     // Call the send function p rovided by the hook
-    await send(topicId, { Message: message }, memo);
+    await send(topicId, Message, memo, "message");
     setShowModal(true);
   };
 

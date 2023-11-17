@@ -14,7 +14,7 @@ By using iBird Explorer ([GitHub link](https://github.com/iassetsorg/ibird-explo
 
 The ultimate goal is to foster a rapid, transparent, and decentralized social network, solidifying user's control on their data.
 
-### [v0.0.2 (Interactions) is Live](https://iassetsorg.github.io/Project-Harriet/)
+### [v0.0.3 (Explorer) is Live](https://iassetsorg.github.io/Project-Harriet/)
 
 ### Project Building Blocks
 
@@ -95,6 +95,7 @@ We plan to release multiple versions of the platform, starting from simple and g
 - Each thread is automatically added to the Explore Feed upon creation, covering a wide array of topics.
 - Users have an option to choose if their threads should be visible on Explore Feed or not. This gives them control over the visibility of their posts.
 - Users can access any thread from the Explore Feed, improving community engagement.
+- [Explore Topic: 0.0.3946144](https://hashscan.io/mainnet/topic/0.0.3946144)
 - **Structure**:
   - Message 1: Topic information
     ```

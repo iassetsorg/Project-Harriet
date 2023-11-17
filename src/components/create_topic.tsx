@@ -8,7 +8,7 @@ import {
 } from "@hashgraph/sdk";
 import { toast } from "react-toastify";
 import TransactionResponse from "../utils/transaction_response";
-import useSendMessage from "./use_send_message";
+import useSendMessage from "../hooks/use_send_message";
 // Component for Creating a Topic
 const CreateTopic = () => {
   // Use state to manage component-specific variables
@@ -24,6 +24,7 @@ const CreateTopic = () => {
   }>(null);
   const [showModal, setShowModal] = useState(false);
   const { send, response } = useSendMessage();
+  const [publishExplore, setPublishExplore] = useState(false);
   // Function for creating a topic
   const create = async () => {
     if (!signingAccount) {
@@ -78,8 +79,18 @@ const CreateTopic = () => {
         await send(
           responseData.receipt.topicId?.toString() || "",
           messageObject,
-          ""
+          "",
+          "message"
         );
+        // Conditional "Publish on Explore" message send
+        if (publishExplore) {
+          await send(
+            "0.0.3946144",
+            responseData.receipt.topicId?.toString() || "",
+            "",
+            "explore"
+          );
+        }
       }
     } else {
       // If the transaction failed, display an error message
@@ -129,6 +140,17 @@ const CreateTopic = () => {
             onChange={(event) => setMemo(event.target.value)}
           />
         </div>
+      </section>
+      <section className="py-4 px-8">
+        <label className="flex items-center text-sm font-semibold text-gray-700">
+          <input
+            type="checkbox"
+            checked={publishExplore}
+            onChange={() => setPublishExplore(!publishExplore)}
+            className="h-6 w-6 text-sky-400 border-2 border-sky-400 focus:ring-4 focus:ring-sky-300"
+          />
+          <span className="ml-3">Publish on Explorer</span>
+        </label>
       </section>
 
       {/* to set the submit key and make a topic private to only the creator can write message on it  */}

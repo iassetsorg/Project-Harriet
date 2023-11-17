@@ -23,7 +23,7 @@ const Navbar = () => {
     <nav className="bg-sky-600 py-4 px-6 shadow-lg">
       <div className="container mx-auto flex justify-between items-center">
         <a href="/" className="text-white text-3xl ">
-          Project Harriet <span className="text-blue-200 text-sm">v0.0.2</span>
+          Project Harriet <span className="text-blue-200 text-sm">v0.0.3</span>
         </a>
         <div className="md:hidden">
           <button
