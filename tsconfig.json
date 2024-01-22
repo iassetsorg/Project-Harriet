@@ -15,7 +15,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "sourceMap": true,
+    "sourceMap": false,
     "types": ["react", "react-dom"]
   },
   "include": ["src", "components Backup"]
