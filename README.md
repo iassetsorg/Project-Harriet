@@ -14,9 +14,13 @@ By using iBird Explorer ([GitHub link](https://github.com/iassetsorg/ibird-explo
 
 The ultimate goal is to foster a rapid, transparent, and decentralized social network, solidifying user's control on their data.
 
-### [Web2 Version](https://ibird.io/)
+### [iBird Server Sync](https://ibird.io/)
 
-### [Web3 Version(🛠️in progress⚙️)](https://ibird.community/)
+This version operates on web3 but utilizes a server for certain functionalities. Ideal for users who prefer a blend of decentralized and traditional server-based approaches.
+
+### [iBird: PureWeb3, Open-Source, Community-Driven(🛠️in progress⚙️)](https://ibird.community/)
+
+A fully decentralized version that doesn't require any server, embodying the core principles of web3. Currently under development.
 
 ### Project Building Blocks
 
