@@ -1,4 +1,6 @@
-# iBird: A Web3 Social Media Platform on Hedera Hashgraph
+# SocialFi Built on Hedera
+
+# iBird is an Open-Source, Community-Driven, Web3 Social Media Built on Hedera
 
 [iBird](https://ibird.io/) is a fully functional Web3 social media platform operating on Hedera Hashgraph built by [iAssets](https://iassets.org/). It offers users an opportunity to join, create an account, and post messages directly on the Hedera Network. Not only messages, iBird writes all user interactions including posting, liking, and commenting on a unique Hedera Consensus Service ([HCS Topic](https://hashscan.io/mainnet/topic/0.0.1290501)).
 
