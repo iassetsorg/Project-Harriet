@@ -52,7 +52,7 @@ const Navbar = () => {
         )}
         {state === "Paired" && (
           <button
-            onClick={() => handleDisconnect}
+            onClick={() => handleDisconnect()}
             className="py-1 px-3 font-semibold text-gray-800 bg-indigo-300 rounded-xl hover:bg-indigo-400 transition duration-300"
           >
             {pairingData?.accountIds.join(", ")}
