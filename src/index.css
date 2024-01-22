@@ -1,3 +1,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@media (max-width: 768px) {
+  /* // For mobile screens */
+  /**
+   * Positions the New Thread button fixed to the bottom right of the viewport, with margins from the edges.
+   */
+  .NewThreadButton {
+    @apply fixed bottom-0 right-0 mb-16 mr-8;
+  }
+}
+
+@media (min-width: 769px) {
+  /* // For larger screens */
+  .NewThreadButton {
+    @apply fixed bottom-0 left-1 mb-4 ml-0.5;
+  }
+}

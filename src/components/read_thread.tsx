@@ -31,14 +31,23 @@ function ReadThread({ topicId }: { topicId: string }) {
     }
   };
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setShowComments(null);
+  };
+
   // Render the Component
   return (
-    <div className="max-w-md mx-auto  bg-gray-200 rounded-lg shadow-xl p-6">
+    <div className="bg-gray-800 text-white">
       {/* Loading Indicator */}
       {loading && <Spinner />}
 
       {!loading && (
-        <div className="mt-4">
+        <div>
           {/* Iterate over messagesInfo and render each message */}
           {Object.entries(messagesInfo).map(([message_id, details], idx) => {
             const messageDetails = details as MessageDetails;
@@ -46,31 +55,12 @@ function ReadThread({ topicId }: { topicId: string }) {
             try {
               // Render the main message and associated reactions and comments
               return (
-                <div
-                  key={idx}
-                  className="p-2 h-24 border rounded mb-4 bg-gray-300"
-                >
+                <div key={idx} className="p-4 border rounded mb-4 bg-gray-700">
                   {/* Display the message text */}
-                  <p>{messageDetails.message}</p>
-
-                  {/* Display like, dislike, and comment counts */}
-                  <div className="text-gray-600 flex ml-1 items-center text-lg">
-                    <span>{messageDetails.likes}</span>{" "}
-                    <AiFillLike className="mr-2" />
-                    <span>{messageDetails.dislikes}</span>{" "}
-                    <AiFillDislike className="mr-2" />
-                    {messageDetails.commentsDetails && (
-                      <button
-                        onClick={() =>
-                          handleShowComments(messageDetails.sequence_number)
-                        }
-                        className="text-sky-900 flex items-center text-lg"
-                      >
-                        {messageDetails.comments}{" "}
-                        <AiFillMessage className="mr-2" />
-                      </button>
-                    )}
-                  </div>
+                  <p className="text-sm mb-1 text-gray-400">
+                    {messageDetails.author}
+                  </p>
+                  <p className="mb-3 text-gray-300">{messageDetails.message}</p>
 
                   {/* Render the Replay component for replies */}
                   <div className="flex items-center space-x-1">
@@ -80,14 +70,41 @@ function ReadThread({ topicId }: { topicId: string }) {
                     />
                   </div>
 
+                  {/* Display like, dislike, and comment counts */}
+                  <div className="text-gray-600 flex ml-1 items-center text-sm ">
+                    <span className=" text-gray-300  px-2 rounded-lg ml-2 flex items-center">
+                      {messageDetails.likes}
+                    </span>{" "}
+                    <span className=" text-gray-300  px-2 rounded-lg ml-4 flex items-center">
+                      {messageDetails.dislikes}
+                    </span>{" "}
+                    {messageDetails.commentsDetails && (
+                      <button
+                        onClick={() => {
+                          if (messageDetails.comments > 0) {
+                            openModal();
+                            handleShowComments(messageDetails.sequence_number);
+                          }
+                        }}
+                        className={`${
+                          messageDetails.comments > 0
+                            ? "bg-gray-600 hover:bg-gray-500"
+                            : "text-gray-300  px-2 rounded-lg ml-2 flex items-center cursor-default"
+                        } text-gray-300 px-2 rounded-lg ml-4 flex items-center`}
+                      >
+                        {messageDetails.comments}{" "}
+                      </button>
+                    )}
+                  </div>
+
                   {/* Display comments in a modal if showComments is set to the current sequence number */}
                   {showComments === messageDetails.sequence_number && (
-                    <Modal setShow={setShowComments}>
+                    <Modal isOpen={isModalOpen} onClose={closeModal}>
                       {messageDetails.commentsDetails.map(
                         (commentDetail, i) => (
                           <div
-                            key={idx}
-                            className="bg-sky-100 border-l-4 rounded border-sky-500 text-sky-700 p-4 mb-3"
+                            key={i}
+                            className="bg-gray-600 border-l-4 rounded border-gray-500 text-gray-300 p-4 mb-3"
                             role="alert"
                           >
                             <p className="font-bold">
@@ -111,7 +128,7 @@ function ReadThread({ topicId }: { topicId: string }) {
           {/* Render a button to load more messages if available */}
           {nextLink && (
             <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
               onClick={handleLoadMore}
             >
               Load More

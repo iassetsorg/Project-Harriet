@@ -96,6 +96,7 @@ We plan to release multiple versions of the platform, starting from simple and g
 - Users have an option to choose if their threads should be visible on Explore Feed or not. This gives them control over the visibility of their posts.
 - Users can access any thread from the Explore Feed, improving community engagement.
 - [Explore Topic: 0.0.3946144](https://hashscan.io/mainnet/topic/0.0.3946144)
+
 - **Structure**:
   - Message 1: Topic information
     ```
@@ -118,52 +119,58 @@ We plan to release multiple versions of the platform, starting from simple and g
     }
     ```
 
-### v0.0.4 (User Profile, Threads Directory and Platform Directory)
+### v0.0.4 (User Profile, UserThreads, Users, and Planet)
 
 #### User Profile
 
 - When a user creates a profile, a unique Topic is created for them. This acts as a personal profile page for a user. It houses the user's details.
 - **Structure**:
-  - Message 1: Topic information
+
+  - Message 1: Profile information
+
     ```
     {
-      "Identifier":"iAssets",
-      "Type":"Profile",
-      "Author": "AccountId",
-    }
-    ```
-  - Message 2: Information
-    ```
-    {
-    "Label":"Information",
-    "Full_Name": "John Doe",
+    "Identifier": "iAssets",
+    "Type": "Profile",
+    "Author": "signingAccount",
+    "Name": "John Doe",
     "Bio": "Software Developer passionate about Web3",
-    "Joined_Date": "2023-09-30",
-    'Website': 'https://johndoe.com'
+    "Website": "https://johndoe.com",
+    "Location":"Nevada"
+    "Threads": "ThreadsTopicId",
+    "Picture": "ipfs_hash",
+    "Banner": "ipfs_hash"
     }
     ```
-  - Message 3: Threads Directory
+
+  - Message 2: Updated Profile information
     ```
     {
-      "Label":"Threads",
-      "Threads":"TopicId"
+    "Identifier": "iAssets",
+    "Type": "Profile",
+    "Author": "signingAccount",
+    "Name": "John Doe",
+    "Bio": "Software Developer passionate about Web3",
+    "Website": "https://johndoe.com",
+    "Threads": "ThreadsTopicId",
+    "Picture": "ipfs_hash",
+    "Banner": "ipfs_hash"
     }
     ```
-  - Message 4: Followings Directory
-    ```
-    {
-      "Label":"Followings",
-      "Followings":"TopicId"
-    }
-    ```
-  #### Threads Directory
+
+One of the major challenges we face with the v0.0.4 design is obtaining user profile data. The issue arises from the fact that user profiles are considered topics, and we aim to avoid relying on a centralized database to store this information. The reason behind this choice is our commitment to achieving a fully decentralized web3 social media platform.
+
+In the context of open sourcing ibird, v0.0.4 stands out as the most complex, crucial, and demanding component. To address the challenge of user profile data, we propose leveraging NFTs (Non-Fungible Tokens). This involves creating an extensive NFT collection dedicated to ibird profiles. Upon a user creating a profile, an NFT is minted with the user's profile topic ID as metadata. This innovative approach ensures that each user maintains ownership of their profile, and the new decentralized system can retrieve user data directly from the network, eliminating the need for a centralized database.
+
+#### UserThreads
+
 - This is a directory for user threads. This Topic is linked back to the user's Profile.
 - **Structure**:
   - Message 1: Topic information
     ```
     {
       "Identifier":"iAssets",
-      "Type":"Threads",
+      "Type":"UserThreads",
       "Author": "AccountId",
     }
     ```
@@ -179,31 +186,60 @@ We plan to release multiple versions of the platform, starting from simple and g
       "Thread": "TopicId2"
     }
     ```
-  #### Platform Directory
-- This is the highest level of organization and acts as the central directory of the platform.
+  #### Users
+- This is the highest level of organization and acts as the central Users directory of the platform.
 - It stores IDs of all users and their associated profile topics.
 - This can be seen as a big directory that holds the records of all users who join the platform.
+- [Users Topic: 0.0.4320592](https://hashscan.io/mainnet/topic/0.0.4320592)
+
 - **Structure**:
+
   - Message 1: Topic information
     ```
     {
       "Identifier":"iAssets",
-      "Type":"Platform",
+      "Type":"Users",
       "Author": "iAssets",
     }
     ```
   - Message 2: User1
     ```
     {
-      "ID1": "AccountId1"
-      "User1": "User Profile1"
+      "AccountId1": "User Profile1"
     }
     ```
   - Message 3: User2
     ```
     {
-      "ID2": "AccountId2"
-      "User2": "User Profile2"
+      "AccountId2": "User Profile2"
+    }
+    ```
+
+  #### Planet
+
+- The Planet is a public topic that serves as an open bulletin board where everyone can post messages, but interactions such as replies and likes are disabled.
+- It provides a one-way communication channel for users to share announcements, updates, or general information with the entire community.
+- Posting a message on the Planet costs only $0.0001, making it a cost-effective way to broadcast information to the Planet.
+- [Planet Topic: 0.0.4320596](https://hashscan.io/mainnet/topic/0.0.4320596)
+- **Structure**:
+  - Message 1: Topic information
+    ```
+    {
+      "Identifier":"iAssets",
+      "Type":"Planet",
+      "Author": "iAssets",
+    }
+    ```
+  - Message 2: User1 post on the Planet
+    ```
+    {
+    "Message": "Hello Earth!"
+    }
+    ```
+  - Message 3: User2 post on the Planet
+    ```
+    {
+    "Message": "Don't forget to check out the latest updates on iBird!"
     }
     ```
 

@@ -2,18 +2,28 @@ import React, { useEffect } from "react";
 import useGetData from "../hooks/use_get_data";
 import ReadThread from "./read_thread";
 import Spinner from "../utils/Spinner";
+import useProfileData from "../hooks/use_profile_data";
+import { useHashConnectContext } from "../hashconnect/hashconnect";
 
-function Explorer() {
-  const explorerTopicID = "0.0.3946144";
+function Threads() {
+  const { pairingData } = useHashConnectContext();
+  const signingAccount = pairingData?.accountIds[0] || "";
+  const { profileData } = useProfileData(signingAccount);
+
+  // Adjusted to handle profileData as an object
+  const profileId = profileData ? profileData.Threads : "";
+
   const { messages, loading, fetchMessages, nextLink } = useGetData(
-    explorerTopicID,
+    profileId,
     null,
     true
   );
 
   useEffect(() => {
-    fetchMessages(explorerTopicID);
-  }, []);
+    if (profileId) {
+      fetchMessages(profileId);
+    }
+  }, [profileId]);
 
   const handleLoadMore = () => {
     if (nextLink) fetchMessages(nextLink);
@@ -26,7 +36,7 @@ function Explorer() {
         messages.map((message, idx) => {
           if (message.Thread) {
             return (
-              <div key={idx} className="">
+              <div key={idx} className="mb-4">
                 <ReadThread topicId={message.Thread} />
               </div>
             );
@@ -45,4 +55,4 @@ function Explorer() {
   );
 }
 
-export default Explorer;
+export default Threads;

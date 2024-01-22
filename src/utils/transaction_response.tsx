@@ -1,11 +1,11 @@
 // TransactionModal.tsx
 import { TransactionReceipt } from "@hashgraph/sdk";
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import Modal from "./modal";
 import { toast } from "react-toastify";
 
 interface IProps {
-  setShow: (showModal: boolean) => void;
+  showResponseModal: boolean;
   transactionData: { transactionId: any; receipt: TransactionReceipt } | null;
   message: string;
   topicId: string;
@@ -13,12 +13,18 @@ interface IProps {
 }
 
 const TransactionResponse: FC<IProps> = ({
-  setShow,
+  showResponseModal,
   transactionData,
   message,
   topicId,
   type,
 }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   // Function to copy the transaction ID to the clipboard
   const copy = () => {
     if (transactionData) {
@@ -61,38 +67,63 @@ const TransactionResponse: FC<IProps> = ({
       a.download = `${fileName}.txt`;
       a.click();
       URL.revokeObjectURL(url);
-      toast("Transaction ID downloaded!");
+      if (type === "message") {
+        toast("Transaction ID downloaded!");
+      } else if (type === "create") {
+        toast("Topic ID downloaded!");
+      }
     }
   };
 
   return (
     <>
       {transactionData && (
-        <Modal setShow={setShow}>
-          <div>
-            <div className="my-3">
+        <Modal isOpen={showResponseModal} onClose={closeModal}>
+          <div className="m-3">
+            <div className="m-3">
               <h2>
-                <span className="text-sky-900 text-lg">Status:</span>
-                <br /> {transactionData.receipt.status.toString()}
+                <span className="text-lg mr-2">Status:</span>
+                <span className="text-green-700 text-lg mr-2">
+                  {transactionData.receipt.status.toString()}
+                </span>
               </h2>
               <h2>
-                <span className="text-sky-900 text-lg">Transaction ID:</span>
+                <span className="text-indigo-900 text-lg">Transaction ID:</span>
                 <br /> {transactionData.transactionId}
               </h2>
             </div>
-            <div className="my-3">
-              <button
-                className="bg-sky-600 hover:bg-sky-900 text-white font-semibold py-2 px-4 rounded-lg mr-2"
-                onClick={copy}
-              >
-                Copy
-              </button>
-              <button
-                className="bg-sky-600 hover:bg-sky-900 text-white font-semibold py-2 px-4 rounded-lg"
-                onClick={download}
-              >
-                Download
-              </button>
+            <div className="m-3">
+              {type === "create" ? (
+                <button
+                  className="bg-indigo-600 hover:bg-indigo-900 text-white font-semibold py-2 px-4 rounded-lg mr-2"
+                  onClick={copy}
+                >
+                  Copy Topic ID
+                </button>
+              ) : (
+                <button
+                  className="bg-indigo-600 hover:bg-indigo-900 text-white font-semibold py-2 px-4 rounded-lg mr-2"
+                  onClick={copy}
+                >
+                  Copy
+                </button>
+              )}
+
+              {type === "create" ? (
+                <button
+                  className="bg-indigo-600 hover:bg-indigo-900 text-white font-semibold py-2 px-4 rounded-lg"
+                  onClick={download}
+                >
+                  Download Topic ID
+                </button>
+              ) : (
+                <button
+                  className="bg-indigo-600 hover:bg-indigo-900 text-white font-semibold py-2 px-4 rounded-lg"
+                  onClick={download}
+                >
+                  Download
+                </button>
+              )}
             </div>
           </div>
         </Modal>

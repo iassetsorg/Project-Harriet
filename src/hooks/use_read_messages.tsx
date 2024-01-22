@@ -1,8 +1,23 @@
+/**
+ * useReadMessages is a React custom hook that processes raw message data
+ * fetched from an API into a more usable format.
+ *
+ * It takes in an initial topic ID and boolean isNew to control fetching behavior.
+ *
+ * Returns an object with processed message info mapped by ID, loading state,
+ * a fetchMessages function, and next link for pagination.
+ *
+ * Internally it calls useGetData to fetch the raw messages. It processes the messages
+ * into MessageDetails objects containing useful metadata like comments, likes, etc.
+ *
+ * The processed MessageDetails are stored in state and updated when raw messages change.
+ */
 import { useState, useEffect, useCallback } from "react";
 import useGetData from "./use_get_data";
 
 // Define an interface for MessageInfo object
 export interface MessageDetails {
+  author: string;
   sequence_number: number;
   message: string;
   likes: number;
@@ -21,10 +36,13 @@ interface MessageInfo {
   [message_id: string]: MessageDetails;
 }
 
-const useReadMessages = (initialTopicId = "") => {
+const useReadMessages = (initialTopicId = "", isNew = false) => {
   // Destructure values from the custom hook useGetMessages
-  const { messages, loading, fetchMessages, nextLink } =
-    useGetData(initialTopicId);
+  const { messages, loading, fetchMessages, nextLink } = useGetData(
+    initialTopicId,
+    null,
+    isNew
+  );
 
   // State to store processed message information
   const [messagesInfo, setMessagesInfo] = useState<MessageInfo>({});
@@ -47,6 +65,7 @@ const useReadMessages = (initialTopicId = "") => {
 
       // Prepare the 'MessageDetails' data structure
       let messageDetails: MessageDetails = {
+        author: message.Author,
         sequence_number: message.sequence_number,
         message: message.Message,
         likes: 0,

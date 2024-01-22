@@ -6,7 +6,7 @@ import Modal from "../utils/modal";
 import { AiFillLike, AiFillDislike, AiFillMessage } from "react-icons/ai";
 import Spinner from "../utils/Spinner";
 // Main component to read and display messages
-function ReadMessagesManually() {
+function ReadThreadManually() {
   // State variables to manage the topic ID
   const [topicId, setTopicId] = useState<string>("");
   const [showComments, setShowComments] = useState<number | null>(null);
@@ -28,6 +28,15 @@ function ReadMessagesManually() {
     if (nextLink) {
       fetchMessages(nextLink);
     }
+  };
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setShowComments(null);
   };
 
   // Render the Component
@@ -65,24 +74,23 @@ function ReadMessagesManually() {
             try {
               // Render the main message and associated reactions and comments
               return (
-                <div
-                  key={idx}
-                  className="p-2 h-24 border rounded mb-4 bg-gray-300"
-                >
+                <div key={idx} className="p-4 border rounded mb-4 bg-gray-300">
                   {/* Display the message text */}
-                  <p>{messageDetails.message}</p>
+                  <p className="font-semibold mb-3">{messageDetails.author}</p>
+                  <p className="mb-3">{messageDetails.message}</p>
 
                   {/* Display like, dislike, and comment counts */}
-                  <div className="text-gray-600 flex ml-1 items-center text-lg">
+                  <div className="text-gray-600 flex ml-1 items-center text-lg mt-3">
                     <span>{messageDetails.likes}</span>{" "}
                     <AiFillLike className="mr-2" />
                     <span>{messageDetails.dislikes}</span>{" "}
                     <AiFillDislike className="mr-2" />
                     {messageDetails.commentsDetails && (
                       <button
-                        onClick={() =>
-                          handleShowComments(messageDetails.sequence_number)
-                        }
+                        onClick={() => {
+                          openModal();
+                          handleShowComments(messageDetails.sequence_number);
+                        }}
                         className="text-sky-900 flex items-center text-lg"
                       >
                         {messageDetails.comments}{" "}
@@ -100,7 +108,7 @@ function ReadMessagesManually() {
                   </div>
 
                   {showComments === messageDetails.sequence_number && (
-                    <Modal setShow={setShowComments}>
+                    <Modal isOpen={isModalOpen} onClose={closeModal}>
                       {messageDetails.commentsDetails.map(
                         (commentDetail, i) => (
                           <div
@@ -141,4 +149,4 @@ function ReadMessagesManually() {
   );
 }
 
-export default ReadMessagesManually;
+export default ReadThreadManually;

@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 interface Message {
   Identifier: string;
   message_id: any;
+  sender: string;
   Message: string;
   message: string;
   sequence_number: number;
@@ -15,6 +16,14 @@ interface Message {
   Thread?: string;
   Status?: string;
   Type?: string;
+  Name?: string;
+  Bio?: string;
+  Website?: string;
+  Location?: string;
+  Threads?: string;
+  Followings?: string;
+  Picture?: string;
+  Banner?: string;
 }
 
 // Function to decode a base64 string
@@ -23,7 +32,8 @@ const decodeBase64 = (base64String: string) => atob(base64String);
 // Custom React hook for fetching messages based on a topic ID or a link
 const useGetData = (
   initialTopicId = "",
-  initialNextLink: string | null = null
+  initialNextLink: string | null = null,
+  isNew = false
 ) => {
   // State variables to store messages, loading state, and the next link for pagination
   const [messages, setMessages] = useState<Message[]>([]);
@@ -44,7 +54,7 @@ const useGetData = (
         ? `https://mainnet-public.mirrornode.hedera.com${topicIdOrLink}`
         : `https://mainnet-public.mirrornode.hedera.com/api/v1/topics/${
             topicIdOrLink || initialTopicId
-          }/messages`;
+          }/messages${isNew ? "?order=desc" : ""}`;
 
     try {
       // Fetching data from the API
@@ -57,7 +67,9 @@ const useGetData = (
 
         // Mapping the raw message data to a more structured format
         const responseData = data.messages.map((message: any) => {
-          const decodedMessage = decodeBase64(message.message);
+          const decodedMessage = new TextDecoder("utf-8").decode(
+            Uint8Array.from(atob(message.message), (c) => c.charCodeAt(0))
+          );
           const {
             Message,
             Identifier,
@@ -68,10 +80,19 @@ const useGetData = (
             Thread,
             Status,
             Type,
+            Name,
+            Bio,
+            Website,
+            Location,
+            Threads,
+            Followings,
+            Picture,
+            Banner,
           } = JSON.parse(decodedMessage);
 
           return {
             message_id: message.consensus_timestamp,
+            sender: message.payer_account_id,
             Message,
             Identifier,
             Author,
@@ -81,6 +102,14 @@ const useGetData = (
             Thread,
             Status,
             Type,
+            Name,
+            Bio,
+            Website,
+            Location,
+            Threads,
+            Followings,
+            Picture,
+            Banner,
             sequence_number: message.sequence_number,
             message: decodedMessage,
           };

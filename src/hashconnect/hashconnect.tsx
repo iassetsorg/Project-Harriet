@@ -135,6 +135,7 @@ export default function HashConnectProvider({ children }: PropsWithChildren) {
   const disconnect = () => {
     hashconnect.disconnect(pairingData!.topic);
     setPairingData(null);
+    window.location.reload();
   };
 
   // Function to clear pairings and connections

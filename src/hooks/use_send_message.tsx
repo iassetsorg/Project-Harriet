@@ -1,3 +1,20 @@
+/**
+ * useSendMessage custom hook to send a message to a Hedera topic.
+ *
+ * Returns an object with a send() function and a sendMessageResponse state.
+ */
+/**
+ * Custom hook to send a message to a Hedera topic.
+ *
+ * Returns an object with a send() function and a sendMessageResponse state.
+ *
+ * The send() function takes a topicId, message object, and optional memo string.
+ * It constructs a TopicMessageSubmitTransaction, signs it, sends it via the HashConnect context,
+ * and handles the response.
+ *
+ * The sendMessageResponse state contains the transaction ID and receipt on success,
+ * or an error message on failure.
+ */
 // hooks/useSendMessage.tsx
 import { useState, useCallback } from "react";
 import { toast } from "react-toastify";
@@ -13,40 +30,12 @@ const useSendMessage = () => {
   const { makeBytes } = useSigningContext();
   const { sendTransaction, pairingData } = useHashConnectContext();
 
-  // Define state for response data
-  const [response, setResponse] = useState<null | {
-    transactionId: any;
-    receipt: TransactionReceipt;
-  }>(null);
-
   // Define send function
   const send = useCallback(
-    async (topicId: string, message: {}, memo: string, type: string) => {
+    async (topicId: string, message: {}, memo: string) => {
       const signingAccount = pairingData?.accountIds[0] || "";
-
-      if (!signingAccount) {
-        toast("Connect your wallet");
-        return;
-      }
-
-      if (!topicId) {
-        toast("Please enter a Thread ID");
-        return;
-      }
-
-      let messageObject;
-
-      if (type === "explore") {
-        // If type is explore
-        messageObject = {
-          Thread: message, // Set your desired explore message
-        };
-      } else {
-        messageObject = message;
-      }
-
       const transaction = new TopicMessageSubmitTransaction()
-        .setMessage(JSON.stringify(messageObject))
+        .setMessage(JSON.stringify(message))
         .setTopicId(topicId);
 
       if (memo && memo.trim() !== "") {
@@ -67,8 +56,7 @@ const useSendMessage = () => {
           receipt: TransactionReceipt.fromBytes(receiptBytes),
         };
 
-        setResponse(responseData);
-        toast(responseData.receipt.status.toString());
+        return responseData;
       } else {
         if (response.error) {
           toast.error(`${JSON.stringify(response.error)}`);
@@ -80,7 +68,7 @@ const useSendMessage = () => {
     [makeBytes, sendTransaction, pairingData]
   );
 
-  return { send, response };
+  return { send };
 };
 
 export default useSendMessage;
