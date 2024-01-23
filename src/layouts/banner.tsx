@@ -19,7 +19,7 @@ const Banner = () => {
       </a>
       <a
         href="https://iassets.org/upgrade/"
-        className="font-semibold py-1 px-2  text-gray-800 bg-indigo-300 rounded-xl hover:bg-indigo-400 transition duration-300"
+        className="font-semibold py-1 px-2 items-center  text-gray-800 bg-indigo-300 rounded-xl hover:bg-indigo-400 transition duration-300"
         target="blank"
       >
         BSC{">>"}HTS
