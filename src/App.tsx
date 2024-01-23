@@ -22,6 +22,7 @@ import Planet from "./components/planet_feed";
 import useGetProfileData from "./hooks/use_profile_data";
 import Profile from "./components/profile";
 import Threads from "./components/threads";
+import NotFoundPage from "./components/404";
 export default function App() {
   return (
     <main className="bg-gray-800">
@@ -42,6 +43,8 @@ export default function App() {
             <Route path="/Profile" element={<Profile />} />
             <Route path="/Threads/:topicId" element={<ReadSharedThread />} />
             <Route path="/Posts/:sequenceNumber" element={<ReadSharedPost />} />
+            <Route path="*" element={<NotFoundPage />} />{" "}
+            {/* Catch-all route */}
           </Routes>
         </div>
 
