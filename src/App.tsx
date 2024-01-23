@@ -26,7 +26,7 @@ import NotFoundPage from "./components/404";
 export default function App() {
   return (
     <main className="bg-gray-800">
-      <Router basename={process.env.PUBLIC_URL}>
+      <Router>
         <Banner />
         <Navbar />
         <div className="flex ">
