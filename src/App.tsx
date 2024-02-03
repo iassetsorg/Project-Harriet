@@ -27,7 +27,7 @@ export default function App() {
   return (
     <main className="bg-gray-800">
       <Router>
-        <Banner />
+        {/* <Banner /> */}
         <Navbar />
         <div className="flex ">
           <Sidebar />

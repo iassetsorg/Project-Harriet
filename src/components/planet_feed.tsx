@@ -3,6 +3,7 @@ import useGetData from "../hooks/use_get_data";
 import Spinner from "../utils/Spinner";
 import { FiShare2 } from "react-icons/fi";
 import { toast } from "react-toastify";
+import { BsCurrencyDollar } from "react-icons/bs";
 function Planet() {
   const planetTopicID = "0.0.4320596";
 
@@ -31,15 +32,27 @@ function Planet() {
   };
 
   return (
-    <div className="overflow-y-scroll w-full h-screen bg-gray-800 shadow-xl p-6 text-white">
+    <div className="overflow-y-scroll w-full h-screen bg-gray-800 shadow-xl p-6 text-white ">
       {loading && <Spinner />}
       {!loading &&
         messages.map((message, idx) => {
           if (message.Message) {
             return (
-              <div key={idx} className="p-4 border rounded mb-4 bg-gray-700">
+              <div
+                key={idx}
+                className="p-4 border border-indigo-300 rounded mb-4 bg-gray-700 overflow-y-auto "
+              >
                 <p className="text-sm mb-1 text-gray-400">{message.sender}</p>
-                <p className="mb-3 text-gray-300">{message.Message}</p>
+                <p className="mb-3 text-gray-300 whitespace-pre-line">
+                  {message.Message}
+                </p>
+                <button
+                  className="bg-gray-700 hover:bg-gray-600 text-gray-300  py-1 px-2 rounded-lg mt-2 ml-2 flex items-center"
+                  onClick={() => {}}
+                >
+                  <BsCurrencyDollar className="text-gray-300" />
+                </button>
+
                 <button
                   className="bg-gray-700 hover:bg-gray-600 text-gray-300  py-1 px-2 rounded-lg mt-2 ml-2 flex items-center"
                   onClick={() => {

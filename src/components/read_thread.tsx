@@ -55,12 +55,17 @@ function ReadThread({ topicId }: { topicId: string }) {
             try {
               // Render the main message and associated reactions and comments
               return (
-                <div key={idx} className="p-4 border rounded mb-4 bg-gray-700">
+                <div
+                  key={idx}
+                  className="p-4 border  border-indigo-300 rounded mb-4 bg-gray-700 overflow-y-auto"
+                >
                   {/* Display the message text */}
                   <p className="text-sm mb-1 text-gray-400">
                     {messageDetails.author}
                   </p>
-                  <p className="mb-3 text-gray-300">{messageDetails.message}</p>
+                  <p className="mb-3 text-gray-300 whitespace-pre-line">
+                    {messageDetails.message}
+                  </p>
 
                   {/* Render the Replay component for replies */}
                   <div className="flex items-center space-x-1">
@@ -110,7 +115,9 @@ function ReadThread({ topicId }: { topicId: string }) {
                             <p className="font-bold">
                               {commentDetail.author} said:
                             </p>
-                            <p>{commentDetail.message}</p>
+                            <p className="whitespace-pre-line">
+                              {commentDetail.message}
+                            </p>
                           </div>
                         )
                       )}

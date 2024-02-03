@@ -40,7 +40,7 @@ function ReadPost({ sequenceNumber }: { sequenceNumber: string }) {
   return (
     <div className="p-4 border border-gray-600 rounded bg-gray-700">
       <p className="text-sm mb-1 text-gray-400">{sender}</p>
-      <p className="mb-3 text-white">{message}</p>
+      <p className="mb-3 text-white whitespace-pre-line">{message}</p>
     </div>
   );
 }

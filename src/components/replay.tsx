@@ -3,6 +3,8 @@ import Modal from "../utils/modal";
 import { useHashConnectContext } from "../hashconnect/hashconnect";
 import useSendMessage from "../hooks/use_send_message";
 import { FiShare2 } from "react-icons/fi";
+
+import { BsCurrencyDollar } from "react-icons/bs";
 import Pair from "../hashconnect/pair";
 import {
   AiOutlineLike,
@@ -124,6 +126,16 @@ const Replay: React.FC<ReplayProps> = ({ sequenceNumber, topicId }) => {
         >
           <AiOutlineMessage className="text-sky-500" />
         </button>
+
+        <button
+          className="bg-gray-700 hover:bg-gray-600 text-gray-300  py-1 px-2 rounded-lg mt-2 ml-2 flex items-center"
+          onClick={() => {
+            copyShareLink();
+          }}
+        >
+          <BsCurrencyDollar className="text-gray-300" />
+        </button>
+
         <button
           className="bg-gray-700 hover:bg-gray-600 text-gray-300  py-1 px-2 rounded-lg mt-2 ml-2 flex items-center"
           onClick={() => {
