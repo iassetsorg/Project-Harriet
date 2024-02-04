@@ -72,6 +72,7 @@ function ReadThread({ topicId }: { topicId: string }) {
                     <Replay
                       sequenceNumber={messageDetails.sequence_number}
                       topicId={topicId}
+                      author={messageDetails.author}
                     />
                   </div>
 

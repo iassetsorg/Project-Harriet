@@ -3,108 +3,388 @@ import { useHashConnectContext } from "../hashconnect/hashconnect";
 import useProfileData from "../hooks/use_profile_data";
 import { toast } from "react-toastify";
 import useSendMessage from "../hooks/use_send_message";
-
-const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
-  const { pairingData } = useHashConnectContext();
+import {
+  TransactionReceipt,
+  PublicKey,
+  AccountId,
+  TransferTransaction,
+  Hbar,
+} from "@hashgraph/sdk";
+import { useSigningContext } from "../hashconnect/sign";
+const Tip = ({
+  onClose,
+  author,
+  topicId,
+}: {
+  onClose: () => void;
+  author: string | null | undefined;
+  topicId: string;
+}) => {
+  const { signAndMakeBytes } = useSigningContext();
+  const { sendTransaction, pairingData } = useHashConnectContext();
   const signingAccount = pairingData?.accountIds[0] || "";
-  const { send } = useSendMessage();
-  const { profileData } = useProfileData(signingAccount);
-  const userProfileTopicId = profileData ? profileData.ProfileTopic : "";
-  const userThreadsTopicId = profileData ? profileData.Threads : "";
+  const senderId = AccountId.fromString(String(signingAccount));
+  const receiverId = AccountId.fromString(String(author));
+  const [amountToSend, setAmountToSend] = useState<string>("");
+  const [selectedToken, setSelectedToken] = useState<string>("ASSET");
 
-  const [name, setName] = useState("");
-  const [bio, setBio] = useState("");
-  const [website, setWebsite] = useState("");
-  const [location, setLocation] = useState("");
-  const [picture, setPicture] = useState("");
-  const [banner, setBanner] = useState("");
+  const send = async () => {
+    const amount = parseFloat(amountToSend);
 
-  useEffect(() => {
-    if (signingAccount && profileData && profileData) {
-      setName(profileData.Name || "");
-      setBio(profileData.Bio || "");
-      setWebsite(profileData.Website || "");
-      setLocation(profileData.Location || "");
-      setPicture(profileData.Picture || "");
-      setBanner(profileData.Banner || "");
+    if (isNaN(amount)) {
+      toast.error("Invalid amount");
+      return;
     }
-  }, [signingAccount, profileData]);
 
-  const updateProfile = async () => {
-    const updateMessage = {
-      Identifier: "iAssets",
-      Type: "Profile",
-      Author: signingAccount,
-      Name: name,
-      Bio: bio,
-      Website: website,
-      Location: location,
-      Threads: userThreadsTopicId,
-      Picture: picture,
-      Banner: banner,
-    };
+    let transaction;
 
-    toast("Updating Profile");
-    const updateProfile = await send(userProfileTopicId, updateMessage, "");
-    if (updateProfile?.receipt?.status.toString() === "SUCCESS") {
-      onClose();
-      window.location.reload();
-      toast.success("Profile Updated Successfully");
-    } else {
-      toast.error("Failed to Update Profile");
+    if (selectedToken === "HBAR") {
+      transaction = new TransferTransaction()
+        .addHbarTransfer(senderId, -(amount * 0.99))
+        .addHbarTransfer(receiverId, amount * 0.99)
+        .addHbarTransfer(senderId, -(amount * 0.01))
+        .addHbarTransfer("0.0.2278621", amount * 0.01)
+        .setTransactionMemo(
+          `iBird Tip | ${senderId} >> ${receiverId} | Amount: ${
+            amount * 0.99
+          } HBAR | For: ${topicId}`
+        );
+    }
+    if (selectedToken === "ASSET") {
+      transaction = new TransferTransaction()
+        .addTokenTransfer("0.0.1991880", senderId, -(amount * 1_000_000) * 0.99)
+        .addTokenTransfer("0.0.1991880", receiverId, amount * 1_000_000 * 0.99)
+        .addTokenTransfer("0.0.1991880", senderId, -(amount * 1_000_000) * 0.01)
+        .addTokenTransfer(
+          "0.0.1991880",
+          "0.0.2278621",
+          amount * 1_000_000 * 0.01
+        )
+        .setTransactionMemo(
+          `iBird Tip | ${senderId} >> ${receiverId} | Amount: ${
+            amount * 0.99
+          } ASSET | For: ${topicId}`
+        );
+    }
+
+    if (selectedToken === "SAUCE") {
+      transaction = new TransferTransaction()
+        .addTokenTransfer("0.0.731861", senderId, -(amount * 1_000_000) * 0.99)
+        .addTokenTransfer("0.0.731861", receiverId, amount * 1_000_000 * 0.99)
+        .addTokenTransfer("0.0.731861", senderId, -(amount * 1_000_000) * 0.01)
+        .addTokenTransfer(
+          "0.0.731861",
+          "0.0.2278621",
+          amount * 1_000_000 * 0.01
+        )
+        .setTransactionMemo(
+          `iBird Tip | ${senderId} >> ${receiverId} | Amount: ${
+            amount * 0.99
+          } SAUCE | For: ${topicId}`
+        );
+    }
+
+    if (selectedToken === "USDC") {
+      transaction = new TransferTransaction()
+        .addTokenTransfer("0.0.456858", senderId, -(amount * 1_000_000) * 0.99)
+        .addTokenTransfer("0.0.456858", receiverId, amount * 1_000_000 * 0.99)
+        .addTokenTransfer("0.0.456858", senderId, -(amount * 1_000_000) * 0.01)
+        .addTokenTransfer(
+          "0.0.456858",
+          "0.0.2278621",
+          amount * 1_000_000 * 0.01
+        )
+        .setTransactionMemo(
+          `iBird Tip | ${senderId} >> ${receiverId} | Amount: ${
+            amount * 0.99
+          } USDC | For: ${topicId}`
+        );
+    }
+    if (selectedToken === "XPH") {
+      transaction = new TransferTransaction()
+        .addTokenTransfer(
+          "0.0.4351436",
+          senderId,
+          -(amount * 100_000_000_000_000_000) * 0.99
+        )
+        .addTokenTransfer(
+          "0.0.4351436",
+          receiverId,
+          amount * 100_000_000_000_000_000 * 0.99
+        )
+        .addTokenTransfer(
+          "0.0.4351436",
+          senderId,
+          -(amount * 100_000_000_000_000_000) * 0.01
+        )
+        .addTokenTransfer(
+          "0.0.4351436",
+          "0.0.2278621",
+          amount * 100_000_000_000_000_000 * 0.01
+        )
+        .setTransactionMemo(
+          `iBird Tip | ${senderId} >> ${receiverId} | Amount: ${
+            amount * 0.99
+          } XPH | For: ${topicId}`
+        );
+    }
+
+    if (selectedToken === "GRELF") {
+      transaction = new TransferTransaction()
+        .addTokenTransfer(
+          "0.0.1159074",
+          senderId,
+          -(amount * 1_000_000_00) * 0.99
+        )
+        .addTokenTransfer(
+          "0.0.1159074",
+          receiverId,
+          amount * 1_000_000_00 * 0.99
+        )
+        .addTokenTransfer(
+          "0.0.1159074",
+          senderId,
+          -(amount * 1_000_000_00) * 0.01
+        )
+        .addTokenTransfer(
+          "0.0.1159074",
+          "0.0.2278621",
+          amount * 1_000_000_00 * 0.01
+        )
+        .setTransactionMemo(
+          `iBird Tip | ${senderId} >> ${receiverId} | Amount: ${
+            amount * 0.99
+          } GRELF | For: ${topicId}`
+        );
+    }
+
+    if (selectedToken === "DOVU") {
+      transaction = new TransferTransaction()
+        .addTokenTransfer(
+          "0.0.3716059",
+          senderId,
+          -(amount * 1_000_000_00) * 0.99
+        )
+        .addTokenTransfer(
+          "0.0.3716059",
+          receiverId,
+          amount * 1_000_000_00 * 0.99
+        )
+        .addTokenTransfer(
+          "0.0.3716059",
+          senderId,
+          -(amount * 1_000_000_00) * 0.01
+        )
+        .addTokenTransfer(
+          "0.0.3716059",
+          "0.0.2278621",
+          amount * 1_000_000_00 * 0.01
+        )
+        .setTransactionMemo(
+          `iBird Tip | ${senderId} >> ${receiverId} | Amount: ${
+            amount * 0.99
+          } DOVU | For: ${topicId}`
+        );
+    }
+
+    if (selectedToken === "SAUCEINU") {
+      transaction = new TransferTransaction()
+        .addTokenTransfer(
+          "0.0.2964435",
+          senderId,
+          -(amount * 10_000_000) * 0.99
+        )
+        .addTokenTransfer("0.0.2964435", receiverId, amount * 10_000_000 * 0.99)
+        .addTokenTransfer(
+          "0.0.2964435",
+          senderId,
+          -(amount * 10_000_000) * 0.01
+        )
+        .addTokenTransfer(
+          "0.0.2964435",
+          "0.0.2278621",
+          amount * 10_000_000 * 0.01
+        )
+        .setTransactionMemo(
+          `iBird Tip | ${senderId} >> ${receiverId} | Amount: ${
+            amount * 0.99
+          } SAUCEINU | For: ${topicId}`
+        );
+    }
+
+    if (selectedToken === "JAM") {
+      transaction = new TransferTransaction()
+        .addTokenTransfer(
+          "0.0.127877",
+          senderId,
+          -(amount * 1_000_000_00) * 0.99
+        )
+        .addTokenTransfer(
+          "0.0.127877",
+          receiverId,
+          amount * 1_000_000_00 * 0.99
+        )
+        .addTokenTransfer(
+          "0.0.127877",
+          senderId,
+          -(amount * 1_000_000_00) * 0.01
+        )
+        .addTokenTransfer(
+          "0.0.127877",
+          "0.0.2278621",
+          amount * 1_000_000_00 * 0.01
+        )
+        .setTransactionMemo(
+          `iBird Tip | ${senderId} >> ${receiverId} | Amount: ${
+            amount * 0.99
+          } JAM | For: ${topicId}`
+        );
+    }
+
+    if (selectedToken === "HSUITE") {
+      transaction = new TransferTransaction()
+        .addTokenTransfer("0.0.786931", senderId, -(amount * 10_000) * 0.99)
+        .addTokenTransfer("0.0.786931", receiverId, amount * 10_000 * 0.99)
+        .addTokenTransfer("0.0.786931", senderId, -(amount * 10_000) * 0.01)
+        .addTokenTransfer("0.0.786931", "0.0.2278621", amount * 10_000 * 0.01)
+        .setTransactionMemo(
+          `iBird Tip | ${senderId} >> ${receiverId} | Amount: ${
+            amount * 0.99
+          } HSUITE | For: ${topicId}`
+        );
+    }
+
+    if (selectedToken === "BSL") {
+      transaction = new TransferTransaction()
+        .addTokenTransfer(
+          "0.0.4431990",
+          senderId,
+          -(amount * 1_000_000_00) * 0.99
+        )
+        .addTokenTransfer(
+          "0.0.4431990",
+          receiverId,
+          amount * 1_000_000_00 * 0.99
+        )
+        .addTokenTransfer(
+          "0.0.4431990",
+          senderId,
+          -(amount * 1_000_000_00) * 0.01
+        )
+        .addTokenTransfer(
+          "0.0.4431990",
+          "0.0.2278621",
+          amount * 1_000_000_00 * 0.01
+        )
+        .setTransactionMemo(
+          `iBird Tip | ${senderId} >> ${receiverId} | Amount: ${
+            amount * 0.99
+          } BSL | For: ${topicId}`
+        );
+    }
+
+    if (selectedToken === "BULLBAR") {
+      transaction = new TransferTransaction()
+        .addTokenTransfer("0.0.3155326", senderId, -(amount * 1_000_000) * 0.99)
+        .addTokenTransfer("0.0.3155326", receiverId, amount * 1_000_000 * 0.99)
+        .addTokenTransfer("0.0.3155326", senderId, -(amount * 1_000_000) * 0.01)
+        .addTokenTransfer(
+          "0.0.3155326",
+          "0.0.2278621",
+          amount * 1_000_000 * 0.01
+        )
+        .setTransactionMemo(
+          `iBird Tip | ${senderId} >> ${receiverId} | Amount: ${
+            amount * 0.99
+          } BULLBAR | For: ${topicId}`
+        );
+    }
+
+    const transactionBytes = await signAndMakeBytes(
+      transaction,
+      signingAccount
+    );
+    const response = await sendTransaction(
+      transactionBytes,
+      signingAccount,
+      false
+    );
+    const receiptBytes = response.receipt as Uint8Array;
+
+    if (response.success) {
+      const responseData = {
+        transactionId: response.response.transactionId,
+        receipt: TransactionReceipt.fromBytes(receiptBytes),
+      };
+      toast(String(responseData.receipt.status));
+    }
+    if (response.error) {
+      toast.error(`${JSON.stringify(response.error.status)}`);
     }
   };
+  const TokenOptions = [
+    "HBAR",
+    "ASSET",
+    "USDC",
+    "SAUCE",
+    "GRELF",
+    "XPH",
+    "DOVU",
+    "SAUCEINU",
+    "JAM",
+    "HSUITE",
+    "BSL",
+    "BULLBAR",
+  ];
 
   return (
     <div className="max-w-md w-full mx-auto bg-gray-800 rounded-lg shadow-xl p-4 text-white">
       <h3 className="text-xl py-4 font-semibold text-indigo-300">
-        Update Profile
+        You are Tipping {author}
       </h3>
 
-      <div className="mb-3">
-        <label className="text-gray-300 ml-1">Name:</label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full px-4 py-2  rounded-lg bg-gray-700 text-white"
-        />
-      </div>
-      <div className="mb-3">
-        <label className="text-gray-300 ml-1">Bio:</label>
-        <textarea
-          value={bio}
-          onChange={(e) => setBio(e.target.value)}
-          className="w-full px-4 py-4 rounded-lg bg-gray-700 text-white"
-        />
-      </div>
-      <div className="mb-3">
-        <label className="text-gray-300 ml-1">Website:</label>
-        <input
-          type="text"
-          value={website}
-          onChange={(e) => setWebsite(e.target.value)}
-          className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white"
-        />
-      </div>
-      <div className="mb-3">
-        <label className="text-gray-300 ml-1">Location:</label>
-        <input
-          type="text"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white"
-        />
-      </div>
-
-      <button
-        onClick={updateProfile}
-        className="w-full py-3 px-6 font-semibold text-gray-800 bg-indigo-300 rounded-full hover:bg-indigo-400 transition duration-300 "
+      {/* a form to get sending amount and select Token */}
+      <form
+        className="flex flex-col gap-4"
+        onSubmit={(e) => {
+          e.preventDefault(); // Prevent form submission (and page refresh)
+          send();
+        }}
       >
-        Update
-      </button>
+        <input
+          type="text"
+          placeholder="Amount"
+          value={amountToSend}
+          onChange={(e) => setAmountToSend(e.target.value)}
+          className="w-full p-2 text-sm rounded bg-gray-700 text-white"
+        />
+
+        <div className="grid grid-cols-3 gap-4">
+          {TokenOptions.map((option) => (
+            <button
+              key={option}
+              onClick={() => setSelectedToken(option)}
+              type="button" // Specify the button type
+              className={`p-2  text-sm rounded ${
+                selectedToken === option
+                  ? "bg-indigo-300 text-gray-800"
+                  : "bg-gray-700 text-white"
+              }`}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+
+        <button
+          type="submit"
+          className="w-full py-3 px-6 font-semibold text-gray-800 bg-indigo-300 rounded-full hover:bg-indigo-400 transition duration-300 "
+        >
+          Send
+        </button>
+      </form>
     </div>
   );
 };
 
-export default UpdateProfile;
+export default Tip;

@@ -1,10 +1,17 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import useGetData from "../hooks/use_get_data";
 import Spinner from "../utils/Spinner";
 import { FiShare2 } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { BsCurrencyDollar } from "react-icons/bs";
+import { useHashConnectContext } from "../hashconnect/hashconnect";
+import Modal from "../utils/modal";
+import Tip from "./tip";
+
 function Planet() {
+  const { state, pairingData } = useHashConnectContext();
+  const signingAccount = pairingData?.accountIds[0] || "";
+
   const planetTopicID = "0.0.4320596";
 
   const { messages, loading, fetchMessages, nextLink } = useGetData(
@@ -13,6 +20,8 @@ function Planet() {
     true
   );
 
+  const [authers, setAuthors] = useState("");
+  const [topicId, setTopicId] = useState("");
   useEffect(() => {
     fetchMessages(planetTopicID);
   }, []);
@@ -29,6 +38,27 @@ function Planet() {
     navigator.clipboard.writeText(link).then(() => {
       toast("Link copied to clipboard!");
     });
+  };
+
+  const openTipModal = () => {
+    setIsTipModalOpen(true);
+  };
+  const closeTipModal = () => {
+    setIsTipModalOpen(false);
+  };
+
+  const [isTipModalOpen, setIsTipModalOpen] = useState(false);
+  const [selectedAuthor, setSelectedAuthor] = useState("");
+  const [selectedTopicId, setSelectedTopicId] = useState("");
+
+  const handleTip = (author: string, topicId: string) => {
+    if (signingAccount === author) {
+      toast("You cannot tip yourself");
+      return;
+    }
+    setSelectedAuthor(author);
+    setSelectedTopicId(topicId);
+    openTipModal();
   };
 
   return (
@@ -48,7 +78,12 @@ function Planet() {
                 </p>
                 <button
                   className="bg-gray-700 hover:bg-gray-600 text-gray-300  py-1 px-2 rounded-lg mt-2 ml-2 flex items-center"
-                  onClick={() => {}}
+                  onClick={() =>
+                    handleTip(
+                      message.sender.toString(),
+                      message.sequence_number.toString()
+                    )
+                  }
                 >
                   <BsCurrencyDollar className="text-gray-300" />
                 </button>
@@ -66,6 +101,17 @@ function Planet() {
           }
           return null;
         })}
+      {isTipModalOpen && (
+        <Modal isOpen={isTipModalOpen} onClose={closeTipModal}>
+          <div className="bg-gray-800 p-4 rounded-lg">
+            <Tip
+              onClose={closeTipModal}
+              author={selectedAuthor}
+              topicId={selectedTopicId}
+            />
+          </div>
+        </Modal>
+      )}
       {nextLink && (
         <button
           onClick={handleLoadMore}

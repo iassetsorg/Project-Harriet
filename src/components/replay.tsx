@@ -3,7 +3,7 @@ import Modal from "../utils/modal";
 import { useHashConnectContext } from "../hashconnect/hashconnect";
 import useSendMessage from "../hooks/use_send_message";
 import { FiShare2 } from "react-icons/fi";
-
+import Tip from "./tip";
 import { BsCurrencyDollar } from "react-icons/bs";
 import Pair from "../hashconnect/pair";
 import {
@@ -15,9 +15,10 @@ import { toast } from "react-toastify";
 interface ReplayProps {
   sequenceNumber: number;
   topicId: string;
+  author?: string | null | undefined;
 }
 
-const Replay: React.FC<ReplayProps> = ({ sequenceNumber, topicId }) => {
+const Replay: React.FC<ReplayProps> = ({ sequenceNumber, topicId, author }) => {
   const { send } = useSendMessage();
   const { state, pairingData } = useHashConnectContext();
   const signingAccount = pairingData?.accountIds[0] || "";
@@ -95,6 +96,23 @@ const Replay: React.FC<ReplayProps> = ({ sequenceNumber, topicId }) => {
       toast("Link copied to clipboard!");
     });
   };
+
+  const [isTipModalOpen, setIsTipModalOpen] = useState(false);
+  const openTipModal = () => {
+    setIsTipModalOpen(true);
+  };
+  const closeTipModal = () => {
+    setIsTipModalOpen(false);
+  };
+
+  const handleTip = () => {
+    if (signingAccount === author) {
+      toast("You cannot tip yourself");
+      return;
+    }
+    openTipModal();
+  };
+
   return (
     <>
       <div className="flex">
@@ -130,7 +148,7 @@ const Replay: React.FC<ReplayProps> = ({ sequenceNumber, topicId }) => {
         <button
           className="bg-gray-700 hover:bg-gray-600 text-gray-300  py-1 px-2 rounded-lg mt-2 ml-2 flex items-center"
           onClick={() => {
-            copyShareLink();
+            handleTip();
           }}
         >
           <BsCurrencyDollar className="text-gray-300" />
@@ -168,6 +186,15 @@ const Replay: React.FC<ReplayProps> = ({ sequenceNumber, topicId }) => {
       {isConnectModalOpen && (
         <Modal isOpen={isConnectModalOpen} onClose={closeConnectModal}>
           <Pair />
+        </Modal>
+      )}
+
+      {/* Display comments in a modal if showComments is set to the current sequence number */}
+      {isTipModalOpen && (
+        <Modal isOpen={isTipModalOpen} onClose={closeTipModal}>
+          <div className="bg-gray-800 p-4 rounded-lg">
+            <Tip onClose={closeTipModal} author={author} topicId={topicId} />
+          </div>
         </Modal>
       )}
     </>
