@@ -76,26 +76,28 @@ function Planet() {
                 <p className="mb-3 text-gray-300 whitespace-pre-line">
                   {message.Message}
                 </p>
-                <button
-                  className="bg-gray-700 hover:bg-gray-600 text-gray-300  py-1 px-2 rounded-lg mt-2 ml-2 flex items-center"
-                  onClick={() =>
-                    handleTip(
-                      message.sender.toString(),
-                      message.sequence_number.toString()
-                    )
-                  }
-                >
-                  <BsCurrencyDollar className="text-gray-300" />
-                </button>
+                <div className="flex items-center">
+                  <button
+                    className="bg-gray-700 hover:bg-gray-600 text-gray-300  py-1 px-1 rounded-lg mt-2 ml-2 flex items-center"
+                    onClick={() =>
+                      handleTip(
+                        message.sender.toString(),
+                        message.sequence_number.toString()
+                      )
+                    }
+                  >
+                    <BsCurrencyDollar className="text-gray-300" />
+                  </button>
 
-                <button
-                  className="bg-gray-700 hover:bg-gray-600 text-gray-300  py-1 px-2 rounded-lg mt-2 ml-2 flex items-center"
-                  onClick={() => {
-                    copyShareLink(message.sequence_number.toString());
-                  }}
-                >
-                  <FiShare2 className="text-gray-300" />
-                </button>
+                  <button
+                    className="bg-gray-700 hover:bg-gray-600 text-gray-300  py-1 px-1 rounded-lg mt-2 ml-2 flex items-center"
+                    onClick={() => {
+                      copyShareLink(message.sequence_number.toString());
+                    }}
+                  >
+                    <FiShare2 className="text-gray-300" />
+                  </button>
+                </div>
               </div>
             );
           }
