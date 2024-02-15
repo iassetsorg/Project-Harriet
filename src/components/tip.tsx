@@ -52,14 +52,10 @@ const Tip = ({
     }
     if (selectedToken === "ASSET") {
       transaction = new TransferTransaction()
-        .addTokenTransfer("0.0.1991880", senderId, -(amount * 1_000_000) * 0.99)
-        .addTokenTransfer("0.0.1991880", receiverId, amount * 1_000_000 * 0.99)
-        .addTokenTransfer("0.0.1991880", senderId, -(amount * 1_000_000) * 0.01)
-        .addTokenTransfer(
-          "0.0.1991880",
-          "0.0.2278621",
-          amount * 1_000_000 * 0.01
-        )
+        .addTokenTransfer("0.0.1991880", senderId, -(amount * 1000000) * 0.99)
+        .addTokenTransfer("0.0.1991880", receiverId, amount * 1000000 * 0.99)
+        .addTokenTransfer("0.0.1991880", senderId, -(amount * 1000000) * 0.01)
+        .addTokenTransfer("0.0.1991880", "0.0.2278621", amount * 1000000 * 0.01)
         .setTransactionMemo(
           `iBird Tip | ${senderId} >> ${receiverId} | Amount: ${
             amount * 0.99
@@ -69,14 +65,10 @@ const Tip = ({
 
     if (selectedToken === "SAUCE") {
       transaction = new TransferTransaction()
-        .addTokenTransfer("0.0.731861", senderId, -(amount * 1_000_000) * 0.99)
-        .addTokenTransfer("0.0.731861", receiverId, amount * 1_000_000 * 0.99)
-        .addTokenTransfer("0.0.731861", senderId, -(amount * 1_000_000) * 0.01)
-        .addTokenTransfer(
-          "0.0.731861",
-          "0.0.2278621",
-          amount * 1_000_000 * 0.01
-        )
+        .addTokenTransfer("0.0.731861", senderId, -(amount * 1000000) * 0.99)
+        .addTokenTransfer("0.0.731861", receiverId, amount * 1000000 * 0.99)
+        .addTokenTransfer("0.0.731861", senderId, -(amount * 1000000) * 0.01)
+        .addTokenTransfer("0.0.731861", "0.0.2278621", amount * 1000000 * 0.01)
         .setTransactionMemo(
           `iBird Tip | ${senderId} >> ${receiverId} | Amount: ${
             amount * 0.99
@@ -86,14 +78,10 @@ const Tip = ({
 
     if (selectedToken === "USDC") {
       transaction = new TransferTransaction()
-        .addTokenTransfer("0.0.456858", senderId, -(amount * 1_000_000) * 0.99)
-        .addTokenTransfer("0.0.456858", receiverId, amount * 1_000_000 * 0.99)
-        .addTokenTransfer("0.0.456858", senderId, -(amount * 1_000_000) * 0.01)
-        .addTokenTransfer(
-          "0.0.456858",
-          "0.0.2278621",
-          amount * 1_000_000 * 0.01
-        )
+        .addTokenTransfer("0.0.456858", senderId, -(amount * 1000000) * 0.99)
+        .addTokenTransfer("0.0.456858", receiverId, amount * 1000000 * 0.99)
+        .addTokenTransfer("0.0.456858", senderId, -(amount * 1000000) * 0.01)
+        .addTokenTransfer("0.0.456858", "0.0.2278621", amount * 1000000 * 0.01)
         .setTransactionMemo(
           `iBird Tip | ${senderId} >> ${receiverId} | Amount: ${
             amount * 0.99
@@ -105,22 +93,22 @@ const Tip = ({
         .addTokenTransfer(
           "0.0.4351436",
           senderId,
-          -(amount * 100_000_000_000_000_000) * 0.99
+          -(amount * 100000000000000000) * 0.99
         )
         .addTokenTransfer(
           "0.0.4351436",
           receiverId,
-          amount * 100_000_000_000_000_000 * 0.99
+          amount * 100000000000000000 * 0.99
         )
         .addTokenTransfer(
           "0.0.4351436",
           senderId,
-          -(amount * 100_000_000_000_000_000) * 0.01
+          -(amount * 100000000000000000) * 0.01
         )
         .addTokenTransfer(
           "0.0.4351436",
           "0.0.2278621",
-          amount * 100_000_000_000_000_000 * 0.01
+          amount * 100000000000000000 * 0.01
         )
         .setTransactionMemo(
           `iBird Tip | ${senderId} >> ${receiverId} | Amount: ${
@@ -131,25 +119,13 @@ const Tip = ({
 
     if (selectedToken === "GRELF") {
       transaction = new TransferTransaction()
-        .addTokenTransfer(
-          "0.0.1159074",
-          senderId,
-          -(amount * 1_000_000_00) * 0.99
-        )
-        .addTokenTransfer(
-          "0.0.1159074",
-          receiverId,
-          amount * 1_000_000_00 * 0.99
-        )
-        .addTokenTransfer(
-          "0.0.1159074",
-          senderId,
-          -(amount * 1_000_000_00) * 0.01
-        )
+        .addTokenTransfer("0.0.1159074", senderId, -(amount * 100000000) * 0.99)
+        .addTokenTransfer("0.0.1159074", receiverId, amount * 100000000 * 0.99)
+        .addTokenTransfer("0.0.1159074", senderId, -(amount * 100000000) * 0.01)
         .addTokenTransfer(
           "0.0.1159074",
           "0.0.2278621",
-          amount * 1_000_000_00 * 0.01
+          amount * 100000000 * 0.01
         )
         .setTransactionMemo(
           `iBird Tip | ${senderId} >> ${receiverId} | Amount: ${
@@ -160,25 +136,13 @@ const Tip = ({
 
     if (selectedToken === "DOVU") {
       transaction = new TransferTransaction()
-        .addTokenTransfer(
-          "0.0.3716059",
-          senderId,
-          -(amount * 1_000_000_00) * 0.99
-        )
-        .addTokenTransfer(
-          "0.0.3716059",
-          receiverId,
-          amount * 1_000_000_00 * 0.99
-        )
-        .addTokenTransfer(
-          "0.0.3716059",
-          senderId,
-          -(amount * 1_000_000_00) * 0.01
-        )
+        .addTokenTransfer("0.0.3716059", senderId, -(amount * 100000000) * 0.99)
+        .addTokenTransfer("0.0.3716059", receiverId, amount * 100000000 * 0.99)
+        .addTokenTransfer("0.0.3716059", senderId, -(amount * 100000000) * 0.01)
         .addTokenTransfer(
           "0.0.3716059",
           "0.0.2278621",
-          amount * 1_000_000_00 * 0.01
+          amount * 100000000 * 0.01
         )
         .setTransactionMemo(
           `iBird Tip | ${senderId} >> ${receiverId} | Amount: ${
@@ -189,21 +153,13 @@ const Tip = ({
 
     if (selectedToken === "SAUCEINU") {
       transaction = new TransferTransaction()
-        .addTokenTransfer(
-          "0.0.2964435",
-          senderId,
-          -(amount * 10_000_000) * 0.99
-        )
-        .addTokenTransfer("0.0.2964435", receiverId, amount * 10_000_000 * 0.99)
-        .addTokenTransfer(
-          "0.0.2964435",
-          senderId,
-          -(amount * 10_000_000) * 0.01
-        )
+        .addTokenTransfer("0.0.2964435", senderId, -(amount * 10000000) * 0.99)
+        .addTokenTransfer("0.0.2964435", receiverId, amount * 10000000 * 0.99)
+        .addTokenTransfer("0.0.2964435", senderId, -(amount * 10000000) * 0.01)
         .addTokenTransfer(
           "0.0.2964435",
           "0.0.2278621",
-          amount * 10_000_000 * 0.01
+          amount * 10000000 * 0.01
         )
         .setTransactionMemo(
           `iBird Tip | ${senderId} >> ${receiverId} | Amount: ${
@@ -214,16 +170,8 @@ const Tip = ({
 
     if (selectedToken === "JAM") {
       transaction = new TransferTransaction()
-        .addTokenTransfer(
-          "0.0.127877",
-          senderId,
-          -(amount * 1_000_000_00) * 0.99
-        )
-        .addTokenTransfer(
-          "0.0.127877",
-          receiverId,
-          amount * 1_000_000_00 * 0.99
-        )
+        .addTokenTransfer("0.0.127877", senderId, -(amount * 100000000) * 0.99)
+        .addTokenTransfer("0.0.127877", receiverId, amount * 1000000_00 * 0.99)
         .addTokenTransfer(
           "0.0.127877",
           senderId,
@@ -259,22 +207,14 @@ const Tip = ({
         .addTokenTransfer(
           "0.0.4431990",
           senderId,
-          -(amount * 1_000_000_00) * 0.99
+          -(amount * 1_000_00000) * 0.99
         )
-        .addTokenTransfer(
-          "0.0.4431990",
-          receiverId,
-          amount * 1_000_000_00 * 0.99
-        )
-        .addTokenTransfer(
-          "0.0.4431990",
-          senderId,
-          -(amount * 1_000_000_00) * 0.01
-        )
+        .addTokenTransfer("0.0.4431990", receiverId, amount * 100000000 * 0.99)
+        .addTokenTransfer("0.0.4431990", senderId, -(amount * 100000000) * 0.01)
         .addTokenTransfer(
           "0.0.4431990",
           "0.0.2278621",
-          amount * 1_000_000_00 * 0.01
+          amount * 100000000 * 0.01
         )
         .setTransactionMemo(
           `iBird Tip | ${senderId} >> ${receiverId} | Amount: ${
@@ -285,14 +225,10 @@ const Tip = ({
 
     if (selectedToken === "BULLBAR") {
       transaction = new TransferTransaction()
-        .addTokenTransfer("0.0.3155326", senderId, -(amount * 1_000_000) * 0.99)
-        .addTokenTransfer("0.0.3155326", receiverId, amount * 1_000_000 * 0.99)
-        .addTokenTransfer("0.0.3155326", senderId, -(amount * 1_000_000) * 0.01)
-        .addTokenTransfer(
-          "0.0.3155326",
-          "0.0.2278621",
-          amount * 1_000_000 * 0.01
-        )
+        .addTokenTransfer("0.0.3155326", senderId, -(amount * 1000000) * 0.99)
+        .addTokenTransfer("0.0.3155326", receiverId, amount * 1000000 * 0.99)
+        .addTokenTransfer("0.0.3155326", senderId, -(amount * 1000000) * 0.01)
+        .addTokenTransfer("0.0.3155326", "0.0.2278621", amount * 1000000 * 0.01)
         .setTransactionMemo(
           `iBird Tip | ${senderId} >> ${receiverId} | Amount: ${
             amount * 0.99

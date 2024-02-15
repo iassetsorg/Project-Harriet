@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 
 // Defining the structure of the Message interface
 interface Message {
+  Media: string;
   Identifier: string;
   message_id: any;
   sender: string;
@@ -72,6 +73,7 @@ const useGetData = (
           );
           const {
             Message,
+            Media,
             Identifier,
             Author,
             Like_to,
@@ -94,6 +96,7 @@ const useGetData = (
             message_id: message.consensus_timestamp,
             sender: message.payer_account_id,
             Message,
+            Media,
             Identifier,
             Author,
             Like_to,

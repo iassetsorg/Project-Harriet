@@ -110,6 +110,10 @@ const Replay: React.FC<ReplayProps> = ({ sequenceNumber, topicId, author }) => {
       toast("You cannot tip yourself");
       return;
     }
+    if (state !== "Paired") {
+      openConnectModal();
+      return;
+    }
     openTipModal();
   };
 

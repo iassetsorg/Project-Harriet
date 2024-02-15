@@ -23,6 +23,7 @@ const SendMessages = () => {
     const Message = {
       Author: signingAccount,
       Message: message,
+      
     };
     // Call the send function p rovided by the hook
     await send(topicId, Message, memo);

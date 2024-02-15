@@ -52,9 +52,9 @@ const Navbar = () => {
         </div>
         <button
           onClick={openTradeModal}
-          className=" font-semibold ml-auto py-1 px-2 text-gray-800 bg-indigo-300 rounded-xl hover:bg-indigo-400 transition duration-300"
+          className=" font-semibold ml-auto p-1 text-gray-800 bg-indigo-300 rounded-xl hover:bg-indigo-400 transition duration-300"
         >
-          <RiMoneyDollarCircleLine className="text-3xl " />
+          <RiMoneyDollarCircleLine className="text-2xl " />
         </button>
         {state !== "Paired" && (
           <button

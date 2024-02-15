@@ -4,11 +4,15 @@ import { useHashConnectContext } from "../hashconnect/hashconnect";
 import Threads from "./threads";
 import { CiLocationOn } from "react-icons/ci";
 import { IoIosInformationCircleOutline } from "react-icons/io";
+import { FaGear } from "react-icons/fa6";
 import { AiFillEdit } from "react-icons/ai";
+import { MdOutlinePermMedia } from "react-icons/md";
 import CreateProfile from "./create_profile";
 import UpdateProfile from "./update_profile";
 import Modal from "../utils/modal";
-
+import IpfsSettings from "./ipfs_settings";
+import useUploadToIPFS from "../hooks/use_upload_to_ipfs";
+import UploadToIPFS from "./upload_to_ipfs";
 const Profile: React.FC = () => {
   const { state, pairingData, disconnect } = useHashConnectContext();
   const signingAccount = pairingData?.accountIds[0] || "";
@@ -19,12 +23,18 @@ const Profile: React.FC = () => {
   const [isUpdateProfileModalOpen, setIsUpdateProfileModalOpen] =
     useState(false);
 
+  const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
+
   const closeCreateProfileModal = () => {
     setIsCreateProfileModalOpen(false);
   };
 
   const closeUpdateProfileModal = () => {
     setIsUpdateProfileModalOpen(false);
+  };
+
+  const closeMediaModal = () => {
+    setIsMediaModalOpen(false);
   };
 
   useEffect(() => {
@@ -66,6 +76,12 @@ const Profile: React.FC = () => {
 
             <button
               className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
+              onClick={() => setIsMediaModalOpen(true)}
+            >
+              <MdOutlinePermMedia className="text-xl text-gray-300" />
+            </button>
+            <button
+              className="absolute top-4 right-12 text-gray-600 hover:text-gray-800"
               onClick={() => setIsUpdateProfileModalOpen(true)}
             >
               <AiFillEdit className="text-xl text-gray-300" />
@@ -138,6 +154,12 @@ const Profile: React.FC = () => {
             onClose={closeUpdateProfileModal}
           >
             <UpdateProfile onClose={closeUpdateProfileModal} />
+          </Modal>
+        )}
+        {isMediaModalOpen && (
+          <Modal isOpen={isMediaModalOpen} onClose={closeMediaModal}>
+            <IpfsSettings onClose={closeMediaModal} />
+            {/* <UploadToIPFS /> */}
           </Modal>
         )}
       </div>

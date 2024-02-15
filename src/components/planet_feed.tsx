@@ -7,7 +7,8 @@ import { BsCurrencyDollar } from "react-icons/bs";
 import { useHashConnectContext } from "../hashconnect/hashconnect";
 import Modal from "../utils/modal";
 import Tip from "./tip";
-
+import Pair from "../hashconnect/pair";
+import ReadIPFSData from "./read_ipfs_data";
 function Planet() {
   const { state, pairingData } = useHashConnectContext();
   const signingAccount = pairingData?.accountIds[0] || "";
@@ -19,6 +20,14 @@ function Planet() {
     null,
     true
   );
+
+  const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
+  const openConnectModal = () => {
+    setIsConnectModalOpen(true);
+  };
+  const closeConnectModal = () => {
+    setIsConnectModalOpen(false);
+  };
 
   const [authers, setAuthors] = useState("");
   const [topicId, setTopicId] = useState("");
@@ -52,6 +61,10 @@ function Planet() {
   const [selectedTopicId, setSelectedTopicId] = useState("");
 
   const handleTip = (author: string, topicId: string) => {
+    if (state !== "Paired") {
+      openConnectModal();
+      return;
+    }
     if (signingAccount === author) {
       toast("You cannot tip yourself");
       return;
@@ -76,6 +89,10 @@ function Planet() {
                 <p className="mb-3 text-gray-300 whitespace-pre-line">
                   {message.Message}
                 </p>
+                <div className="flex items-center md:w-1/6 md:justify-start w-full">
+                  {message.Media && <ReadIPFSData cid={message.Media} />}
+                </div>
+
                 <div className="flex items-center">
                   <button
                     className="bg-gray-700 hover:bg-gray-600 text-gray-300  py-1 px-1 rounded-lg mt-2 ml-2 flex items-center"
@@ -103,6 +120,12 @@ function Planet() {
           }
           return null;
         })}
+      {isConnectModalOpen && (
+        <Modal isOpen={isConnectModalOpen} onClose={closeConnectModal}>
+          <Pair />
+        </Modal>
+      )}
+
       {isTipModalOpen && (
         <Modal isOpen={isTipModalOpen} onClose={closeTipModal}>
           <div className="bg-gray-800 p-4 rounded-lg">
