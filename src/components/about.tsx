@@ -178,8 +178,18 @@ const About: React.FC = () => (
             <span>⏳</span> v0.0.6 Tipping Support
           </h3>
           <ul>
-            <li>🟡 Tip HBAR</li>
-            <li>🟡 Tip ASSET</li>
+            <li>🟢 Tip HBAR</li>
+            <li>🟢 Tip ASSET</li>
+            <li>🟢 Tip USDC</li>
+            <li>🟢 Tip SAUCE</li>
+            <li>🟢 Tip GRELF</li>
+            <li>🟢 Tip XPH</li>
+            <li>🟢 Tip DOVU</li>
+            <li>🟢 Tip SAUCEINU</li>
+            <li>🟢 Tip JAM</li>
+            <li>🟢 Tip HSUITE</li>
+            <li>🟢 Tip BSL</li>
+            <li>🟢 Tip BULLBAR</li>
           </ul>
         </div>
 
