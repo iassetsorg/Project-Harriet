@@ -236,6 +236,57 @@ const Tip = ({
         );
     }
 
+    if (selectedToken === "MFM") {
+      transaction = new TransferTransaction()
+        .addTokenTransfer("0.0.4599983", senderId, -(amount * 100000000) * 0.99)
+        .addTokenTransfer("0.0.4599983", receiverId, amount * 100000000 * 0.99)
+        .addTokenTransfer("0.0.4599983", senderId, -(amount * 100000000) * 0.01)
+        .addTokenTransfer(
+          "0.0.4599983",
+          "0.0.2278621",
+          amount * 100000000 * 0.01
+        )
+        .setTransactionMemo(
+          `iBird Tip | ${senderId} >> ${receiverId} | Amount: ${
+            amount * 0.99
+          } MFM | For: ${topicId}`
+        );
+    }
+
+    if (selectedToken === "NARDOGE") {
+      transaction = new TransferTransaction()
+        .addTokenTransfer("0.0.4562198", senderId, -(amount * 100000000) * 0.99)
+        .addTokenTransfer("0.0.4562198", receiverId, amount * 100000000 * 0.99)
+        .addTokenTransfer("0.0.4562198", senderId, -(amount * 100000000) * 0.01)
+        .addTokenTransfer(
+          "0.0.4562198",
+          "0.0.2278621",
+          amount * 100000000 * 0.01
+        )
+        .setTransactionMemo(
+          `iBird Tip | ${senderId} >> ${receiverId} | Amount: ${
+            amount * 0.99
+          } NARDOGE | For: ${topicId}`
+        );
+    }
+
+    if (selectedToken === "KARATE") {
+      transaction = new TransferTransaction()
+        .addTokenTransfer("0.0.2283230", senderId, -(amount * 100000000) * 0.99)
+        .addTokenTransfer("0.0.2283230", receiverId, amount * 100000000 * 0.99)
+        .addTokenTransfer("0.0.2283230", senderId, -(amount * 100000000) * 0.01)
+        .addTokenTransfer(
+          "0.0.2283230",
+          "0.0.2278621",
+          amount * 100000000 * 0.01
+        )
+        .setTransactionMemo(
+          `iBird Tip | ${senderId} >> ${receiverId} | Amount: ${
+            amount * 0.99
+          } KARATE | For: ${topicId}`
+        );
+    }
+
     const transactionBytes = await signAndMakeBytes(
       transaction,
       signingAccount
@@ -271,6 +322,9 @@ const Tip = ({
     "HSUITE",
     "BSL",
     "BULLBAR",
+    "MFM",
+    "NARDOGE",
+    "KARATE",
   ];
 
   return (
