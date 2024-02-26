@@ -8,6 +8,16 @@ import useSendMessage from "../hooks/use_send_message";
 import useCreateTopic from "../hooks/use_create_topic";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { MdFileDownloadDone } from "react-icons/md";
+import useUploadToIPFS from "../hooks/use_upload_to_ipfs";
+import { MdOutlinePermMedia } from "react-icons/md";
+import { FiDelete } from "react-icons/fi";
+
+interface Message {
+  Author: string;
+  Message: string;
+  Media?: string | null;
+}
+
 // Component for Creating a Topic
 const CreateThread = ({ onClose }: { onClose: () => void }) => {
   const [message, setMessage] = useState("");
@@ -26,6 +36,10 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
   const [isBreak, setIsBreak] = useState(false);
   const [currentStepStatus, setCurrentStepStatus] = useState(0);
   const isBreakRef = useRef(false);
+
+  const [file, setFile] = useState<File | null>(null);
+  const maxSize = 100 * 1024 * 1024; // 100 MB
+  const { uploadToNFTStorage, uploading, ipfsHash, error } = useUploadToIPFS();
   ////////////////////////////////STEPS//////////////////////////////////////
   let currentStep = 0;
   let topic = "";
@@ -48,7 +62,16 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
     // Additional logic if needed when breaking the process
   };
 
+  const clearFile = () => {
+    setFile(null);
+  };
   const createThread = async () => {
+    if (!message) {
+      toast("Please enter a message");
+      setIsBreak(true);
+      return;
+    }
+
     setIsProcess(true);
     isBreakRef.current = false;
 
@@ -56,9 +79,9 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
       if (isBreak) {
         break;
       }
-      // ======================STEP 1======================
+
       // Creating Thread Topic
-      // ======================STEP 1======================
+
       if (currentStep === 0) {
         if (isBreakRef.current) {
           toast("Process Cancelled");
@@ -76,9 +99,8 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
 
         toast("Thread Created, Step:" + currentStep);
       }
-      // ======================STEP 2======================
+
       // Sending Initiating Thread Message
-      // ======================STEP 2======================
       if (currentStep === 1) {
         if (isBreakRef.current) {
           toast("Process Cancelled");
@@ -98,9 +120,8 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
           toast("Thread Initiated, Step:" + currentStep);
         }
       }
-      // ======================STEP 3======================
+
       // Publishing on Explore
-      // ======================STEP 3======================
       if (currentStep === 2) {
         if (isBreakRef.current) {
           toast("Process Cancelled");
@@ -126,9 +147,8 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
           }
         }
       }
-      // ======================STEP 4======================
+
       // Adding To Profile
-      // ======================STEP 4======================
       if (currentStep === 3) {
         if (isBreakRef.current) {
           toast("Process Cancelled");
@@ -148,18 +168,42 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
           }
         }
       }
-      // ======================STEP 5======================
+
       // Sending Message
-      // ======================STEP 5======================
       if (currentStep === 4) {
         if (isBreakRef.current) {
           toast("Process Cancelled");
           setIsProcess(false);
           break;
         }
-        const Message = {
+        // Check if there is a file to upload
+        if (file && file.size > maxSize) {
+          toast.error("The file exceeds 100MB.");
+          setIsProcess(false);
+          return;
+        }
+
+        let uploadedMediaHash = null;
+        // Proceed with file upload if a file is selected
+        if (file) {
+          try {
+            setIsProcess(true); // Indicate uploading process
+            uploadedMediaHash = await uploadToNFTStorage(file);
+            if (!uploadedMediaHash) {
+              throw new Error("Failed to upload media to IPFS.");
+            }
+            setIsProcess(false); // End uploading indication
+          } catch (error) {
+            toast.error("Media upload failed. Try again.");
+            setIsProcess(false);
+            return;
+          }
+        }
+
+        let Message: Message = {
           Author: signingAccount,
           Message: message,
+          Media: uploadedMediaHash || null,
         };
 
         const sendingMessage = await send(topic, Message, memo);
@@ -167,6 +211,7 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
           currentStep++;
           setCurrentStepStatus(5);
           onClose();
+          window.location.reload();
           toast("Message Sent to Profile, Step:" + currentStep);
         }
       }
@@ -175,13 +220,13 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
   // Function to retry the current step
 
   return (
-    <div className="max-w-md w-full mx-auto bg-gray-700 rounded-lg shadow-xl p-3 text-white border-2 border-gray-500 ">
+    <div className="modal-content max-w-md mx-auto bg-gray-800 rounded-lg shadow-xl p-3 text-white">
       {!isProcess ? (
         <>
           <h3 className="text-xl py-4 px-8 font-semibold text-indigo-300">
             Create a Thread
           </h3>
-          <section className="py-4 px-8">
+          <section className="py-4 px-8 ">
             <label
               htmlFor="messageContent"
               className="block text-sm font-semibold text-gray-300"
@@ -190,7 +235,7 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
             </label>
             <div className="mt-2">
               <textarea
-                className="w-full px-4 py-2 h-24 rounded-lg border-2 border-gray-500  text-base bg-gray-800"
+                className="w-full h-48 px-4 py-2 rounded-lg text-base bg-gray-700 text-white"
                 name="messageContent"
                 id="messageContent"
                 value={message}
@@ -198,7 +243,43 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
               />
             </div>
           </section>
-          <section className="py-4 px-8">
+          <section>
+            {!file && (
+              <label
+                htmlFor="fileUpload"
+                className="cursor-pointer flex items-center justify-center p-4 mx-4 border-2 border-dashed mb-3"
+              >
+                <input
+                  type="file"
+                  id="fileUpload"
+                  style={{ display: "none" }}
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      setFile(e.target.files[0]);
+                    }
+                  }}
+                />
+                <MdOutlinePermMedia className="text-xl" />
+                <span>Add Media</span>
+              </label>
+            )}
+
+            {file && (
+              <div className="flex justify-center items-center p-4">
+                <img
+                  src={URL.createObjectURL(file)}
+                  alt="Selected File"
+                  className="w-24 h-24 object-cover mr-4"
+                />
+                <FiDelete
+                  className="text-2xl hover:cursor-pointer"
+                  onClick={clearFile}
+                />
+              </div>
+            )}
+            {uploading && <p>Uploading Media to IPFS...</p>}
+          </section>
+          {/* <section className="py-4 px-8">
             <label
               htmlFor="messageMemo"
               className="block text-sm font-semibold text-gray-300"
@@ -215,8 +296,8 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
                 onChange={(e) => setMemo(e.target.value)}
               />
             </div>
-          </section>
-          <div className="py-2 px-8 ">
+          </section> */}
+          {/* <div className="py-2 px-8 ">
             <label className="flex items-center text-sm font-semibold text-gray-300">
               <input
                 type="checkbox"
@@ -248,12 +329,12 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
               />
               <span className="ml-3">Publish on Explorer</span>
             </label>
-          </div>
+          </div> */}
           <button
             onClick={() => createThread()}
             className="w-full p-3  text-gray-800 bg-indigo-300 rounded-full hover:bg-indigo-400 transition duration-300 py-3 px-6 "
           >
-            Create
+            Create Thread
           </button>
         </>
       ) : (

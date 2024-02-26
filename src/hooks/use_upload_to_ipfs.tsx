@@ -7,25 +7,20 @@ const useUploadToIPFS = () => {
   const [error, setError] = useState<string | null>(null);
   const [ipfsHash, setIpfsHash] = useState<string | null>(null);
 
-  let hash = null;
-
   const uploadToNFTStorage = useCallback(async (file: File) => {
     try {
       setUploading(true);
       setProgress(0);
-
       const ipfsKey = localStorage.getItem("ipfsKey");
-
       if (!ipfsKey) {
         throw new Error(
           "IPFS key not found. Please set the key in local storage."
         );
       }
-
       const config = {
         headers: {
           Authorization: `Bearer ${ipfsKey}`,
-          "Content-Type": file.type, // or you can hardcode to "application/octet-stream"
+          "Content-Type": file.type,
         },
         onUploadProgress: (progressEvent: any) => {
           const percentCompleted = Math.round(
@@ -34,23 +29,23 @@ const useUploadToIPFS = () => {
           setProgress(percentCompleted);
         },
       };
-
       const response = await axios.post(
         "https://api.nft.storage/upload",
         file,
         config
       );
-
       const nftStorageResult = response.data;
-      hash = `ipfs://${nftStorageResult.value.cid}`;
+      const hash = `ipfs://${nftStorageResult.value.cid}`;
       setIpfsHash(hash);
       setUploading(false);
+      return hash; // Return the hash directly here
     } catch (error) {
       setError(
         (error as Error).message ||
           "An error occurred while uploading to NFT.STORAGE"
       );
       setUploading(false);
+      throw error; // Rethrow the error to handle it in the caller
     }
   }, []);
 

@@ -5,7 +5,7 @@ import Replay from "./replay";
 import Modal from "../utils/modal";
 import { AiFillLike, AiFillDislike, AiFillMessage } from "react-icons/ai";
 import Spinner from "../utils/Spinner";
-
+import ReadIPFSData from "./read_ipfs_data";
 // Main component to read and display messages
 function ReadThread({ topicId }: { topicId: string }) {
   // State variables to manage the topic ID and control showing comments
@@ -66,7 +66,11 @@ function ReadThread({ topicId }: { topicId: string }) {
                   <p className="mb-3 text-gray-300 whitespace-pre-line">
                     {messageDetails.message}
                   </p>
-
+                  <div className="flex items-center md:w-1/6 md:justify-start w-full">
+                    {messageDetails.media && (
+                      <ReadIPFSData cid={messageDetails.media} />
+                    )}
+                  </div>
                   {/* Render the Replay component for replies */}
                   <div className="flex items-center space-x-1">
                     <Replay

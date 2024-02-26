@@ -17,6 +17,7 @@ import useGetData from "./use_get_data";
 
 // Define an interface for MessageInfo object
 export interface MessageDetails {
+  media: string;
   author: string;
   sequence_number: number;
   message: string;
@@ -68,6 +69,7 @@ const useReadMessages = (initialTopicId = "", isNew = false) => {
         author: message.Author,
         sequence_number: message.sequence_number,
         message: message.Message,
+        media: message.Media,
         likes: 0,
         dislikes: 0,
         comments: 0,
