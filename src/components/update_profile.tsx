@@ -62,38 +62,38 @@ const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
       </h3>
 
       <div className="mb-3">
-        <label className="text-gray-300 ml-1">Name:</label>
+        <label className="text-text ml-1">Name:</label>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full px-4 py-2  rounded-lg bg-background text-text"
+          className="w-full px-4 py-2  rounded-lg bg-secondary text-text"
         />
       </div>
       <div className="mb-3">
-        <label className="text-gray-300 ml-1">Bio:</label>
+        <label className="text-text ml-1">Bio:</label>
         <textarea
           value={bio}
           onChange={(e) => setBio(e.target.value)}
-          className="w-full px-4 py-4 rounded-lg bg-background text-text"
+          className="w-full px-4 py-4 rounded-lg bg-secondary text-text"
         />
       </div>
       <div className="mb-3">
-        <label className="text-gray-300 ml-1">Website:</label>
+        <label className="text-text ml-1">Website:</label>
         <input
           type="text"
           value={website}
           onChange={(e) => setWebsite(e.target.value)}
-          className="w-full px-4 py-2 rounded-lg bg-background text-text"
+          className="w-full px-4 py-2 rounded-lg bg-secondary text-text"
         />
       </div>
       <div className="mb-3">
-        <label className="text-gray-300 ml-1">Location:</label>
+        <label className="text-text ml-1">Location:</label>
         <input
           type="text"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
-          className="w-full px-4 py-2 rounded-lg bg-background text-text"
+          className="w-full px-4 py-2 rounded-lg bg-secondary text-text"
         />
       </div>
 

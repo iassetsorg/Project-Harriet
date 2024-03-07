@@ -56,7 +56,7 @@ const IpfsSettings = ({ onClose }: { onClose: () => void }) => {
           type="text"
           value={ipfsKey}
           onChange={handleKeyChange}
-          className="w-full px-4 py-2 rounded-lg bg-gray-700 text-text"
+          className="w-full px-4 py-2 rounded-lg bg-secondary text-text"
         />
       </div>
 
@@ -69,7 +69,7 @@ const IpfsSettings = ({ onClose }: { onClose: () => void }) => {
 
       <button
         onClick={onClose}
-        className="mt-4 w-full py-3 px-6 font-semibold text-background bg-error rounded-full hover:bg-errorHover transition duration-300 "
+        className="mt-4 w-full py-3 px-6 font-semibold text-background bg-error hover:bg-secondary hover:text-text rounded-full  transition duration-300 "
       >
         Close
       </button>
