@@ -50,7 +50,7 @@ export const NewThreadButton: FC = () => {
       {state !== "Paired" && (
         <button
           onClick={openPairModal}
-          className="NewThreadButton flex items-center  p-3 font-semibold text-gray-800 bg-indigo-300 rounded-full hover:bg-indigo-400 transition duration-300 "
+          className="NewThreadButton flex items-center  p-3 font-semibold text-background bg-primary rounded-full hover:bg-accent transition duration-300 "
         >
           <FaPen className="mr-2" />
           <span className="text-sm font-medium">
@@ -62,7 +62,7 @@ export const NewThreadButton: FC = () => {
       {state === "Paired" && currentRoute === "/Planet" && (
         <button
           onClick={openSendMessageToPlanetModal}
-          className="NewThreadButton flex items-center p-3 font-semibold text-gray-800 bg-indigo-300 rounded-full hover:bg-indigo-400 transition duration-300"
+          className="NewThreadButton flex items-center p-3 font-semibold text-background bg-primary rounded-full hover:bg-accent transition duration-300"
         >
           <FaPen className="mr-2" />
           <span className="text-sm font-medium">New Post</span>
@@ -72,7 +72,7 @@ export const NewThreadButton: FC = () => {
       {state === "Paired" && currentRoute === "/Explore" && (
         <button
           onClick={openCreateThreadModal}
-          className="NewThreadButton flex items-center p-3 font-semibold text-gray-800 bg-indigo-300 rounded-full hover:bg-indigo-400 transition duration-300"
+          className="NewThreadButton flex items-center p-3 font-semibold text-background bg-primary rounded-full hover:bg-accent transition duration-300"
         >
           <FaPen className="mr-2" />
           <span className="text-sm font-medium">New Thread</span>

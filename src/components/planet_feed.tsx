@@ -9,6 +9,7 @@ import Modal from "../utils/modal";
 import Tip from "./tip";
 import Pair from "../hashconnect/pair";
 import ReadIPFSData from "./read_ipfs_data";
+import { FiHash } from "react-icons/fi";
 function Planet() {
   const { state, pairingData } = useHashConnectContext();
   const signingAccount = pairingData?.accountIds[0] || "";
@@ -75,7 +76,7 @@ function Planet() {
   };
 
   return (
-    <div className="overflow-y-scroll w-full h-screen bg-gray-800 shadow-xl p-6 text-white ">
+    <div className="overflow-y-scroll w-full h-screen bg-background shadow-xl p-6 text-text ">
       {loading && <Spinner />}
       {!loading &&
         messages.map((message, idx) => {
@@ -83,10 +84,10 @@ function Planet() {
             return (
               <div
                 key={idx}
-                className="p-4 border border-indigo-300 rounded mb-4 bg-gray-700 overflow-y-auto "
+                className="p-4 border border-primary rounded mb-4 bg-secondary overflow-y-auto "
               >
-                <p className="text-sm mb-1 text-gray-400">{message.sender}</p>
-                <p className="mb-3 text-gray-300 whitespace-pre-line">
+                <p className="text-sm mb-1 text-primary">{message.sender}</p>
+                <p className="mb-3 text-text textspace-pre-line">
                   {message.Message}
                 </p>
                 <div className="flex items-center md:w-1/6 md:justify-start w-full">
@@ -95,7 +96,7 @@ function Planet() {
 
                 <div className="flex items-center">
                   <button
-                    className="bg-gray-700 hover:bg-gray-600 text-gray-300  py-1 px-1 rounded-lg mt-2 ml-2 flex items-center"
+                    className="bg-secondary hover:bg-background text-text  py-1 px-1 rounded-lg mt-2 ml-2 flex items-center"
                     onClick={() =>
                       handleTip(
                         message.sender.toString(),
@@ -103,17 +104,24 @@ function Planet() {
                       )
                     }
                   >
-                    <BsCurrencyDollar className="text-gray-300" />
+                    <BsCurrencyDollar className="text-text" />
                   </button>
 
                   <button
-                    className="bg-gray-700 hover:bg-gray-600 text-gray-300  py-1 px-1 rounded-lg mt-2 ml-2 flex items-center"
+                    className="bg-secondary hover:bg-background text-text  py-1 px-1 rounded-lg mt-2 ml-2 flex items-center"
                     onClick={() => {
                       copyShareLink(message.sequence_number.toString());
                     }}
                   >
-                    <FiShare2 className="text-gray-300" />
+                    <FiShare2 className="text-text" />
                   </button>
+                  <a
+                    href={`https://hashscan.io/mainnet/transaction/${message.message_id}`}
+                    target="blank"
+                    className="bg-secondary hover:bg-background text-text  py-1 px-1 rounded-lg mt-2 ml-2 flex items-center"
+                  >
+                    <FiHash />
+                  </a>
                 </div>
               </div>
             );
@@ -128,7 +136,7 @@ function Planet() {
 
       {isTipModalOpen && (
         <Modal isOpen={isTipModalOpen} onClose={closeTipModal}>
-          <div className="bg-gray-800 p-4 rounded-lg">
+          <div className="bg-background p-4 rounded-lg">
             <Tip
               onClose={closeTipModal}
               author={selectedAuthor}
@@ -140,7 +148,7 @@ function Planet() {
       {nextLink && (
         <button
           onClick={handleLoadMore}
-          className="bg-blue-600 text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline-blue hover:bg-blue-700"
+          className="py-3 px-6 font-semibold text-background bg-primary rounded-full hover:bg-accent transition duration-300"
         >
           Load more
         </button>

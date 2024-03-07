@@ -15,17 +15,17 @@ const Pair: FC = () => {
   };
 
   return (
-    <div className="m-4 space-y-3 text-center text-white bg-gray-800 p-6 rounded-lg">
+    <div className="m-4 space-y-3 text-center text-white bg-background p-6 rounded-lg">
       <a
         href="https://www.hashpack.app/"
         target="blank"
-        className="text-lg font-semibold mb-2 hover:underline text-indigo-300"
+        className="text-lg font-semibold mb-2 hover:underline text-primary"
       >
         HashPack
       </a>
       <button
         onClick={(event) => connectToExtension(event)}
-        className=" w-full text-lg text-center py-2 px-3   font-semibold text-gray-800 bg-indigo-300 rounded-xl hover:bg-indigo-400 transition duration-300"
+        className=" w-full text-lg text-center py-2 px-3   font-semibold text-background bg-primary rounded-xl hover:bg-accent transition duration-300"
       >
         Connect
       </button>
@@ -39,7 +39,7 @@ const Pair: FC = () => {
           readOnly
         />
         <button className="  " onClick={copyToClipboard}>
-          <IoCopyOutline className="text-3xl mr-2 hover:text-indigo-300 rounded p-1" />
+          <IoCopyOutline className="text-3xl mr-2 hover:text-primary rounded p-1" />
         </button>
       </div>
       <span className="text-green-500">{copySuccess}</span>

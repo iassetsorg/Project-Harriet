@@ -44,7 +44,7 @@ const Profile: React.FC = () => {
   }, [isLoading, profileData]);
 
   return (
-    <div className="flex flex-col items-center w-full bg-gray-800 text-white">
+    <div className="flex flex-col items-center w-full bg-background text-text">
       <div className="w-full max-w-4xl p-6">
         {isLoading && (
           <p className="text-xl font-semibold text-center">Loading...</p>
@@ -56,7 +56,7 @@ const Profile: React.FC = () => {
           <div className="text-center p-10">
             <p className="text-lg mb-4">You don't have a profile.</p>
             <button
-              className="p-3 font-semibold text-gray-800 bg-indigo-300 rounded-full hover:bg-indigo-400 transition duration-300"
+              className="p-3 font-semibold text-background bg-primary rounded-full hover:bg-accent transition duration-300"
               onClick={() => setIsCreateProfileModalOpen(true)}
             >
               Create Profile
@@ -65,7 +65,7 @@ const Profile: React.FC = () => {
         )}
 
         {profileData && !isCheckingProfile && state === "Paired" && (
-          <div className="bg-gray-700 shadow-xl rounded-xl p-6 mb-6 relative">
+          <div className="bg-background shadow-xl rounded-xl p-6 mb-6 relative">
             {profileData.Banner && (
               <img
                 src={profileData.Banner}
@@ -75,16 +75,16 @@ const Profile: React.FC = () => {
             )}
 
             <button
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
+              className="absolute top-4 right-4 text-secondary hover:text-background"
               onClick={() => setIsMediaModalOpen(true)}
             >
-              <MdOutlinePermMedia className="text-xl text-gray-300" />
+              <MdOutlinePermMedia className="text-xl text-text" />
             </button>
             <button
-              className="absolute top-4 right-12 text-gray-600 hover:text-gray-800"
+              className="absolute top-4 right-12 text-secondary hover:text-background"
               onClick={() => setIsUpdateProfileModalOpen(true)}
             >
-              <AiFillEdit className="text-xl text-gray-300" />
+              <AiFillEdit className="text-xl text-text" />
             </button>
 
             <div
@@ -100,17 +100,15 @@ const Profile: React.FC = () => {
                 />
               )}
               <div className="text-left">
-                <p className="text-3xl font-bold text-gray-300">
+                <p className="text-3xl font-bold text-text">
                   {profileData.Name}
                 </p>
                 <div className="flex items-center my-1">
-                  <IoIosInformationCircleOutline className="text-lg text-gray-300" />
-                  <p className="text-md ml-1 text-gray-300">
-                    {profileData.Bio}
-                  </p>
+                  <IoIosInformationCircleOutline className="text-lg text-text" />
+                  <p className="text-md ml-1 text-text">{profileData.Bio}</p>
                 </div>
                 <div className="flex items-center my-1">
-                  <CiLocationOn className="text-lg text-gray-300" />
+                  <CiLocationOn className="text-lg text-text" />
                   <p className="text-sm ml-1 text-gray-400">
                     {profileData.Location}
                   </p>
@@ -132,8 +130,8 @@ const Profile: React.FC = () => {
         )}
 
         {!isLoading && profileData && !isCheckingProfile && (
-          <div className="w-full max-w-4xl shadow-xl rounded-xl bg-gray-700 border border-gray-600">
-            <h1 className="text-2xl mt-5 ml-5 font-semibold text-gray-300 mb-4">
+          <div className="w-full max-w-4xl shadow-xl rounded-xl bg-background border border-secondary">
+            <h1 className="text-2xl mt-5 ml-5 font-semibold text-text mb-4">
               My Threads
             </h1>
             <Threads />

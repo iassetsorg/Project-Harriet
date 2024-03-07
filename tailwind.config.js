@@ -4,7 +4,16 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        customBlue: "#26304EFF ",
+        background: "var(--color-background)",
+        text: "var(--color-text)",
+        primary: "var(--color-primary)",
+        secondary: "var(--color-secondary)",
+        accent: "var(--color-accent)",
+        border: "var(--color-border)",
+        error: "var(--color-error)",
+        errorHover: "var(--color-errorHover)",
+        waiting: "var(--color-waiting)",
+        success: "var(--color-success)",
       },
     },
   },

@@ -56,8 +56,8 @@ const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
   };
 
   return (
-    <div className="max-w-md w-full mx-auto bg-gray-800 rounded-lg shadow-xl p-4 text-white">
-      <h3 className="text-xl py-4 font-semibold text-indigo-300">
+    <div className="max-w-md w-full mx-auto bg-background rounded-lg shadow-xl p-4 text-text">
+      <h3 className="text-xl py-4 font-semibold text-primary">
         Update Profile
       </h3>
 
@@ -67,7 +67,7 @@ const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full px-4 py-2  rounded-lg bg-gray-700 text-white"
+          className="w-full px-4 py-2  rounded-lg bg-background text-text"
         />
       </div>
       <div className="mb-3">
@@ -75,7 +75,7 @@ const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
         <textarea
           value={bio}
           onChange={(e) => setBio(e.target.value)}
-          className="w-full px-4 py-4 rounded-lg bg-gray-700 text-white"
+          className="w-full px-4 py-4 rounded-lg bg-background text-text"
         />
       </div>
       <div className="mb-3">
@@ -84,7 +84,7 @@ const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
           type="text"
           value={website}
           onChange={(e) => setWebsite(e.target.value)}
-          className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white"
+          className="w-full px-4 py-2 rounded-lg bg-background text-text"
         />
       </div>
       <div className="mb-3">
@@ -93,13 +93,13 @@ const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
           type="text"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
-          className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white"
+          className="w-full px-4 py-2 rounded-lg bg-background text-text"
         />
       </div>
 
       <button
         onClick={updateProfile}
-        className="w-full py-3 px-6 font-semibold text-gray-800 bg-indigo-300 rounded-full hover:bg-indigo-400 transition duration-300 "
+        className="w-full py-3 px-6 font-semibold text-background bg-primary rounded-full hover:bg-accent transition duration-300 "
       >
         Update
       </button>

@@ -1,63 +1,63 @@
 import React from "react";
 
 const About: React.FC = () => (
-  <div>
+  <div className="container mx-auto p-6 sm:p-10 lg:p-16 xl:p-20 2xl:p-24 bg-background text-text shadow-xl ">
     <section>
-      <div className="container mx-auto p-6 sm:p-10 lg:p-16 xl:p-20 2xl:p-24 bg-gray-800 text-gray-300">
-        <h1 className="text-5xl font-bold text-indigo-300 mb-12 text-center">
+      <div className="">
+        <h1 className="text-5xl font-bold text-primary mb-12 text-center">
           Welcome to ibird
         </h1>
 
-        <p className="text-xl mb-10 leading-relaxed">
+        <p className="text-xl mb-10 leading-relaxed ">
           ibird is a revolutionary web3, open-source, community-driven social
           media platform built on Hedera by iAssets. It leverages Hashgraph
           technology for unparalleled speed, security, and innovation.
         </p>
 
         <div className="grid gap-12 lg:grid-cols-3">
-          <div className="bg-gray-700 shadow-xl rounded-lg p-6">
-            <h2 className="text-2xl font-semibold text-indigo-300 mb-4">
+          <div className="bg-secondary shadow-xl rounded-lg p-6">
+            <h2 className="text-2xl font-semibold text-text mb-4">
               Community-Driven
             </h2>
-            <p>
+            <p className="text-text">
               Governed democratically by its users, ibird evolves with the
               community at its heart. Your voice shapes its future.
             </p>
             <a
               href="https://discord.gg/xM7SkkTEAG"
-              className="text-indigo-300 hover:text-indigo-500 transition duration-300 mt-4 inline-block"
+              className="text-primary hover:text-accent transition duration-300 mt-4 inline-block"
             >
               Join The Community
             </a>
           </div>
 
-          <div className="bg-gray-700 shadow-xl rounded-lg p-6">
-            <h2 className="text-2xl font-semibold text-indigo-300 mb-4">
+          <div className="bg-secondary shadow-xl rounded-lg p-6">
+            <h2 className="text-2xl font-semibold text-text mb-4">
               Open-Source
             </h2>
-            <p>
+            <p className="text-text">
               With transparent, open-source code, ibird fosters trust and
               continuous innovation, free from hidden agendas.
             </p>
             <a
               href="https://github.com/iassetsorg/Project-Harriet"
-              className="text-indigo-300 hover:text-indigo-500 transition duration-300 mt-4 inline-block"
+              className="text-primary hover:text-accent transition duration-300 mt-4 inline-block"
             >
               Start Building Freedom
             </a>
           </div>
 
-          <div className="bg-gray-700 shadow-xl rounded-lg p-6">
-            <h2 className="text-2xl font-semibold text-indigo-300 mb-4">
+          <div className="bg-secondary shadow-xl rounded-lg p-6">
+            <h2 className="text-2xl font-semibold text-text mb-4">
               Hedera-Powered
             </h2>
-            <p>
+            <p className="text-text">
               Harnessing Hedera's advanced technology, ibird offers a fast,
               secure, and equitable social media experience.
             </p>
             <a
               href="https://hedera.com/"
-              className="text-indigo-300 hover:text-indigo-500 transition duration-300 mt-4 inline-block"
+              className="text-primary hover:text-accent transition duration-300 mt-4 inline-block"
             >
               Learn more about Hedera
             </a>
@@ -68,24 +68,23 @@ const About: React.FC = () => (
         </div>
       </div>
 
-      <div className="border border-gray-500 md:mx-24 sm:mx-2 mt-8"></div>
-
-      <div className="container mx-auto my-12 p-6 bg-gray-800 text-gray-300">
-        <h2 className="text-4xl font-bold text-indigo-300 mb-8 text-center">
+      <div className="container mx-auto my-12 p-6 bg-background text-primary">
+        <h2 className="text-4xl font-bold text-primary mb-8 text-center">
           Our Journey
         </h2>
 
         {/* v0.0.1 (Threads) */}
         <div className="mb-12">
-          <h3 className="text-2xl text-indigo-300 mb-2">
+          <h3 className="text-2xl text-primary mb-2">
             <span>✅ </span>v0.0.1 Threads
           </h3>
           <ul>
-            <li>🟡 Connect wallet</li>
+            <li> 🟠 Connect wallet</li>
             <ul className="ml-4 ">
-              <li>🟢 HashPack</li>
-              <li>🟡 Blade</li>
-              <li>🟡 Metamask</li>
+              <li>🟢 HashPack </li>
+              <li> 🟠 Blade </li>
+              <li> 🟠 Metamask </li>
+              <li> 🟠 Wallet Connect </li>
             </ul>
             <li>🟢 Create threads</li>
             <li>🟢 Read thread's data</li>
@@ -95,7 +94,7 @@ const About: React.FC = () => (
 
         {/* v0.0.2 (Interactions) */}
         <div className="mb-12">
-          <h3 className="text-2xl text-indigo-300 mb-2">
+          <h3 className="text-2xl text-primary mb-2">
             <span>✅</span> v0.0.2 Interactions
           </h3>
           <ul>
@@ -110,7 +109,7 @@ const About: React.FC = () => (
 
         {/* v0.0.2 (Interactions) */}
         <div className="mb-6">
-          <h3 className="text-2xl text-indigo-300 mb-2">
+          <h3 className="text-2xl text-primary mb-2">
             <span>✅</span> v0.0.3 Explore Feed
           </h3>
           <ul>
@@ -120,7 +119,7 @@ const About: React.FC = () => (
               <a
                 target="blank"
                 href="https://hashscan.io/mainnet/topic/0.0.3946144"
-                className="text-indigo-300"
+                className="text-primary"
               >
                 0.0.3946144
               </a>
@@ -131,7 +130,7 @@ const About: React.FC = () => (
 
         {/* v0.0.4 (Profile, Threads, and Planet) */}
         <div className="mb-6">
-          <h3 className="text-2xl text-indigo-300 mb-2">
+          <h3 className="text-2xl text-primary mb-2">
             <span>✅</span> v0.0.4 Profile, Threads, and Planet
           </h3>
           <ul>
@@ -152,7 +151,7 @@ const About: React.FC = () => (
                 <a
                   target="blank"
                   href="https://hashscan.io/mainnet/topic/0.0.4320596"
-                  className="text-indigo-300"
+                  className="text-primary"
                 >
                   0.0.4320596
                 </a>
@@ -163,19 +162,19 @@ const About: React.FC = () => (
 
         {/* v0.0.5 (v0.0.5 Media Support - IPFS) */}
         <div className="mb-6">
-          <h3 className="text-2xl text-indigo-300 mb-2">
-            <span>⏳</span> v0.0.5 Media Support
+          <h3 className="text-2xl text-primary mb-2">
+            <span>✅</span> v0.0.5 Media Support
           </h3>
           <ul>
-            <li>🟡 Save media files on IPFS</li>
-            <li>🟡 Send media files with messages</li>
+            <li>🟢 Save media files on IPFS</li>
+            <li>🟢 Send media files with messages</li>
           </ul>
         </div>
 
         {/* v0.0.6 (Tipping - ASSET and HBAR Tokens) */}
         <div className="mb-6">
-          <h3 className="text-2xl text-indigo-300 mb-2">
-            <span>⏳</span> v0.0.6 Tipping Support
+          <h3 className="text-2xl text-primary mb-2">
+            <span>✅</span> v0.0.6 Tipping Support
           </h3>
           <ul>
             <li>🟢 Tip HBAR</li>
@@ -190,19 +189,36 @@ const About: React.FC = () => (
             <li>🟢 Tip HSUITE</li>
             <li>🟢 Tip BSL</li>
             <li>🟢 Tip BULLBAR</li>
+            <li>🟢 Tip MFM</li>
+            <li>🟢 Tip NORDOGE</li>
+            <li>🟢 Tip KARATE</li>
           </ul>
         </div>
 
         {/* v0.0.7 Boosting Threads */}
         <div className="mb-6">
-          <h3 className="text-2xl text-indigo-300 mb-2">
-            <span>⏳</span> v0.0.7 Boosting Threads
+          <h3 className="text-2xl text-primary mb-2">
+            <span>⏳</span> v0.0.7 UPGRADO
           </h3>
           <ul>
+            <li> 🟢 Hash Link #</li>
+            <li> 🟢 Dark & light theme</li>
+            <li> 🟠 Universal Topic</li>
+            <li> 🟠 interactive polls</li>
+          </ul>
+        </div>
+
+        {/* v0.0.8 Interactive Polls */}
+        <div className="mb-6">
+          <h3 className="text-2xl text-primary mb-2">
+            <span>⏳</span> v0.0.8 Boosting Threads
+          </h3>
+
+          <ul>
             <li>
-              🟡
+              🟠
               <a
-                className=" text-indigo-300 mb-2"
+                className=" text-primary mb-2"
                 href="https://sentx.io/nft-marketplace/0.0.3844404"
                 target="blank"
               >
@@ -213,35 +229,26 @@ const About: React.FC = () => (
           </ul>
         </div>
 
-        {/* v0.0.8 Interactive Polls */}
-        <div className="mb-6">
-          <h3 className="text-2xl text-indigo-300 mb-2">
-            <span>⏳</span> v0.0.8 Interactive Polls
-          </h3>
-          <ul>
-            <li>🟡 Users can create interactive polls on their threads.</li>
-          </ul>
-        </div>
-
         {/* v0.0.9 iOS and Android Applications */}
         <div className="mb-6">
-          <h3 className="text-2xl text-indigo-300 mb-2">
-            <span>⏳</span> v0.0.9 Mobile Applications
+          <h3 className="text-2xl text-primary mb-2">
+            <span>⏳</span> v0.0.9 Applications
           </h3>
           <ul>
-            <li>🟡 IOS Application</li>
-            <li>🟡 Android Application</li>
+            <li> 🟠 IOS Application</li>
+            <li> 🟠 Android Application</li>
+            <li> 🟠 Desktop Application</li>
           </ul>
         </div>
 
         {/* v0.1.0 Community Governance */}
         <div className="mb-6">
-          <h3 className="text-2xl text-indigo-300 mb-2">
+          <h3 className="text-2xl text-primary mb-2">
             <span>⏳</span> v0.1.0 Community Governance
           </h3>
           <ul>
             <li>
-              🟡 ASSET Token Holders propose and vote on key platform updates
+              🟠 ASSET Token Holders propose and vote on key platform updates
             </li>
           </ul>
         </div>
@@ -254,7 +261,7 @@ const CallToAction: React.FC = () => (
   <a
     href="https://iassets.gitbook.io/ibird/"
     target="blank"
-    className="inline-flex items-center px-8 py-4 text-xl font-semibold text-gray-800 bg-indigo-300 rounded-full hover:bg-indigo-400 transition duration-300"
+    className="inline-flex items-center px-8 py-4 text-xl font-semibold text-background bg-primary rounded-full hover:bg-accent transition duration-300"
   >
     Learn More!
   </a>

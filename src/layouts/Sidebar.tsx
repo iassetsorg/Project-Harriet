@@ -65,8 +65,8 @@ export const Sidebar: FC = () => {
 
   return (
     <>
-      <div className="flex border-l shadow-lg">
-        <div className="flex flex-col items-center overflow-hidden text-gray-300 h-screen bg-gray-800">
+      <div className="flex  shadow-lg">
+        <div className="flex flex-col items-center overflow-hidden text-text h-screen bg-background">
           <div className="w-full px-2 hidden md:inline">
             <div className="flex flex-col items-center w-full mt-3">
               {/* <h1 className="flex items-center w-full h-12 px-3 mt-2 rounded ">
@@ -77,8 +77,8 @@ export const Sidebar: FC = () => {
               {filteredMenuItems.map((item) => (
                 <Link
                   to={item.link}
-                  className={`flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-gray-700 ${
-                    location.pathname === item.link ? "bg-gray-700" : ""
+                  className={`flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-secondary ${
+                    location.pathname === item.link ? "bg-secondary" : ""
                   }`}
                   key={item.text}
                   target={item.isExternal ? "_blank" : undefined}

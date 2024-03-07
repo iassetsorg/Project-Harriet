@@ -45,19 +45,19 @@ const UploadToIPFS = () => {
   };
   // Rest of your component remains the same
   return (
-    <div className="flex items-center justify-center bg-gray-700 border border-gray-500 rounded text-white">
+    <div className="flex items-center justify-center bg-background border border-secondary rounded text-text">
       <div className="w-full max-w-md p-6">
         <div className="p-3  rounded   text-center ">
           <p className="text-xl font-semibold ">
             <span>
-              <MdOutlinePermMedia className="text-4xl inline-flex mr-3  text-white" />
+              <MdOutlinePermMedia className="text-4xl inline-flex mr-3  text-text" />
             </span>
             IPFS Media Storage
           </p>
         </div>
         {!uploading && !file && (
           <div {...getRootProps()} className="space-y-1 text-center">
-            <div className="border-4 border-dashed border-gray-500 rounded-md my-6 p-6">
+            <div className="border-4 border-dashed border-secondary rounded-md my-6 p-6">
               <input {...getInputProps()} />
               {isDragActive ? (
                 <p className="text-lg">Drop the files here...</p>
@@ -71,7 +71,7 @@ const UploadToIPFS = () => {
           </div>
         )}
         {!uploading && file && (
-          <div className="border-4 border-dashed border-gray-500 rounded-md my-6 p-6">
+          <div className="border-4 border-dashed border-secondary rounded-md my-6 p-6">
             <p className="text-lg text-center">{`Selected File: ${file?.name}`}</p>
             {file?.type.startsWith("image/") && (
               <img
@@ -82,7 +82,7 @@ const UploadToIPFS = () => {
             )}
             <button
               onClick={handleClear}
-              className=" py-1 px-4 font-semibold text-gray-800 mouse:cursor-confined bg-indigo-300 rounded-full hover:bg-indigo-400 transition duration-300"
+              className=" py-1 px-4 font-semibold text-background mouse:cursor-confined bg-primary rounded-full hover:bg-accent transition duration-300"
             >
               Clear
             </button>
@@ -92,7 +92,7 @@ const UploadToIPFS = () => {
         {!uploading ? (
           <button
             onClick={handleUpload}
-            className="w-full  py-3 px-6 font-semibold text-gray-800 mouse:cursor-confined bg-indigo-300 rounded-full hover:bg-indigo-400 transition duration-300"
+            className="w-full  py-3 px-6 font-semibold text-gray-800 mouse:cursor-confined bg-primary rounded-full hover:bg-secondary transition duration-300"
           >
             Upload
           </button>
@@ -114,7 +114,7 @@ const UploadToIPFS = () => {
             <ReadIPFSData cid={ipfsHash} />
           </div>
         )}
-        {error && <p className="mt-4 text-center text-red-500">{error}</p>}
+        {error && <p className="mt-4 text-center text-error">{error}</p>}
       </div>
     </div>
   );

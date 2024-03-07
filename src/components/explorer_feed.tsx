@@ -20,7 +20,7 @@ function Explorer() {
   };
 
   return (
-    <div className="overflow-y-scroll w-full h-screen bg-gray-800 shadow-xl p-6 text-white">
+    <div className="overflow-y-scroll w-full h-screen bg-background shadow-xl p-6 text-text">
       {loading && <Spinner />}
       {!loading &&
         messages.map((message, idx) => {
@@ -36,7 +36,7 @@ function Explorer() {
       {nextLink && (
         <button
           onClick={handleLoadMore}
-          className="bg-blue-600 text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline-blue hover:bg-blue-700"
+          className="py-3 px-6 font-semibold text-background bg-primary rounded-full hover:bg-accent transition duration-300"
         >
           Load more
         </button>

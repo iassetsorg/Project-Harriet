@@ -21,24 +21,22 @@ const IpfsSettings = ({ onClose }: { onClose: () => void }) => {
   }, []);
 
   return (
-    <div className="max-w-md w-full mx-auto bg-gray-800 rounded-lg shadow-xl p-4 text-white">
-      <h3 className="text-xl py-4 font-semibold text-indigo-300">
-        Upload Media
-      </h3>
+    <div className="max-w-md w-full mx-auto bg-background rounded-lg shadow-xl p-4 text-text">
+      <h3 className="text-xl py-4 font-semibold text-primary">Upload Media</h3>
 
-      <p className="text-gray-300 mb-4">
+      <p className="text-text mb-4">
         Your Media is stored on IPFS. IPFS is a decentralized storage network.
         To upload media on iBird, you need to have an IPFS key. Follow the steps
         below to get an API Token:
       </p>
 
-      <ol className="list-decimal text-gray-300 mb-4 ml-6">
+      <ol className="list-decimal text-text mb-4 ml-6">
         <li>
           Click API Keys to go to your{" "}
           <a
             href="https://nft.storage/manage/"
             target="_blank"
-            className="text-indigo-300"
+            className="text-primary"
           >
             NFT.Storage
           </a>{" "}
@@ -53,25 +51,25 @@ const IpfsSettings = ({ onClose }: { onClose: () => void }) => {
       </ol>
 
       <div className="mb-3">
-        <label className="text-gray-300 ml-1">Enter your IPFS Key:</label>
+        <label className="text-text ml-1">Enter your IPFS Key:</label>
         <input
           type="text"
           value={ipfsKey}
           onChange={handleKeyChange}
-          className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white"
+          className="w-full px-4 py-2 rounded-lg bg-gray-700 text-text"
         />
       </div>
 
       <button
         onClick={saveIpfsKey}
-        className="w-full py-3 px-6 font-semibold text-gray-800 bg-indigo-300 rounded-full hover:bg-indigo-400 transition duration-300 "
+        className="w-full py-3 px-6 font-semibold text-background bg-primary rounded-full hover:bg-accent transition duration-300 "
       >
         Save IPFS Key
       </button>
 
       <button
         onClick={onClose}
-        className="mt-4 w-full py-3 px-6 font-semibold text-gray-800 bg-red-500 rounded-full hover:bg-red-600 transition duration-300 "
+        className="mt-4 w-full py-3 px-6 font-semibold text-background bg-error rounded-full hover:bg-errorHover transition duration-300 "
       >
         Close
       </button>

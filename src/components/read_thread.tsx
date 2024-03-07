@@ -42,7 +42,7 @@ function ReadThread({ topicId }: { topicId: string }) {
 
   // Render the Component
   return (
-    <div className="bg-gray-800 text-white">
+    <div className="bg-background text-text">
       {/* Loading Indicator */}
       {loading && <Spinner />}
 
@@ -57,13 +57,13 @@ function ReadThread({ topicId }: { topicId: string }) {
               return (
                 <div
                   key={idx}
-                  className="p-4 border  border-indigo-300 rounded mb-4 bg-gray-700 overflow-y-auto"
+                  className="p-4 border  border-primary rounded mb-4 bg-secondary overflow-y-auto"
                 >
                   {/* Display the message text */}
-                  <p className="text-sm mb-1 text-gray-400">
+                  <p className="text-sm mb-1 text-primary">
                     {messageDetails.author}
                   </p>
-                  <p className="mb-3 text-gray-300 whitespace-pre-line">
+                  <p className="mb-3 text-text whitespace-pre-line">
                     {messageDetails.message}
                   </p>
                   <div className="flex items-center md:w-1/6 md:justify-start w-full">
@@ -77,15 +77,16 @@ function ReadThread({ topicId }: { topicId: string }) {
                       sequenceNumber={messageDetails.sequence_number}
                       topicId={topicId}
                       author={messageDetails.author}
+                      message_id={message_id}
                     />
                   </div>
 
                   {/* Display like, dislike, and comment counts */}
-                  <div className="text-gray-600 flex ml-1 items-center text-sm ">
-                    <span className=" text-gray-300  px-2 rounded-lg ml-2 flex items-center">
+                  <div className="text-background flex ml-1 items-center text-sm ">
+                    <span className=" text-text  px-2 rounded-lg ml-2 flex items-center">
                       {messageDetails.likes}
                     </span>{" "}
-                    <span className=" text-gray-300  px-2 rounded-lg ml-4 flex items-center">
+                    <span className=" text-text  px-2 rounded-lg ml-4 flex items-center">
                       {messageDetails.dislikes}
                     </span>{" "}
                     {messageDetails.commentsDetails && (
@@ -98,9 +99,9 @@ function ReadThread({ topicId }: { topicId: string }) {
                         }}
                         className={`${
                           messageDetails.comments > 0
-                            ? "bg-gray-600 hover:bg-gray-500"
-                            : "text-gray-300  px-2 rounded-lg ml-2 flex items-center cursor-default"
-                        } text-gray-300 px-2 rounded-lg ml-4 flex items-center`}
+                            ? "bg-background hover:bg-primary hover:text-background"
+                            : "text-text  px-2 rounded-lg ml-2 flex items-center cursor-default"
+                        } text-text px-2 rounded-lg ml-4 flex items-center`}
                       >
                         {messageDetails.comments}{" "}
                       </button>
@@ -110,19 +111,21 @@ function ReadThread({ topicId }: { topicId: string }) {
                   {/* Display comments in a modal if showComments is set to the current sequence number */}
                   {showComments === messageDetails.sequence_number && (
                     <Modal isOpen={isModalOpen} onClose={closeModal}>
+                      <div className="mb-2 p-4">Comments: </div>
                       {messageDetails.commentsDetails.map(
                         (commentDetail, i) => (
                           <div
                             key={i}
-                            className="bg-gray-600 border-l-4 rounded border-gray-500 text-gray-300 p-4 mb-3"
+                            className="bg-background  px-4 rounded  text-text p-2 "
                             role="alert"
                           >
-                            <p className="font-bold">
-                              {commentDetail.author} said:
+                            <p className="text-sm text-primary">
+                              {commentDetail.author}
                             </p>
                             <p className="whitespace-pre-line">
                               {commentDetail.message}
                             </p>
+                            <hr className="text-secondary" />
                           </div>
                         )
                       )}
@@ -140,7 +143,7 @@ function ReadThread({ topicId }: { topicId: string }) {
           {/* Render a button to load more messages if available */}
           {nextLink && (
             <button
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
+              className="bg-primary hover:bg-accent text-text font-bold py-2 px-4 rounded mt-4"
               onClick={handleLoadMore}
             >
               Load More

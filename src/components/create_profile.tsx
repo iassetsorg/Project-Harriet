@@ -279,10 +279,10 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
   };
 
   return (
-    <div className="max-w-md w-full mx-auto bg-gray-700 rounded-lg shadow-xl p-3 text-white">
+    <div className="max-w-md w-full mx-auto bg-background rounded-lg shadow-xl p-3 text-text">
       {!isProcess ? (
         <>
-          <h3 className="text-xl py-4 px-8 font-semibold text-indigo-300">
+          <h3 className="text-xl py-4 px-8 font-semibold text-primary">
             Create a Profile
           </h3>
 
@@ -292,14 +292,14 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
             {/* Name Input */}
             <label
               htmlFor="name"
-              className="block text-sm font-semibold text-gray-300"
+              className="block text-sm font-semibold text-text"
             >
               Name:
             </label>
             <div className="mt-2">
               <input
                 type="text"
-                className="w-full px-4 py-2 rounded-lg border-2border-gray-500  text-base bg-gray-800"
+                className="w-full px-4 py-2 rounded-lg border-2 border-secondary text-base bg-background"
                 name="name"
                 id="name"
                 value={name}
@@ -312,13 +312,13 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
             {/* Bio Input */}
             <label
               htmlFor="bio"
-              className="block text-sm font-semibold text-gray-300"
+              className="block text-sm font-semibold text-text"
             >
               Bio:
             </label>
             <div className="mt-2">
               <textarea
-                className="w-full px-4 py-2 rounded-lg border-gray-500  text-base bg-gray-800"
+                className="w-full px-4 py-2 rounded-lg border-secondary text-base bg-background"
                 name="bio"
                 id="bio"
                 value={bio}
@@ -331,14 +331,14 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
             {/* Website Input */}
             <label
               htmlFor="website"
-              className="block text-sm font-semibold text-gray-300"
+              className="block text-sm font-semibold text-text"
             >
               Website:
             </label>
             <div className="mt-2">
               <input
                 type="text"
-                className="w-full px-4 py-2 rounded-lg border-gray-500  text-base bg-gray-800"
+                className="w-full px-4 py-2 rounded-lg border-secondary text-base bg-background"
                 name="website"
                 id="website"
                 value={website}
@@ -351,14 +351,14 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
             {/* Location Input */}
             <label
               htmlFor="location"
-              className="block text-sm font-semibold text-gray-300"
+              className="block text-sm font-semibold text-text"
             >
               Location:
             </label>
             <div className="mt-2">
               <input
                 type="text"
-                className="w-full px-4 py-2 rounded-lg border-gray-500  text-base bg-gray-800"
+                className="w-full px-4 py-2 rounded-lg border-secondary text-base bg-background"
                 name="location"
                 id="location"
                 value={location}
@@ -370,14 +370,14 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
           {/* <section className="py-4 px-8">
         <label
           htmlFor="picture"
-          className="block text-sm font-semibold text-gray-700"
+          className="block text-sm font-semibold text-background"
         >
           Picture URL:
         </label>
         <div className="mt-2">
           <input
             type="text"
-            className="w-full px-4 py-2 rounded-lg border-2 border-sky-400 focus:ring-4 focus:ring-sky-300 text-base bg-white backdrop-blur-md"
+            className="w-full px-4 py-2 rounded-lg border-2 border-sky-400 focus:ring-4 focus:ring-sky-300 text-base bg-text backdrop-blur-md"
             name="picture"
             id="picture"
             value={picture}
@@ -389,14 +389,14 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
       <section className="py-4 px-8">
         <label
           htmlFor="banner"
-          className="block text-sm font-semibold text-gray-700"
+          className="block text-sm font-semibold text-background"
         >
           Banner URL:
         </label>
         <div className="mt-2">
           <input
             type="text"
-            className="w-full px-4 py-2 rounded-lg border-2 border-sky-400 focus:ring-4 focus:ring-sky-300 text-base bg-white backdrop-blur-md"
+            className="w-full px-4 py-2 rounded-lg border-2 border-sky-400 focus:ring-4 focus:ring-sky-300 text-base bg-text backdrop-blur-md"
             name="banner"
             id="banner"
             value={banner}
@@ -407,42 +407,42 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
 
           <button
             onClick={() => createProfile()}
-            className="w-full py-3 px-6 font-semibold text-gray-800 bg-indigo-300 rounded-full hover:bg-indigo-400 transition duration-300"
+            className="w-full py-3 px-6 font-semibold text-background bg-primary rounded-full hover:bg-indigo-400 transition duration-300"
           >
             Create
           </button>
         </>
       ) : (
         <div className="p-4 ">
-          <h1 className="text-gray-200 mb-3">Network fees: $1.0402</h1>
+          <h1 className="text-secondary mb-3">Network fees: $1.0402</h1>
           {/* Process Steps UI */}
           <div className="flex flex-col justify-between mb-2 ">
-            <span className="text-sm text-gray-400">$0.01</span>
+            <span className="text-sm text-secondary">$0.01</span>
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold mr-3">
                 Creating User Threads Topic
               </h3>
               <span>
                 {currentStepStatus >= 1 ? (
-                  <MdFileDownloadDone className="text-xl text-green-500" />
+                  <MdFileDownloadDone className="text-xl text-success" />
                 ) : (
-                  <HiOutlineDotsHorizontal className="text-xl text-orange-500" />
+                  <HiOutlineDotsHorizontal className="text-xl text-waiting" />
                 )}
               </span>
             </div>
           </div>
           {/* Step 2: Initiating User Threads */}
           <div className="flex flex-col justify-between mb-2 ">
-            <span className="text-sm text-gray-400">$0.0001</span>
+            <span className="text-sm text-secondary">$0.0001</span>
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold mr-3">
                 Initiating User Threads
               </h3>
               <span>
                 {currentStepStatus >= 2 ? (
-                  <MdFileDownloadDone className="text-xl text-green-500" />
+                  <MdFileDownloadDone className="text-xl text-success" />
                 ) : (
-                  <HiOutlineDotsHorizontal className="text-xl text-orange-500" />
+                  <HiOutlineDotsHorizontal className="text-xl text-waiting" />
                 )}
               </span>
             </div>
@@ -450,16 +450,16 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
 
           {/* Step 3: Creating User Profile Topic */}
           <div className="flex flex-col justify-between mb-2 ">
-            <span className="text-sm text-gray-400">$0.01</span>
+            <span className="text-sm text-secondary">$0.01</span>
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold mr-3">
                 Creating User Profile Topic
               </h3>
               <span>
                 {currentStepStatus >= 3 ? (
-                  <MdFileDownloadDone className="text-xl text-green-500" />
+                  <MdFileDownloadDone className="text-xl text-success" />
                 ) : (
-                  <HiOutlineDotsHorizontal className="text-xl text-orange-500" />
+                  <HiOutlineDotsHorizontal className="text-xl text-waiting" />
                 )}
               </span>
             </div>
@@ -467,32 +467,32 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
 
           {/* Step 4: Initiating User Profile */}
           <div className="flex flex-col justify-between mb-2 ">
-            <span className="text-sm text-gray-400">$0.0001</span>
+            <span className="text-sm text-secondary">$0.0001</span>
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold mr-3">
                 Initiating User Profile
               </h3>
               <span>
                 {currentStepStatus >= 4 ? (
-                  <MdFileDownloadDone className="text-xl text-green-500" />
+                  <MdFileDownloadDone className="text-xl text-success" />
                 ) : (
-                  <HiOutlineDotsHorizontal className="text-xl text-orange-500" />
+                  <HiOutlineDotsHorizontal className="text-xl text-waiting" />
                 )}
               </span>
             </div>
           </div>
           {/* Step 5: Minting User Profile NFT */}
           <div className="flex flex-col justify-between mb-2 ">
-            <span className="text-sm text-gray-400">$1</span>
+            <span className="text-sm text-secondary">$1</span>
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold mr-3">
                 Creating User Profile NFT
               </h3>
               <span>
                 {currentStepStatus >= 5 ? (
-                  <MdFileDownloadDone className="text-xl text-green-500" />
+                  <MdFileDownloadDone className="text-xl text-success" />
                 ) : (
-                  <HiOutlineDotsHorizontal className="text-xl text-orange-500" />
+                  <HiOutlineDotsHorizontal className="text-xl text-waiting" />
                 )}
               </span>
             </div>
@@ -500,16 +500,16 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
 
           {/* Step 6: Finalizing Profile Creation */}
           <div className="flex flex-col justify-between mb-2 ">
-            <span className="text-sm text-gray-400">$0.02</span>
+            <span className="text-sm text-secondary">$0.02</span>
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold mr-3">
                 Minting User Profile NFT
               </h3>
               <span>
                 {currentStepStatus >= 6 ? (
-                  <MdFileDownloadDone className="text-xl text-green-500" />
+                  <MdFileDownloadDone className="text-xl text-success" />
                 ) : (
-                  <HiOutlineDotsHorizontal className="text-xl text-orange-500" />
+                  <HiOutlineDotsHorizontal className="text-xl text-waiting" />
                 )}
               </span>
             </div>
@@ -517,7 +517,7 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
 
           <button
             onClick={breakStep}
-            className="w-full bg-red-600 hover:bg-red-700 text-white py-2 mt-3 px-4 rounded-full"
+            className="w-full bg-error hover:bg-secondary text-text py-2 mt-3 px-4 rounded-full"
           >
             Cancel
           </button>

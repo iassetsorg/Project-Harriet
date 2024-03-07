@@ -62,12 +62,12 @@ const BottomBar = () => {
   const location = useLocation();
   return (
     <div className="md:hidden">
-      <div className="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-600 p-2 flex justify-around items-center">
+      <div className="fixed bottom-0 left-0 right-0 bg-background border-text  p-2 flex justify-around items-center">
         {filteredMenuItems.map((item) => (
           <Link
             to={item.link}
-            className={`flex flex-col items-center text-gray-400 hover:text-indigo-300 focus:text-indigo-300 focus:outline-none ${
-              location.pathname === item.link ? "text-indigo-300" : ""
+            className={`flex flex-col items-center text-text hover:text-primary focus:text-primary focus:outline-none ${
+              location.pathname === item.link ? "text-primary" : ""
             }`}
             key={item.text}
             target={item.isExternal ? "_blank" : undefined}

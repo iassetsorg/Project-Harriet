@@ -2,8 +2,7 @@ import Banner from "./layouts/banner";
 import Navbar from "./layouts/navbar";
 import CreateThread from "./components/create_thread";
 import ExplorerFeed from "./components/explorer_feed";
-import SendMessages from "./components/send_message";
-import ReadThreadManually from "./components/read_thread_manually";
+
 import { Sidebar } from "./layouts/Sidebar";
 import About from "./components/about";
 import ReadSharedThread from "./components/read_shared_thread";
@@ -25,7 +24,7 @@ import Threads from "./components/threads";
 import NotFoundPage from "./components/404";
 export default function App() {
   return (
-    <main className="bg-gray-800">
+    <main className="bg-background">
       <Router>
         {/* <Banner /> */}
         <Navbar />
@@ -47,10 +46,6 @@ export default function App() {
             {/* Catch-all route */}
           </Routes>
         </div>
-
-        {/* <CreateThread />
-        <SendMessages />
-        <ReadThreadManually /> */}
 
         <BottomBar />
         <NewThreadButton />

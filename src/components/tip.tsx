@@ -328,8 +328,8 @@ const Tip = ({
   ];
 
   return (
-    <div className="max-w-md w-full mx-auto bg-gray-800 rounded-lg shadow-xl p-4 text-white">
-      <h3 className="text-xl py-4 font-semibold text-indigo-300">
+    <div className="max-w-md w-full mx-auto bg-background rounded-lg shadow-xl p-4 text-text">
+      <h3 className="text-xl py-4 font-semibold text-primary">
         You are Tipping {author}
       </h3>
 
@@ -346,7 +346,7 @@ const Tip = ({
           placeholder="Amount"
           value={amountToSend}
           onChange={(e) => setAmountToSend(e.target.value)}
-          className="w-full p-2 text-sm rounded bg-gray-700 text-white"
+          className="w-full p-2 text-sm rounded bg-background text-text"
         />
 
         <div className="grid grid-cols-3 gap-4">
@@ -357,8 +357,8 @@ const Tip = ({
               type="button" // Specify the button type
               className={`p-2  text-sm rounded ${
                 selectedToken === option
-                  ? "bg-indigo-300 text-gray-800"
-                  : "bg-gray-700 text-white"
+                  ? "bg-primary text-background"
+                  : "bg-background text-text"
               }`}
             >
               {option}
@@ -368,7 +368,7 @@ const Tip = ({
 
         <button
           type="submit"
-          className="w-full py-3 px-6 font-semibold text-gray-800 bg-indigo-300 rounded-full hover:bg-indigo-400 transition duration-300 "
+          className="w-full py-3 px-6 font-semibold text-background bg-primary rounded-full hover:bg-secondary transition duration-300 "
         >
           Send
         </button>

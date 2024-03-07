@@ -18,3 +18,25 @@
     @apply fixed bottom-0 left-1 mb-4 ml-0.5;
   }
 }
+
+:root {
+  --color-background: #cbd5e1; /* Light mode background color */
+  --color-text: #1e293b; /* Light mode text color */
+  --color-primary: #075985; /* Light mode primary color */
+  --color-secondary: #94a3b8; /* Light mode secondary color */
+  --color-accent: #0c4a6e; /* Light mode accent color */
+  --color-error: #ae0808; /* Light mode error color */
+  --color-success: #22c55e;
+  --color-waiting: #ea580c;
+}
+
+.dark {
+  --color-background: rgb(31 41 55); /* Dark mode background color */
+  --color-text: rgb(209 213 219); /* Dark mode text color */
+  --color-primary: rgb(165 180 252); /* Dark mode primary color */
+  --color-secondary: rgb(55 65 81); /* Dark mode secondary color */
+  --color-accent: #818cf8; /* Dark mode accent color */
+  --color-error: #ae0808; /* Dark mode error color */
+  --color-success: #22c55e;
+  --color-waiting: #ea580c;
+}

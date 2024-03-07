@@ -70,8 +70,8 @@ const SendMessageToPlanetModal: React.FC<SendMessageToPlanetProps> = ({
 
   return (
     <div className="modal">
-      <div className="modal-content max-w-md mx-auto bg-gray-800 rounded-lg shadow-xl p-3 text-white">
-        <h3 className="text-xl py-4 px-8 font-semibold text-indigo-300">
+      <div className="modal-content max-w-md mx-auto bg-background rounded-lg shadow-xl p-3 text-text">
+        <h3 className="text-xl py-4 px-8 font-semibold text-primary">
           Post on Planet
         </h3>
 
@@ -96,12 +96,12 @@ const SendMessageToPlanetModal: React.FC<SendMessageToPlanetProps> = ({
         <section className="py-4 px-8">
           <label
             htmlFor="messageContent"
-            className="block mb-1 text-sm font-semibold text-gray-300"
+            className="block mb-1 text-sm font-semibold text-text"
           >
             Message:
           </label>
           <textarea
-            className="w-full h-48 px-4 py-2 rounded-lg text-base bg-gray-700 text-white"
+            className="w-full h-48 px-4 py-2 rounded-lg text-base bg-secondary text-text"
             id="messageContent"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
@@ -113,7 +113,7 @@ const SendMessageToPlanetModal: React.FC<SendMessageToPlanetProps> = ({
           {!file && (
             <label
               htmlFor="fileUpload"
-              className="cursor-pointer flex items-center justify-center mx-4 p-4 border-2 border-dashed"
+              className="cursor-pointer flex items-center justify-center mx-4 p-4 border-2 border-dashed border-secondary"
             >
               <input
                 type="file"
@@ -146,13 +146,13 @@ const SendMessageToPlanetModal: React.FC<SendMessageToPlanetProps> = ({
           {uploading && <p>Uploading Media to IPFS...</p>}
         </section>
 
-        {error && <p className="text-red-500">{error}</p>}
+        {error && <p className="text-error">{error}</p>}
 
         {/* Send Button */}
         <div className="text-center py-4">
           <button
             onClick={handleSend}
-            className="w-full py-3 px-6 font-semibold text-gray-800 bg-indigo-300 rounded-full hover:bg-indigo-400 transition duration-300"
+            className="w-full py-3 px-6 font-semibold text-background bg-primary rounded-full hover:accent transition duration-300"
           >
             Send Message
           </button>

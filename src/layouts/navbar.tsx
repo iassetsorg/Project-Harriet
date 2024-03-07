@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Pair from "../hashconnect/pair";
 import Modal from "../utils/modal";
 import { RiMoneyDollarCircleLine } from "react-icons/ri";
+import DarkModeToggle from "./DarkModeToggle";
 const Navbar = () => {
   const navigate = useNavigate();
   const { state, pairingData, disconnect } = useHashConnectContext();
@@ -35,7 +36,7 @@ const Navbar = () => {
   }, [state]);
 
   return (
-    <nav className="py-3 px-6 shadow-lg border bg-gray-800 border-gray-700">
+    <nav className="py-3 px-6 shadow-lg border-y  bg-background border-secondary">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center">
           <img
@@ -43,35 +44,38 @@ const Navbar = () => {
             alt="Logo"
             className="mr-2 w-10 h-auto"
           />
-          <h1 className="md:text-lg text-xl mr-3 text-indigo-300 font-semibold">
+          <h1 className="md:text-lg text-xl mr-3 text-primary font-semibold">
             iBird
           </h1>
-          <span className="text-white text-sm bg-gradient-to-r from-sky-500 to-indigo-600 rounded p-1">
-            v0.0.4
+          <span className="text-background text-sm bg-gradient-to-r from-primary to-accent rounded p-1">
+            v0.0.6
           </span>
         </div>
-        <button
-          onClick={openTradeModal}
-          className=" font-semibold ml-auto p-1 text-gray-800 bg-indigo-300 rounded-xl hover:bg-indigo-400 transition duration-300"
-        >
-          <RiMoneyDollarCircleLine className="text-2xl " />
-        </button>
-        {state !== "Paired" && (
+        <div className="flex items-center">
+          <DarkModeToggle />
           <button
-            onClick={openModal}
-            className="py-2 px-3 ml-3 font-semibold text-gray-800 bg-indigo-300 rounded-xl hover:bg-indigo-400 transition duration-300"
+            onClick={openTradeModal}
+            className="font-semibold  text-background bg-primary rounded-xl hover:bg-accent transition duration-300 ml-2"
           >
-            CONNECT
+            <RiMoneyDollarCircleLine className="text-3xl" />
           </button>
-        )}
-        {state === "Paired" && (
-          <button
-            onClick={() => handleDisconnect()}
-            className="py-1 px-3 ml-3 font-semibold text-gray-800 bg-indigo-300 rounded-xl hover:bg-indigo-400 transition duration-300"
-          >
-            {pairingData?.accountIds.join(", ")}
-          </button>
-        )}
+
+          {state !== "Paired" ? (
+            <button
+              onClick={openModal}
+              className="py-2 px-3 ml-3 font-semibold text-background bg-primary rounded-xl hover:bg-accent transition duration-300"
+            >
+              CONNECT
+            </button>
+          ) : (
+            <button
+              onClick={handleDisconnect}
+              className="py-1 px-3 ml-3 font-semibold text-background bg-primary rounded-xl hover:bg-accent transition duration-300"
+            >
+              {pairingData?.accountIds.join(", ")}
+            </button>
+          )}
+        </div>
         {isModalOpen && (
           <Modal isOpen={isModalOpen} onClose={closeModal}>
             <Pair />
@@ -80,10 +84,10 @@ const Navbar = () => {
 
         {isTradeModalOpen && (
           <Modal isOpen={isTradeModalOpen} onClose={closeTradeModal}>
-            <div className=" text-white bg-gray-800  text-center  flex flex-col space-y-3 px-12 pb-6 pt-12 rounded-full">
+            <div className=" text-text bg-background  text-center  flex flex-col space-y-3 px-12 pb-6 pt-12 rounded-full">
               <a
                 href="https://pancakeswap.finance/swap?inputCurrency=BNB&outputCurrency=0x6b471d5ab9f3d92a600e7d49a0b135bf6d4c6a5b"
-                className="text-md text-center py-2 px-3   font-semibold text-gray-800 bg-indigo-300 rounded-xl hover:bg-indigo-400 transition duration-300"
+                className="text-md text-center py-2 px-3   font-semibold text-background bg-primary rounded-xl hover:bg-accent transition duration-300"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -91,7 +95,7 @@ const Navbar = () => {
               </a>
               <a
                 href="https://www.saucerswap.finance/swap/HBAR/0.0.1991880"
-                className="text-md text-center py-2 px-3   font-semibold text-gray-800 bg-indigo-300 rounded-xl hover:bg-indigo-400 transition duration-300"
+                className="text-md text-center py-2 px-3   font-semibold text-background bg-primary rounded-xl hover:bg-accent transition duration-300"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -99,7 +103,7 @@ const Navbar = () => {
               </a>
               <a
                 href="https://iassets.org/upgrade/"
-                className="text-md text-center py-2 px-3   font-semibold text-gray-800 bg-indigo-300 rounded-xl hover:bg-indigo-400 transition duration-300"
+                className="text-md text-center py-2 px-3   font-semibold text-background bg-primary rounded-xl hover:bg-accent transition duration-300"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -107,7 +111,7 @@ const Navbar = () => {
               </a>
               <a
                 href="https://sentx.io/nft-marketplace/0.0.3844404"
-                className="text-md text-center py-2 px-3   font-semibold text-gray-800 bg-indigo-300 rounded-xl hover:bg-indigo-400 transition duration-300"
+                className="text-md text-center py-2 px-3   font-semibold text-background bg-primary rounded-xl hover:bg-accent transition duration-300"
                 target="_blank"
                 rel="noopener noreferrer"
               >

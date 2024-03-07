@@ -8,6 +8,16 @@ import SingingProvider from "./hashconnect/sign";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+// Detect user's theme preference from localStorage or default to dark mode
+const preferredTheme = localStorage.getItem("theme") || "dark";
+
+// Apply the preferred theme by adding the appropriate class to the <html> element
+if (preferredTheme === "dark") {
+  document.documentElement.classList.add("dark");
+} else {
+  document.documentElement.classList.remove("dark");
+}
+
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );

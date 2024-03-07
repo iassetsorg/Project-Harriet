@@ -11,14 +11,21 @@ import {
   AiOutlineDislike,
   AiOutlineMessage,
 } from "react-icons/ai";
+import { FiHash } from "react-icons/fi";
 import { toast } from "react-toastify";
 interface ReplayProps {
   sequenceNumber: number;
   topicId: string;
   author?: string | null | undefined;
+  message_id: string;
 }
 
-const Replay: React.FC<ReplayProps> = ({ sequenceNumber, topicId, author }) => {
+const Replay: React.FC<ReplayProps> = ({
+  sequenceNumber,
+  topicId,
+  author,
+  message_id,
+}) => {
   const { send } = useSendMessage();
   const { state, pairingData } = useHashConnectContext();
   const signingAccount = pairingData?.accountIds[0] || "";
@@ -121,21 +128,21 @@ const Replay: React.FC<ReplayProps> = ({ sequenceNumber, topicId, author }) => {
     <>
       <div className="flex">
         <button
-          className="bg-gray-700 hover:bg-gray-600 text-gray-300 py-1 px-2 rounded-lg mt-2 ml-2 flex items-center"
+          className="bg-secondary hover:bg-background text-text py-1 px-2 rounded-lg mt-2 ml-2 flex items-center"
           onClick={() => handleLike(sequenceNumber)}
         >
-          <AiOutlineLike className="text-green-500" />
+          <AiOutlineLike className="text-text" />
         </button>
 
         <button
-          className="bg-gray-700 hover:bg-gray-600 text-gray-300 py-1 px-2 rounded-lg ml-2 mt-2 flex items-center"
+          className="bg-secondary hover:bg-background text-text py-1 px-2 rounded-lg ml-2 mt-2 flex items-center"
           onClick={() => handleDislike(sequenceNumber)}
         >
-          <AiOutlineDislike className="text-red-500" />
+          <AiOutlineDislike className="text-text" />
         </button>
 
         <button
-          className="bg-gray-700 hover:bg-gray-600 text-gray-300  py-1 px-2 rounded-lg mt-2 ml-2 flex items-center"
+          className="bg-secondary hover:bg-background text-text  py-1 px-2 rounded-lg mt-2 ml-2 flex items-center"
           onClick={() => {
             if (state !== "Paired") {
               openConnectModal();
@@ -146,40 +153,47 @@ const Replay: React.FC<ReplayProps> = ({ sequenceNumber, topicId, author }) => {
             setShowReplyForm(sequenceNumber);
           }}
         >
-          <AiOutlineMessage className="text-sky-500" />
+          <AiOutlineMessage className="text-text" />
         </button>
+        <a
+          href={`https://hashscan.io/mainnet/transaction/${message_id}`}
+          target="blank"
+          className="bg-secondary hover:bg-background text-text  py-1 px-1 rounded-lg mt-2 ml-2 flex items-center"
+        >
+          <FiHash />
+        </a>
 
         <button
-          className="bg-gray-700 hover:bg-gray-600 text-gray-300  py-1 px-2 rounded-lg mt-2 ml-2 flex items-center"
+          className="bg-secondary hover:bg-background text-text  py-1 px-2 rounded-lg mt-2 ml-2 flex items-center"
           onClick={() => {
             handleTip();
           }}
         >
-          <BsCurrencyDollar className="text-gray-300" />
+          <BsCurrencyDollar className="text-text" />
         </button>
 
         <button
-          className="bg-gray-700 hover:bg-gray-600 text-gray-300  py-1 px-2 rounded-lg mt-2 ml-2 flex items-center"
+          className="bg-secondary hover:bg-background text-text  py-1 px-2 rounded-lg mt-2 ml-2 flex items-center"
           onClick={() => {
             copyShareLink();
           }}
         >
-          <FiShare2 className="text-gray-300" />
+          <FiShare2 className="text-text" />
         </button>
       </div>
 
       {showReplyForm === sequenceNumber && (
         <Modal isOpen={isModalOpen} onClose={closeModal}>
-          <div className="max-w-md mx-auto mt-3 text-center flex flex-col justify-center rounded-lg bg-gray-800 p-6 text-white">
+          <div className="max-w-md mx-auto mt-3 text-center flex flex-col justify-center rounded-lg bg-background p-6 text-text">
             <h3 className="mb-3 font-semibold text-xl">Write a comment</h3>
             <textarea
-              className="h-24 w-full border border-gray-600 rounded mb-3 p-2 bg-gray-700 text-white"
+              className="h-24 w-full border border-background rounded mb-3 p-2 bg-secondary text-text"
               placeholder="Type your reply here"
               value={replyContent}
               onChange={(event) => setReplyContent(event.target.value)}
             />
             <button
-              className=" text-gray-800 bg-indigo-300 rounded-full hover:bg-indigo-400 transition duration-300 py-2 px-4  w-full"
+              className=" text-background bg-primary rounded-full hover:bg-accent transition duration-300 py-2 px-4  w-full"
               onClick={() => handleReply(sequenceNumber)}
             >
               Send
@@ -196,7 +210,7 @@ const Replay: React.FC<ReplayProps> = ({ sequenceNumber, topicId, author }) => {
       {/* Display comments in a modal if showComments is set to the current sequence number */}
       {isTipModalOpen && (
         <Modal isOpen={isTipModalOpen} onClose={closeTipModal}>
-          <div className="bg-gray-800 p-4 rounded-lg">
+          <div className="bg-background p-4 rounded-lg">
             <Tip onClose={closeTipModal} author={author} topicId={topicId} />
           </div>
         </Modal>

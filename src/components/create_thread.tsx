@@ -220,22 +220,22 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
   // Function to retry the current step
 
   return (
-    <div className="modal-content max-w-md mx-auto bg-gray-800 rounded-lg shadow-xl p-3 text-white">
+    <div className="modal-content max-w-md mx-auto bg-background rounded-lg shadow-xl p-3 text-text">
       {!isProcess ? (
         <>
-          <h3 className="text-xl py-4 px-8 font-semibold text-indigo-300">
+          <h3 className="text-xl py-4 px-8 font-semibold text-primary">
             Create a Thread
           </h3>
           <section className="py-4 px-8 ">
             <label
               htmlFor="messageContent"
-              className="block text-sm font-semibold text-gray-300"
+              className="block text-sm font-semibold text-text"
             >
               Message:
             </label>
             <div className="mt-2">
               <textarea
-                className="w-full h-48 px-4 py-2 rounded-lg text-base bg-gray-700 text-white"
+                className="w-full h-48 px-4 py-2 rounded-lg text-base bg-secondary text-text"
                 name="messageContent"
                 id="messageContent"
                 value={message}
@@ -247,7 +247,7 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
             {!file && (
               <label
                 htmlFor="fileUpload"
-                className="cursor-pointer flex items-center justify-center p-4 mx-4 border-2 border-dashed mb-3"
+                className="cursor-pointer flex items-center justify-center p-4 mx-4 border-2 border-dashed mb-3 border-secondary"
               >
                 <input
                   type="file"
@@ -282,7 +282,7 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
           {/* <section className="py-4 px-8">
             <label
               htmlFor="messageMemo"
-              className="block text-sm font-semibold text-gray-300"
+              className="block text-sm font-semibold text-text"
             >
               Memo:
             </label>
@@ -298,18 +298,18 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
             </div>
           </section> */}
           {/* <div className="py-2 px-8 ">
-            <label className="flex items-center text-sm font-semibold text-gray-300">
+            <label className="flex items-center text-sm font-semibold text-text">
               <input
                 type="checkbox"
                 checked={submitKey}
                 onChange={() => setSubmitKey(!submitKey)}
-                className="h-6 w-6 text-gray-400 border-2 border-gray-400 "
+                className="h-6 w-6 text-secondary border-2 border-secondary "
               />
               <span className="ml-3">No Reactions</span>
             </label>
           </div>
           <div className="pb-2 px-8">
-            <label className="flex items-center text-sm font-semibold text-gray-300">
+            <label className="flex items-center text-sm font-semibold text-text">
               <input
                 type="checkbox"
                 checked={addToProfile}
@@ -320,7 +320,7 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
             </label>
           </div>
           <div className="pb-4 px-8">
-            <label className="flex items-center text-sm font-semibold text-gray-300">
+            <label className="flex items-center text-sm font-semibold text-text">
               <input
                 type="checkbox"
                 checked={publishExplore}
@@ -332,92 +332,92 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
           </div> */}
           <button
             onClick={() => createThread()}
-            className="w-full p-3  text-gray-800 bg-indigo-300 rounded-full hover:bg-indigo-400 transition duration-300 py-3 px-6 "
+            className="w-full p-3  text-background bg-primary rounded-full hover:bg-accent transition duration-300 py-3 px-6 "
           >
             Create Thread
           </button>
         </>
       ) : (
         <div className="p-4 ">
-          <h1 className="text-gray-200 mb-3">Network fees: $0.0104</h1>
+          <h1 className="text-text mb-3">Network fees: $0.0104</h1>
           <div className="flex flex-col justify-between mb-2 ">
-            <span className="text-sm text-gray-400">$0.01</span>
+            <span className="text-sm text-secondary">$0.01</span>
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold mr-3">
                 Creating Thread Topic
               </h3>
               <span>
                 {currentStepStatus >= 1 ? (
-                  <MdFileDownloadDone className="text-xl text-green-500" />
+                  <MdFileDownloadDone className="text-xl text-success" />
                 ) : (
-                  <HiOutlineDotsHorizontal className="text-xl text-orange-500" />
+                  <HiOutlineDotsHorizontal className="text-xl text-waiting" />
                 )}
               </span>
             </div>
           </div>
 
           <div className="flex flex-col justify-between mb-2">
-            <span className="text-sm text-gray-400">$0.0001</span>
+            <span className="text-sm text-secondary">$0.0001</span>
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold  mr-3">
                 Initiating Thread Topic
               </h3>
               <span>
                 {currentStepStatus >= 2 ? (
-                  <MdFileDownloadDone className="text-xl text-green-500" />
+                  <MdFileDownloadDone className="text-xl text-success" />
                 ) : (
-                  <HiOutlineDotsHorizontal className="text-xl text-orange-500" />
+                  <HiOutlineDotsHorizontal className="text-xl text-waiting" />
                 )}
               </span>
             </div>
           </div>
 
           <div className="flex flex-col justify-between mb-2">
-            <span className="text-sm text-gray-400">$0.0001</span>
+            <span className="text-sm text-secondary">$0.0001</span>
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold  mr-3">
                 Publishing on Explore
               </h3>
               <span>
                 {currentStepStatus >= 3 ? (
-                  <MdFileDownloadDone className="text-xl text-green-500" />
+                  <MdFileDownloadDone className="text-xl text-success" />
                 ) : (
-                  <HiOutlineDotsHorizontal className="text-xl text-orange-500" />
+                  <HiOutlineDotsHorizontal className="text-xl text-waiting" />
                 )}
               </span>
             </div>
           </div>
 
           <div className="flex flex-col justify-between mb-2">
-            <span className="text-sm text-gray-400">$0.0001</span>
+            <span className="text-sm text-secondary">$0.0001</span>
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold  mr-3">Adding To Profile</h3>
               <span>
                 {currentStepStatus >= 4 ? (
-                  <MdFileDownloadDone className="text-xl text-green-500" />
+                  <MdFileDownloadDone className="text-xl text-success" />
                 ) : (
-                  <HiOutlineDotsHorizontal className="text-xl text-orange-500" />
+                  <HiOutlineDotsHorizontal className="text-xl text-waiting" />
                 )}
               </span>
             </div>
           </div>
 
           <div className="flex flex-col justify-between mb-2">
-            <span className="text-sm text-gray-400">$0.0001</span>
+            <span className="text-sm text-secondary">$0.0001</span>
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold  mr-3">Sending Message</h3>
               <span>
                 {currentStepStatus >= 5 ? (
-                  <MdFileDownloadDone className="text-xl text-green-500" />
+                  <MdFileDownloadDone className="text-xl text-success" />
                 ) : (
-                  <HiOutlineDotsHorizontal className="text-xl text-orange-500" />
+                  <HiOutlineDotsHorizontal className="text-xl text-waiting" />
                 )}
               </span>
             </div>
           </div>
           <button
             onClick={breakStep}
-            className="w-full bg-red-600 hover:bg-red-700 text-white py-2 mt-3 px-4 rounded-full"
+            className="w-full bg-error hover:bg-secondary text-text py-2 mt-3 px-4 rounded-full"
           >
             Cancel
           </button>
