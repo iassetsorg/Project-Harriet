@@ -65,7 +65,7 @@ const ReadIPFSData: React.FC<Props> = ({ cid }) => {
   };
 
   return (
-    <div className="file-preview border border-primary   ">{fileElement}</div>
+    <div className="file-preview border border-primary ">{fileElement}</div>
   );
 };
 

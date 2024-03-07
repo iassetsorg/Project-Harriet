@@ -87,7 +87,7 @@ function Planet() {
                 className="p-4 border border-primary rounded mb-4 bg-secondary overflow-y-auto "
               >
                 <p className="text-sm mb-1 text-primary">{message.sender}</p>
-                <p className="mb-3 text-text textspace-pre-line">
+                <p className="mb-3 text-text whitespace-pre-line">
                   {message.Message}
                 </p>
                 <div className="flex items-center md:w-1/6 md:justify-start w-full">
