@@ -14,15 +14,9 @@ import { useHashConnectContext } from "../hashconnect/hashconnect";
 
 const menuItems = [
   {
-    icon: <MdExplore className="text-2xl" />,
+    icon: <MdOutlinePublic className="text-2xl" />,
     text: "Explore",
     link: "/Explore",
-    isExternal: false,
-  },
-  {
-    icon: <MdOutlinePublic className="text-2xl" />,
-    text: "Planet",
-    link: "/Planet",
     isExternal: false,
   },
 

@@ -198,33 +198,27 @@ const About: React.FC = () => (
         {/* v0.0.7 Boosting Threads */}
         <div className="mb-6">
           <h3 className="text-2xl text-primary mb-2">
-            <span>⏳</span> v0.0.7 UPGRADO
+            <span>✅</span> v0.0.7 UPGRADO
           </h3>
           <ul>
             <li> 🟢 Hash Link #</li>
             <li> 🟢 Dark & light theme</li>
-            <li> 🟠 Universal Topic</li>
-            <li> 🟠 interactive polls</li>
+            <li> 🟢 Universal Topic</li>
+            <li> 🟢 Interactive polls</li>
+            <li> 🟢 Users profile</li>
           </ul>
         </div>
 
         {/* v0.0.8 Interactive Polls */}
         <div className="mb-6">
           <h3 className="text-2xl text-primary mb-2">
-            <span>⏳</span> v0.0.8 Boosting Threads
+            <span>⏳</span> v0.0.8 Reward & Analyze
           </h3>
 
           <ul>
             <li>
-              🟠
-              <a
-                className=" text-primary mb-2"
-                href="https://sentx.io/nft-marketplace/0.0.3844404"
-                target="blank"
-              >
-                iBird Gen 1: The First Flight
-              </a>{" "}
-              NFT Holders can boost their Threads
+              <li> 🟠 Reward engine</li>
+              <li> 🟠 System Analytics</li>
             </li>
           </ul>
         </div>
@@ -248,7 +242,15 @@ const About: React.FC = () => (
           </h3>
           <ul>
             <li>
-              🟠 ASSET Token Holders propose and vote on key platform updates
+              <a
+                className=" text-text mb-2"
+                href="https://sentx.io/nft-marketplace/0.0.3844404"
+                target="blank"
+              >
+                🟠 iBird Gen 1: The First Flight
+              </a>{" "}
+              <span className="text-text"> </span>
+              Holders propose and vote on key platform updates
             </li>
           </ul>
         </div>

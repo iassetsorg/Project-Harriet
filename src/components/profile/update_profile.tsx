@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { useHashConnectContext } from "../hashconnect/hashconnect";
-import useProfileData from "../hooks/use_profile_data";
+import { useHashConnectContext } from "../../hashconnect/hashconnect";
+import useProfileData from "../../hooks/use_profile_data";
 import { toast } from "react-toastify";
-import useSendMessage from "../hooks/use_send_message";
+import useSendMessage from "../../hooks/use_send_message";
+import useUploadToIPFS from "../../hooks/use_upload_to_ipfs";
 
 const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
   const { pairingData } = useHashConnectContext();
@@ -10,14 +11,15 @@ const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
   const { send } = useSendMessage();
   const { profileData } = useProfileData(signingAccount);
   const userProfileTopicId = profileData ? profileData.ProfileTopic : "";
-  const userThreadsTopicId = profileData ? profileData.Threads : "";
+  const userMessagesTopicId = profileData ? profileData.UserMessages : "";
+  const { uploading, uploadToNFTStorage, error } = useUploadToIPFS();
 
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
   const [website, setWebsite] = useState("");
   const [location, setLocation] = useState("");
-  const [picture, setPicture] = useState("");
-  const [banner, setBanner] = useState("");
+  const [picture, setPicture] = useState<File | null>(null);
+  const [banner, setBanner] = useState<File | null>(null);
 
   useEffect(() => {
     if (signingAccount && profileData && profileData) {
@@ -25,12 +27,31 @@ const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
       setBio(profileData.Bio || "");
       setWebsite(profileData.Website || "");
       setLocation(profileData.Location || "");
-      setPicture(profileData.Picture || "");
-      setBanner(profileData.Banner || "");
     }
   }, [signingAccount, profileData]);
 
   const updateProfile = async () => {
+    let pictureHash = null;
+    let bannerHash = null;
+
+    if (picture) {
+      try {
+        pictureHash = await uploadToNFTStorage(picture);
+      } catch (e) {
+        toast.error("Picture upload failed. Try again.");
+        return;
+      }
+    }
+
+    if (banner) {
+      try {
+        bannerHash = await uploadToNFTStorage(banner);
+      } catch (e) {
+        toast.error("Banner upload failed. Try again.");
+        return;
+      }
+    }
+
     const updateMessage = {
       Identifier: "iAssets",
       Type: "Profile",
@@ -39,9 +60,9 @@ const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
       Bio: bio,
       Website: website,
       Location: location,
-      Threads: userThreadsTopicId,
-      Picture: picture,
-      Banner: banner,
+      UserMessages: userMessagesTopicId,
+      Picture: pictureHash,
+      Banner: bannerHash,
     };
 
     toast("Updating Profile");
@@ -67,7 +88,7 @@ const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full px-4 py-2  rounded-lg bg-secondary text-text"
+          className="w-full px-4 py-2 rounded-lg bg-secondary text-text"
         />
       </div>
       <div className="mb-3">
@@ -96,12 +117,35 @@ const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
           className="w-full px-4 py-2 rounded-lg bg-secondary text-text"
         />
       </div>
+      <div className="mb-3">
+        <label className="text-text ml-1">Profile Picture:</label>
+        <input
+          type="file"
+          onChange={(e) =>
+            e.target.files && e.target.files[0] && setPicture(e.target.files[0])
+          }
+          className="w-full px-4 py-2 rounded-lg bg-secondary text-text"
+        />
+      </div>
+      {/* <div className="mb-3">
+        <label className="text-text ml-1">Banner Image:</label>
+        <input
+          type="file"
+          onChange={(e) =>
+            e.target.files && e.target.files[0] && setBanner(e.target.files[0])
+          }
+          className="w-full px-4 py-2 rounded-lg bg-secondary text-text"
+        />
+      </div> */}
+      {uploading && <p>Uploading Media to IPFS...</p>}
+      {error && <p className="text-error">{error}</p>}
 
       <button
         onClick={updateProfile}
-        className="w-full py-3 px-6 font-semibold text-background bg-primary rounded-full hover:bg-accent transition duration-300 "
+        className="w-full py-3 px-6 font-semibold text-background bg-primary rounded-full hover:bg-accent transition duration-300"
+        disabled={uploading}
       >
-        Update
+        {uploading ? "Uploading..." : "Update"}
       </button>
     </div>
   );

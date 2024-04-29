@@ -1,11 +1,11 @@
-import React, { useState } from "react";
-import Modal from "../utils/modal";
-import { useHashConnectContext } from "../hashconnect/hashconnect";
-import useSendMessage from "../hooks/use_send_message";
+import React, { useEffect, useState } from "react";
+import Modal from "../../common/modal";
+import { useHashConnectContext } from "../../hashconnect/hashconnect";
+import useSendMessage from "../../hooks/use_send_message";
 import { FiShare2 } from "react-icons/fi";
-import Tip from "./tip";
+import Tip from "../tip/tip";
 import { BsCurrencyDollar } from "react-icons/bs";
-import Pair from "../hashconnect/pair";
+import Pair from "../../hashconnect/pair";
 import {
   AiOutlineLike,
   AiOutlineDislike,
@@ -48,12 +48,18 @@ const Replay: React.FC<ReplayProps> = ({
   const closeConnectModal = () => {
     setIsConnectModalOpen(false);
   };
+  useEffect(() => {
+    if (state === "Paired") {
+      closeModal();
+    }
+  }, [state]);
 
   const handleReply = async (sequenceNumber: number) => {
     if (state !== "Paired") {
       openConnectModal();
       return;
     }
+
 
     const replyMessage = {
       Author: signingAccount,
@@ -79,6 +85,7 @@ const Replay: React.FC<ReplayProps> = ({
 
     toast("Sending Like");
     await send(topicId, likeMessage, "");
+    window.location.reload();
   };
 
   const handleDislike = async (sequenceNumber: number) => {
@@ -93,6 +100,7 @@ const Replay: React.FC<ReplayProps> = ({
 
     toast("Sending DisLike");
     await send(topicId, dislikeMessage, "");
+    window.location.reload();
   };
   const generateShareLink = () => {
     return `${window.location.origin}/Threads/${topicId}`;

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { useHashConnectContext } from "../hashconnect/hashconnect";
-import useProfileData from "../hooks/use_profile_data";
+import { useHashConnectContext } from "../../hashconnect/hashconnect";
+import useProfileData from "../../hooks/use_profile_data";
 import { toast } from "react-toastify";
-import useSendMessage from "../hooks/use_send_message";
+import useSendMessage from "../../hooks/use_send_message";
 import {
   TransactionReceipt,
   PublicKey,
@@ -10,7 +10,7 @@ import {
   TransferTransaction,
   Hbar,
 } from "@hashgraph/sdk";
-import { useSigningContext } from "../hashconnect/sign";
+import { useSigningContext } from "../../hashconnect/sign";
 const Tip = ({
   onClose,
   author,
@@ -346,7 +346,7 @@ const Tip = ({
           placeholder="Amount"
           value={amountToSend}
           onChange={(e) => setAmountToSend(e.target.value)}
-          className="w-full p-2 text-sm rounded bg-background text-text"
+          className="w-full p-2 text-sm border border-primary rounded bg-background text-text"
         />
 
         <div className="grid grid-cols-3 gap-4">
@@ -358,7 +358,7 @@ const Tip = ({
               className={`p-2  text-sm rounded ${
                 selectedToken === option
                   ? "bg-primary text-background"
-                  : "bg-background text-text"
+                  : "bg-background text-text border border-primary"
               }`}
             >
               {option}

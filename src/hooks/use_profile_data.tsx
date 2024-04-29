@@ -17,7 +17,7 @@ interface ProfileData {
   Website: string;
   Picture: string;
   Banner: string;
-  Threads: string;
+  UserMessages: string;
 }
 
 /**
@@ -104,7 +104,7 @@ const useProfileData = (signingAccount: string) => {
         Website: d.Website,
         Picture: d.Picture,
         Banner: d.Banner,
-        Threads: d.Threads,
+        UserMessages: d.UserMessages,
       }));
 
       if (processedData.length > 0) {

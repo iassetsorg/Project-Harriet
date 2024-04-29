@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
-import { useSigningContext } from "../hashconnect/sign";
-import { useHashConnectContext } from "../hashconnect/hashconnect";
+import { useSigningContext } from "../../hashconnect/sign";
+import { useHashConnectContext } from "../../hashconnect/hashconnect";
 import {
   TransactionReceipt,
   PublicKey,
@@ -11,25 +11,27 @@ import {
   Hbar,
 } from "@hashgraph/sdk";
 import { toast } from "react-toastify";
-import useSendMessage from "../hooks/use_send_message";
-import useCreateTopic from "../hooks/use_create_topic";
+import useSendMessage from "../../hooks/use_send_message";
+import useCreateTopic from "../../hooks/use_create_topic";
+import useUploadToIPFS from "../../hooks/use_upload_to_ipfs";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { MdFileDownloadDone } from "react-icons/md";
 
-const CreateProfile = ({ onClose }: { onClose: () => void }) => {
+const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
   const { send } = useSendMessage();
   const { create } = useCreateTopic();
   const { signAndMakeBytes } = useSigningContext();
   const { sendTransaction, pairingData } = useHashConnectContext();
   const signingAccount = pairingData?.accountIds[0] || "";
+  const { uploading, uploadToNFTStorage, error } = useUploadToIPFS();
   const [memo, setMemo] = useState("");
   const [submitKey, setSubmitKey] = useState(false);
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
   const [website, setWebsite] = useState("");
   const [location, setLocation] = useState("");
-  const [picture, setPicture] = useState("");
-  const [banner, setBanner] = useState("");
+  const [picture, setPicture] = useState<File | null>(null);
+  const [banner, setBanner] = useState<File | null>(null);
 
   const [isProcess, setIsProcess] = useState(false);
   const [isBreak, setIsBreak] = useState(false);
@@ -46,10 +48,7 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
   };
 
   const createProfile = async () => {
-    setIsProcess(true);
-    isBreakRef.current = false;
-
-    let ThreadsTopicId = "";
+    let UserMessagesTopicId = "";
     let ProfileTopicId = "";
     let profileTokenId = "";
     let accountInfo: any = await fetch(
@@ -59,9 +58,39 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
     accountInfo = await accountInfo.json();
     let key = PublicKey.fromString(accountInfo.key.key);
 
+    let pictureHash = null;
+    let bannerHash = null;
+
+    if (picture) {
+      try {
+        pictureHash = await uploadToNFTStorage(picture);
+      } catch (e) {
+        toast.error("Picture upload failed. Try again.");
+        setIsProcess(false);
+        return;
+      }
+    }
+
+    if (banner) {
+      try {
+        bannerHash = await uploadToNFTStorage(banner);
+      } catch (e) {
+        toast.error("Banner upload failed. Try again.");
+        setIsProcess(false);
+        return;
+      }
+    }
+
+    setIsProcess(true);
+    isBreakRef.current = false;
+
     while (currentStep < 6) {
+      if (isBreak) {
+        break;
+      }
+
       // Step 1: Create User Threads Topic
-      toast(`Starting process, Step: ${currentStep}`);
+      toast(`Starting process`);
 
       if (currentStep === 0) {
         if (isBreakRef.current) {
@@ -70,19 +99,19 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
           break;
         }
 
-        toast(`Start the process, Step: ${currentStep}`);
-        const userThreadsTopicId = await create(
-          "ibird UserThreads",
+        toast(`Start the process`);
+        const createUserMessagesTopicId = await create(
+          "ibird UserMessages",
           "",
           submitKey
         );
 
-        if (userThreadsTopicId) {
+        if (createUserMessagesTopicId) {
           currentStep++;
           setCurrentStepStatus(1);
-          if (userThreadsTopicId) ThreadsTopicId = userThreadsTopicId;
+          UserMessagesTopicId = createUserMessagesTopicId;
         }
-        toast(`UserThreads Created, Step: ${currentStep}`);
+        toast(`UserMessagesTopic Created`);
       }
 
       // Step 2: Initiating UserThreads
@@ -92,22 +121,23 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
           setIsProcess(false);
           break;
         }
-        toast(`Initiating UserThreads, Step: ${currentStep}`);
-        const InitiatingUserThreadsMessage = {
+
+        toast(`Initiating UserMessagesTopic`);
+        const InitiatingUserMessagesTopic = {
           Identifier: "iAssets",
-          Type: "UserThreads",
+          Type: "UserMessages",
           Author: signingAccount,
         };
-        const initiatingUserThread = await send(
-          ThreadsTopicId,
-          InitiatingUserThreadsMessage,
+        const initiatingUserMessages = await send(
+          UserMessagesTopicId,
+          InitiatingUserMessagesTopic,
           ""
         );
 
-        if (initiatingUserThread?.receipt.status.toString() === "SUCCESS") {
+        if (initiatingUserMessages?.receipt.status.toString() === "SUCCESS") {
           currentStep++;
           setCurrentStepStatus(2);
-          toast("UserThreads Initiated");
+          toast("UserMessages Initiated");
         }
       }
 
@@ -152,9 +182,9 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
           Bio: bio,
           Website: website,
           Location: location,
-          Threads: ProfileTopicId,
-          Picture: picture,
-          Banner: banner,
+          UserMessages: UserMessagesTopicId,
+          Picture: pictureHash,
+          Banner: bannerHash,
         };
 
         const initiatingUserProfile = await send(
@@ -262,7 +292,7 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
             currentStep++;
             setCurrentStepStatus(6);
             toast("Profile Token Created");
-            // Reload the page
+            onClose();
             window.location.reload();
           } else {
             if (response.error) {
@@ -272,8 +302,6 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
             }
           }
         }
-        setIsProcess(false);
-        onClose();
       }
     }
   };
@@ -299,7 +327,7 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
             <div className="mt-2">
               <input
                 type="text"
-                className="w-full px-4 py-2 rounded-lg border-2 border-secondary text-base bg-background"
+                className="w-full px-4 py-2 rounded-lg border-2 border-secondary text-base bg-secondary"
                 name="name"
                 id="name"
                 value={name}
@@ -318,7 +346,7 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
             </label>
             <div className="mt-2">
               <textarea
-                className="w-full px-4 py-2 rounded-lg border-secondary text-base bg-background"
+                className="w-full px-4 py-2 rounded-lg border-secondary text-base bg-secondary"
                 name="bio"
                 id="bio"
                 value={bio}
@@ -338,7 +366,7 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
             <div className="mt-2">
               <input
                 type="text"
-                className="w-full px-4 py-2 rounded-lg border-secondary text-base bg-background"
+                className="w-full px-4 py-2 rounded-lg border-secondary text-base bg-secondary"
                 name="website"
                 id="website"
                 value={website}
@@ -358,7 +386,7 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
             <div className="mt-2">
               <input
                 type="text"
-                className="w-full px-4 py-2 rounded-lg border-secondary text-base bg-background"
+                className="w-full px-4 py-2 rounded-lg border-secondary text-base bg-secondary"
                 name="location"
                 id="location"
                 value={location}
@@ -367,49 +395,60 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
             </div>
           </section>
 
-          {/* <section className="py-4 px-8">
-        <label
-          htmlFor="picture"
-          className="block text-sm font-semibold text-background"
-        >
-          Picture URL:
-        </label>
-        <div className="mt-2">
-          <input
-            type="text"
-            className="w-full px-4 py-2 rounded-lg border-2 border-sky-400 focus:ring-4 focus:ring-sky-300 text-base bg-text backdrop-blur-md"
-            name="picture"
-            id="picture"
-            value={picture}
-            onChange={(e) => setPicture(e.target.value)}
-          />
-        </div>
-      </section>
+          <section className="py-4 px-8">
+            {/* Profile Picture Input */}
+            <label
+              htmlFor="picture"
+              className="block text-sm font-semibold text-text"
+            >
+              Profile Picture:
+            </label>
+            <div className="mt-2">
+              <input
+                type="file"
+                className="w-full px-4 py-2 rounded-lg border-secondary text-base bg-secondary"
+                name="picture"
+                id="picture"
+                onChange={(e) =>
+                  e.target.files &&
+                  e.target.files[0] &&
+                  setPicture(e.target.files[0])
+                }
+              />
+            </div>
+          </section>
 
-      <section className="py-4 px-8">
-        <label
-          htmlFor="banner"
-          className="block text-sm font-semibold text-background"
-        >
-          Banner URL:
-        </label>
-        <div className="mt-2">
-          <input
-            type="text"
-            className="w-full px-4 py-2 rounded-lg border-2 border-sky-400 focus:ring-4 focus:ring-sky-300 text-base bg-text backdrop-blur-md"
-            name="banner"
-            id="banner"
-            value={banner}
-            onChange={(e) => setBanner(e.target.value)}
-          />
-        </div>
-      </section> */}
+          {/* <section className="py-4 px-8">
+            <label
+              htmlFor="banner"
+              className="block text-sm font-semibold text-text"
+            >
+              Banner:
+            </label>
+            <div className="mt-2">
+              <input
+                type="file"
+                className="w-full px-4 py-2 rounded-lg border-secondary text-base bg-secondary"
+                name="banner"
+                id="banner"
+                onChange={(e) =>
+                  e.target.files &&
+                  e.target.files[0] &&
+                  setBanner(e.target.files[0])
+                }
+              />
+            </div>
+          </section> */}
+
+          {uploading && <p>Uploading Media to IPFS...</p>}
+          {error && <p className="text-error">{error}</p>}
 
           <button
             onClick={() => createProfile()}
             className="w-full py-3 px-6 font-semibold text-background bg-primary rounded-full hover:bg-indigo-400 transition duration-300"
+            disabled={uploading}
           >
-            Create
+            {uploading ? "Uploading..." : "Create"}
           </button>
         </>
       ) : (
@@ -447,7 +486,6 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
               </span>
             </div>
           </div>
-
           {/* Step 3: Creating User Profile Topic */}
           <div className="flex flex-col justify-between mb-2 ">
             <span className="text-sm text-secondary">$0.01</span>
@@ -527,4 +565,4 @@ const CreateProfile = ({ onClose }: { onClose: () => void }) => {
   );
 };
 
-export default CreateProfile;
+export default CreateNewProfile;

@@ -1,25 +1,25 @@
 import { useState, useRef } from "react";
 import { FaCheck } from "react-icons/fa";
-import { useHashConnectContext } from "../hashconnect/hashconnect";
-import useProfileData from "../hooks/use_profile_data";
+import { useHashConnectContext } from "../../hashconnect/hashconnect";
+import useProfileData from "../../hooks/use_profile_data";
 
 import { toast } from "react-toastify";
-import useSendMessage from "../hooks/use_send_message";
-import useCreateTopic from "../hooks/use_create_topic";
+import useSendMessage from "../../hooks/use_send_message";
+import useCreateTopic from "../../hooks/use_create_topic";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { MdFileDownloadDone } from "react-icons/md";
-import useUploadToIPFS from "../hooks/use_upload_to_ipfs";
+import useUploadToIPFS from "../../hooks/use_upload_to_ipfs";
 import { MdOutlinePermMedia } from "react-icons/md";
 import { FiDelete } from "react-icons/fi";
+const explorerTopic = process.env.REACT_APP_EXPLORER_TOPIC || "";
 
 interface Message {
-  Author: string;
   Message: string;
   Media?: string | null;
 }
 
 // Component for Creating a Topic
-const CreateThread = ({ onClose }: { onClose: () => void }) => {
+const SendNewThread = ({ onClose }: { onClose: () => void }) => {
   const [message, setMessage] = useState("");
   const { sendTransaction, pairingData } = useHashConnectContext();
   const signingAccount = pairingData?.accountIds[0] || "";
@@ -31,7 +31,7 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
   const [publishExplore, setPublishExplore] = useState(true);
   const [addToProfile, setAddToProfile] = useState(true);
   const { profileData } = useProfileData(signingAccount);
-  const profileId = profileData ? profileData.Threads : "";
+  const profileId = profileData ? profileData.UserMessages : "";
   const [isProcess, setIsProcess] = useState(false);
   const [isBreak, setIsBreak] = useState(false);
   const [currentStepStatus, setCurrentStepStatus] = useState(0);
@@ -131,11 +131,12 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
         // Conditional "Publish on Explore" message send
         if (publishExplore) {
           const PublishingOnExplore = {
+            Type: "Thread",
             Thread: topic,
           };
 
           const publishingExplore = await send(
-            "0.0.3946144",
+            explorerTopic,
             PublishingOnExplore,
             ""
           );
@@ -157,6 +158,7 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
         }
         if (addToProfile) {
           const addingToProfile = {
+            Type: "Thread",
             Thread: topic,
           };
 
@@ -201,7 +203,6 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
         }
 
         let Message: Message = {
-          Author: signingAccount,
           Message: message,
           Media: uploadedMediaHash || null,
         };
@@ -220,16 +221,16 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
   // Function to retry the current step
 
   return (
-    <div className="modal-content max-w-md mx-auto bg-background rounded-lg shadow-xl p-3 text-text">
+    <div className="max-w-md mx-auto bg-background rounded-lg shadow-xl p-3 text-text">
       {!isProcess ? (
         <>
-          <h3 className="text-xl py-4 px-8 font-semibold text-primary">
-            Create a Thread
+          <h3 className="text-xl pt-4  px-8 font-semibold text-primary">
+            NEW THREAD
           </h3>
-          <section className="py-4 px-8 ">
+          <section className="pb-4  px-8 ">
             <label
               htmlFor="messageContent"
-              className="block text-sm font-semibold text-text"
+              className=" text-sm font-semibold text-text"
             >
               Message:
             </label>
@@ -334,7 +335,7 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
             onClick={() => createThread()}
             className="w-full p-3  text-background bg-primary rounded-full hover:bg-accent transition duration-300 py-3 px-6 "
           >
-            Create Thread
+            Send Thread
           </button>
         </>
       ) : (
@@ -427,4 +428,4 @@ const CreateThread = ({ onClose }: { onClose: () => void }) => {
   );
 };
 
-export default CreateThread;
+export default SendNewThread;

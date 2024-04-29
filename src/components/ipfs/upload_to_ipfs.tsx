@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import "react-toastify/dist/ReactToastify.css";
-import useUploadToIPFS from "../hooks/use_upload_to_ipfs";
+import useUploadToIPFS from "../../hooks/use_upload_to_ipfs";
 import { toast } from "react-toastify";
 import { useDropzone } from "react-dropzone";
 
 import ReadIPFSData from "./read_ipfs_data";
-import Spinner from "../utils/Spinner";
+import Spinner from "../../common/Spinner";
 import { MdOutlinePermMedia } from "react-icons/md";
 const UploadToIPFS = () => {
   const { uploadToNFTStorage, uploading, ipfsHash, error, progress } =

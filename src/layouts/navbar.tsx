@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useHashConnectContext } from "../hashconnect/hashconnect";
 import { useNavigate } from "react-router-dom";
 import Pair from "../hashconnect/pair";
-import Modal from "../utils/modal";
+import Modal from "../common/modal";
 import { RiMoneyDollarCircleLine } from "react-icons/ri";
 import DarkModeToggle from "./DarkModeToggle";
 const Navbar = () => {
@@ -48,7 +48,7 @@ const Navbar = () => {
             iBird
           </h1>
           <span className="text-background text-sm bg-gradient-to-r from-primary to-accent rounded p-1">
-            v0.0.6
+            v0.0.7
           </span>
         </div>
         <div className="flex items-center">

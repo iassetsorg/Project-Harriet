@@ -3,6 +3,8 @@ import { toast } from "react-toastify";
 
 // Defining the structure of the Message interface
 interface Message {
+  filter(arg0: (m: any) => boolean): unknown;
+  Choice: string;
   Media: string;
   Identifier: string;
   message_id: any;
@@ -21,10 +23,17 @@ interface Message {
   Bio?: string;
   Website?: string;
   Location?: string;
-  Threads?: string;
+  UserMessages?: string;
   Followings?: string;
   Picture?: string;
   Banner?: string;
+  Post?: string;
+  Poll?: string;
+  Choice1?: string;
+  Choice2?: string;
+  Choice3?: string;
+  Choice4?: string;
+  Choice5?: string;
 }
 
 // Function to decode a base64 string
@@ -86,10 +95,18 @@ const useGetData = (
             Bio,
             Website,
             Location,
-            Threads,
+            UserMessages,
             Followings,
             Picture,
             Banner,
+            Post,
+            Poll,
+            Choice,
+            Choice1,
+            Choice2,
+            Choice3,
+            Choice4,
+            Choice5,
           } = JSON.parse(decodedMessage);
 
           return {
@@ -109,10 +126,18 @@ const useGetData = (
             Bio,
             Website,
             Location,
-            Threads,
+            UserMessages,
             Followings,
             Picture,
             Banner,
+            Post,
+            Poll,
+            Choice,
+            Choice1,
+            Choice2,
+            Choice3,
+            Choice4,
+            Choice5,
             sequence_number: message.sequence_number,
             message: decodedMessage,
           };

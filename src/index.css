@@ -26,7 +26,7 @@
   --color-secondary: #94a3b8; /* Light mode secondary color */
   --color-accent: #0c4a6e; /* Light mode accent color */
   --color-error: #ae0808; /* Light mode error color */
-  --color-success: #22c55e;
+  --color-success: #0f9a29;
   --color-waiting: #ea580c;
 }
 
@@ -37,6 +37,6 @@
   --color-secondary: rgb(55 65 81); /* Dark mode secondary color */
   --color-accent: #818cf8; /* Dark mode accent color */
   --color-error: #ae0808; /* Dark mode error color */
-  --color-success: #22c55e;
+  --color-success: #0f9a29;
   --color-waiting: #ea580c;
 }

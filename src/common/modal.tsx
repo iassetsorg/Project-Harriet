@@ -5,6 +5,7 @@ interface ModalProps {
   onClose: () => void;
   children: React.ReactNode;
   hideCloseButton?: boolean;
+  onCloseClick?: () => void; // New optional prop
 }
 
 const Modal: FC<ModalProps> = ({
@@ -12,12 +13,16 @@ const Modal: FC<ModalProps> = ({
   onClose,
   children,
   hideCloseButton = false,
+  onCloseClick, // Destructure the new prop
 }) => {
   const [modalOpen, setModalOpen] = useState(isOpen);
 
   const closeModal = () => {
     setModalOpen(false);
     onClose();
+    if (onCloseClick) {
+      onCloseClick(); // Call the onCloseClick function if provided
+    }
   };
 
   return (
@@ -30,11 +35,11 @@ const Modal: FC<ModalProps> = ({
 
           <div className="z-50 relative max-w-3xl mx-auto">
             <div className="relative bg-background rounded-lg shadow-xl text-text">
-              {!hideCloseButton && ( // Conditional rendering based on hideCloseButton
+              {!hideCloseButton && (
                 <div className="absolute top-4 right-4">
                   <button
                     type="button"
-                    className="rounded-md text-text hover:text-primary focus:outline-none mr-3"
+                    className="rounded-md text-text hover:text-primary focus:outline-none mr-3 z-10"
                     onClick={closeModal}
                   >
                     <span className="sr-only">Close</span>
