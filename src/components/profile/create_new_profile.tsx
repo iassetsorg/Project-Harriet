@@ -210,9 +210,9 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
         toast("Creating User Profile NFT");
         // Create Token Transaction
         let createTokenTransaction = new TokenCreateTransaction()
-          .setTokenName("ibird.io")
+          .setTokenName("iAssets Profile")
           .setTokenSymbol("ASSET")
-          .setTokenMemo("ibird Profile")
+          .setTokenMemo("Profile NFT")
           .setTokenType(TokenType.NonFungibleUnique)
           .setDecimals(0)
           .setSupplyType(TokenSupplyType.Finite)

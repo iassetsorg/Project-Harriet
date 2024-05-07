@@ -12,7 +12,7 @@ const DarkModeToggle: React.FC = () => {
     darkMode
       ? document.documentElement.classList.add("dark")
       : document.documentElement.classList.remove("dark");
-  }, [darkMode]); // Re-run the effect when darkMode state changes
+  }, [darkMode]); 
 
   // Function to toggle dark mode state
   const toggleDarkMode = () => {
@@ -32,3 +32,4 @@ const DarkModeToggle: React.FC = () => {
 };
 
 export default DarkModeToggle;
+// Re-run the effect when darkMode state changes
