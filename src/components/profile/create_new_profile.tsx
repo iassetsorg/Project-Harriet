@@ -89,7 +89,7 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
         break;
       }
 
-      // Step 1: Create User Threads Topic
+      // Step 1: Create User Messages Topic
       toast(`Starting process`);
 
       if (currentStep === 0) {
@@ -114,7 +114,7 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
         toast(`UserMessagesTopic Created`);
       }
 
-      // Step 2: Initiating UserThreads
+      // Step 2: Initiating Messages Topic
       if (currentStep === 1) {
         if (isBreakRef.current) {
           toast("Process Cancelled");

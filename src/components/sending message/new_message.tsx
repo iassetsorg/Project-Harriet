@@ -153,7 +153,7 @@ export const NewMessage: FC = () => {
             </div>
 
             <div>
-              <p className="mt-2 text-sm text-text ">
+              <p className="mt-2 text-text ">
                 Initiate a voting process by creating a poll. Polls allow for
                 community participation through voting on specific topics.
                 Creating a poll costs $0.0104, which covers fees for creating

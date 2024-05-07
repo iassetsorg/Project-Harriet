@@ -34,7 +34,7 @@ const IpfsSettings = ({ onClose }: { onClose: () => void }) => {
         <li>
           Click API Keys to go to your{" "}
           <a
-            href="https://nft.storage/manage/"
+            href="https://app.nft.storage/v1/docs/how-to/api-key"
             target="_blank"
             className="text-primary"
           >
