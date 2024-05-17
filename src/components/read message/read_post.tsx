@@ -8,6 +8,7 @@ import Modal from "../../common/modal";
 import Tip from "../tip/tip";
 import Pair from "../../hashconnect/pair";
 import ReadIPFSData from "../ipfs/read_ipfs_data";
+import ReadMediaFile from "../media/read_media_file";
 import UserProfile from "../profile/user_profile";
 
 function ReadPost({
@@ -97,7 +98,7 @@ function ReadPost({
         <p className="mb-3 text-text whitespace-pre-line">{message}</p>
         {media && (
           <div className="flex items-center md:w-1/6 md:justify-start w-full">
-            <ReadIPFSData cid={media} />
+            <ReadMediaFile cid={media} />
           </div>
         )}
 

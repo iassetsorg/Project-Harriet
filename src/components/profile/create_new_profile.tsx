@@ -13,17 +13,17 @@ import {
 import { toast } from "react-toastify";
 import useSendMessage from "../../hooks/use_send_message";
 import useCreateTopic from "../../hooks/use_create_topic";
-import useUploadToIPFS from "../../hooks/use_upload_to_ipfs";
+import useUploadToIPFS from "../media/use_upload_to_ipfs";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { MdFileDownloadDone } from "react-icons/md";
-
+import useUploadToArweave from "../media/use_upload_to_arweave";
 const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
   const { send } = useSendMessage();
   const { create } = useCreateTopic();
   const { signAndMakeBytes } = useSigningContext();
   const { sendTransaction, pairingData } = useHashConnectContext();
   const signingAccount = pairingData?.accountIds[0] || "";
-  const { uploading, uploadToNFTStorage, error } = useUploadToIPFS();
+  const { uploading, uploadToArweave, error } = useUploadToArweave();
   const [memo, setMemo] = useState("");
   const [submitKey, setSubmitKey] = useState(false);
   const [name, setName] = useState("");
@@ -63,7 +63,7 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
 
     if (picture) {
       try {
-        pictureHash = await uploadToNFTStorage(picture);
+        pictureHash = await uploadToArweave(picture);
       } catch (e) {
         toast.error("Picture upload failed. Try again.");
         setIsProcess(false);
@@ -73,7 +73,8 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
 
     if (banner) {
       try {
-        bannerHash = await uploadToNFTStorage(banner);
+        const bannerResponse = await uploadToArweave(banner);
+        bannerHash = await uploadToArweave(banner);
       } catch (e) {
         toast.error("Banner upload failed. Try again.");
         setIsProcess(false);
@@ -440,7 +441,7 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
             </div>
           </section> */}
 
-          {uploading && <p>Uploading Media to IPFS...</p>}
+          {uploading && <p>Uploading Media...</p>}
           {error && <p className="text-error">{error}</p>}
 
           <button

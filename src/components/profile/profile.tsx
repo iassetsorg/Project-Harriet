@@ -8,10 +8,8 @@ import { MdOutlinePermMedia } from "react-icons/md";
 import CreateProfile from "./create_new_profile";
 import UpdateProfile from "./update_profile";
 import Modal from "../../common/modal";
-import IpfsSettings from "../ipfs/ipfs_settings";
 import UserExplorer from "../explorer/user_explore";
-import ReadIPFSData from "../ipfs/read_ipfs_data";
-
+import ReadMediaFile from "../media/read_media_file";
 const Profile: React.FC = () => {
   const { state, pairingData, disconnect } = useHashConnectContext();
   const signingAccount = pairingData?.accountIds[0] || "";
@@ -69,7 +67,7 @@ const Profile: React.FC = () => {
                 <ReadIPFSData cid={profileData.Banner} />
               </div>
             )} */}
-
+            {/* 
             {profileData.Picture && (
               <button
                 className="absolute top-4 right-4 text-secondary hover:text-background"
@@ -77,7 +75,7 @@ const Profile: React.FC = () => {
               >
                 <MdOutlinePermMedia className="text-xl text-text" />
               </button>
-            )}
+            )} */}
             <button
               className="absolute top-4 right-12 text-secondary hover:text-background"
               onClick={() => setIsUpdateProfileModalOpen(true)}
@@ -92,7 +90,7 @@ const Profile: React.FC = () => {
             >
               {profileData.Picture && (
                 <div className="w-32 h-32 md:w-48 md:h-48 rounded-full mx-auto md:mx-0 mb-4 md:mb-0">
-                  <ReadIPFSData cid={profileData.Picture} />
+                  <ReadMediaFile cid={profileData.Picture} />
                 </div>
               )}
               <div className="text-left">
@@ -160,11 +158,11 @@ const Profile: React.FC = () => {
             <UpdateProfile onClose={closeUpdateProfileModal} />
           </Modal>
         )}
-        {isMediaModalOpen && (
+        {/* {isMediaModalOpen && (
           <Modal isOpen={isMediaModalOpen} onClose={closeMediaModal}>
             <IpfsSettings onClose={closeMediaModal} />
           </Modal>
-        )}
+        )} */}
       </div>
     </div>
   );

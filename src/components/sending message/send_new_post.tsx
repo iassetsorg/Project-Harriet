@@ -5,16 +5,16 @@ import { FiDelete } from "react-icons/fi";
 import useSendMessage from "../../hooks/use_send_message";
 import { useHashConnectContext } from "../../hashconnect/hashconnect";
 import useProfileData from "../../hooks/use_profile_data";
-import useUploadToIPFS from "../../hooks/use_upload_to_ipfs";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { MdFileDownloadDone } from "react-icons/md";
+import useUploadToArweave from "../media/use_upload_to_arweave";
 
 const explorerTopic = process.env.REACT_APP_EXPLORER_TOPIC || "";
 
 const SendNewPost = ({ onClose }: { onClose: () => void }) => {
   const [message, setMessage] = useState("");
   const [file, setFile] = useState<File | null>(null);
-  const { uploading, uploadToNFTStorage, error } = useUploadToIPFS();
+  const { uploadToArweave, uploading, arweaveId, error } = useUploadToArweave();
   const { send } = useSendMessage();
   const { pairingData } = useHashConnectContext();
   const signingAccount = pairingData?.accountIds[0] || "";
@@ -52,7 +52,7 @@ const SendNewPost = ({ onClose }: { onClose: () => void }) => {
       return;
     }
 
-    let uploadedMediaHash = null;
+    let uploadedMediaId = null;
 
     setIsProcess(true);
     isBreakRef.current = false;
@@ -72,7 +72,7 @@ const SendNewPost = ({ onClose }: { onClose: () => void }) => {
         if (file) {
           try {
             setIsProcess(true);
-            uploadedMediaHash = await uploadToNFTStorage(file);
+            uploadedMediaId = await uploadToArweave(file);
           } catch (e) {
             toast.error("Media upload failed. Try again.");
             setIsProcess(false);
@@ -84,7 +84,7 @@ const SendNewPost = ({ onClose }: { onClose: () => void }) => {
         const postPayload = {
           Type: "Post",
           Message: message,
-          Media: uploadedMediaHash || null,
+          Media: uploadedMediaId || null,
         };
 
         const postExplorer = await send(explorerTopic, postPayload, memo);
@@ -105,7 +105,7 @@ const SendNewPost = ({ onClose }: { onClose: () => void }) => {
         const postPayload = {
           Type: "Post",
           Message: message,
-          Media: uploadedMediaHash || null,
+          Media: uploadedMediaId || null,
         };
 
         const postUserMessages = await send(profileId, postPayload, memo);

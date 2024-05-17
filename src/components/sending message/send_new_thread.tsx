@@ -8,7 +8,7 @@ import useSendMessage from "../../hooks/use_send_message";
 import useCreateTopic from "../../hooks/use_create_topic";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { MdFileDownloadDone } from "react-icons/md";
-import useUploadToIPFS from "../../hooks/use_upload_to_ipfs";
+import useUploadToArweave from "../media/use_upload_to_arweave";
 import { MdOutlinePermMedia } from "react-icons/md";
 import { FiDelete } from "react-icons/fi";
 const explorerTopic = process.env.REACT_APP_EXPLORER_TOPIC || "";
@@ -39,8 +39,10 @@ const SendNewThread = ({ onClose }: { onClose: () => void }) => {
 
   const [file, setFile] = useState<File | null>(null);
   const maxSize = 100 * 1024 * 1024; // 100 MB
-  const { uploadToNFTStorage, uploading, ipfsHash, error } = useUploadToIPFS();
-  ////////////////////////////////STEPS//////////////////////////////////////
+  const { uploadToArweave, uploading, arweaveId, error } = useUploadToArweave();
+
+  // Steps
+
   let currentStep = 0;
   let topic = "";
   // Function for creating a topic
@@ -185,16 +187,16 @@ const SendNewThread = ({ onClose }: { onClose: () => void }) => {
           return;
         }
 
-        let uploadedMediaHash = null;
+        let uploadedMediaId = null;
         // Proceed with file upload if a file is selected
         if (file) {
           try {
-            setIsProcess(true); // Indicate uploading process
-            uploadedMediaHash = await uploadToNFTStorage(file);
-            if (!uploadedMediaHash) {
-              throw new Error("Failed to upload media to IPFS.");
+            setIsProcess(true);
+            uploadedMediaId = await uploadToArweave(file);
+            if (!uploadedMediaId) {
+              throw new Error("Failed to upload media to Arweave.");
             }
-            setIsProcess(false); // End uploading indication
+            setIsProcess(false);
           } catch (error) {
             toast.error("Media upload failed. Try again.");
             setIsProcess(false);
@@ -204,7 +206,7 @@ const SendNewThread = ({ onClose }: { onClose: () => void }) => {
 
         let Message: Message = {
           Message: message,
-          Media: uploadedMediaHash || null,
+          Media: uploadedMediaId || null,
         };
 
         const sendingMessage = await send(topic, Message, memo);

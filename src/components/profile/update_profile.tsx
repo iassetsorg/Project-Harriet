@@ -3,7 +3,7 @@ import { useHashConnectContext } from "../../hashconnect/hashconnect";
 import useProfileData from "../../hooks/use_profile_data";
 import { toast } from "react-toastify";
 import useSendMessage from "../../hooks/use_send_message";
-import useUploadToIPFS from "../../hooks/use_upload_to_ipfs";
+import useUploadToArweave from "../media/use_upload_to_arweave";
 
 const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
   const { pairingData } = useHashConnectContext();
@@ -12,7 +12,7 @@ const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
   const { profileData } = useProfileData(signingAccount);
   const userProfileTopicId = profileData ? profileData.ProfileTopic : "";
   const userMessagesTopicId = profileData ? profileData.UserMessages : "";
-  const { uploading, uploadToNFTStorage, error } = useUploadToIPFS();
+  const { uploading, uploadToArweave, error } = useUploadToArweave();
 
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
@@ -36,7 +36,7 @@ const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
 
     if (picture) {
       try {
-        pictureHash = await uploadToNFTStorage(picture);
+        pictureHash = await uploadToArweave(picture);
       } catch (e) {
         toast.error("Picture upload failed. Try again.");
         return;
@@ -45,7 +45,7 @@ const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
 
     if (banner) {
       try {
-        bannerHash = await uploadToNFTStorage(banner);
+        bannerHash = await uploadToArweave(banner);
       } catch (e) {
         toast.error("Banner upload failed. Try again.");
         return;
@@ -137,7 +137,7 @@ const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
           className="w-full px-4 py-2 rounded-lg bg-secondary text-text"
         />
       </div> */}
-      {uploading && <p>Uploading Media to IPFS...</p>}
+      {uploading && <p>Uploading Media...</p>}
       {error && <p className="text-error">{error}</p>}
 
       <button

@@ -4,9 +4,8 @@ import useGetData from "../../hooks/use_get_data";
 import Replay from "../replay/replay_to_thread";
 import Modal from "../../common/modal";
 import Spinner from "../../common/Spinner";
-import ReadIPFSData from "../ipfs/read_ipfs_data";
 import UserProfile from "../profile/user_profile";
-
+import ReadMediaFile from "../media/read_media_file";
 function ReadThread({ topicId }: { topicId?: string }) {
   const [showComments, setShowComments] = useState<number | null>(null);
   const { messages, loading, fetchMessages, nextLink } = useGetData(topicId);
@@ -104,7 +103,7 @@ function ReadThread({ topicId }: { topicId?: string }) {
                   </p>
                   <div className="flex items-center md:w-1/6 md:justify-start w-full">
                     {messageDetails.media && (
-                      <ReadIPFSData cid={messageDetails.media} />
+                      <ReadMediaFile cid={messageDetails.media} />
                     )}
                   </div>
                   {topicId && (

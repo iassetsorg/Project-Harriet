@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "react-toastify/dist/ReactToastify.css";
-import useUploadToIPFS from "../../hooks/use_upload_to_ipfs";
+import useUploadToIPFS from "../media/use_upload_to_ipfs";
 import { toast } from "react-toastify";
 import { useDropzone } from "react-dropzone";
 

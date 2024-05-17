@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import useGetData from "../../hooks/use_get_data";
 import Modal from "../../common/modal";
 import Spinner from "../../common/Spinner";
-import ReadIPFSData from "../ipfs/read_ipfs_data";
+import ReadMediaFile from "../media/read_media_file";
 import ReplayPoll from "../replay/replay_to_poll";
 import UserProfile from "../profile/user_profile";
 
@@ -285,7 +285,7 @@ function ReadPoll({ topicId }: { topicId?: string }) {
 
                     <div className="flex items-center md:w-1/6 md:justify-start w-full">
                       {messageDetails.media && (
-                        <ReadIPFSData cid={messageDetails.media} />
+                        <ReadMediaFile cid={messageDetails.media} />
                       )}
                     </div>
                     {topicId && (

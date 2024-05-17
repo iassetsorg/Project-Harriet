@@ -4,7 +4,7 @@ import useProfileData from "../../hooks/use_profile_data";
 import { CiLocationOn } from "react-icons/ci";
 import { IoIosInformationCircleOutline } from "react-icons/io";
 import UserExplorer from "../explorer/user_explore";
-import ReadIPFSData from "../ipfs/read_ipfs_data";
+import ReadMediaFile from "../media/read_media_file";
 import Modal from "../../common/modal";
 
 const UserProfile = ({ userAccountId }: { userAccountId: string }) => {
@@ -34,7 +34,7 @@ const UserProfile = ({ userAccountId }: { userAccountId: string }) => {
       >
         {profileData && profileData.Picture && (
           <div className="w-10 h-10 rounded-full mr-2">
-            <ReadIPFSData cid={profileData.Picture} />
+            <ReadMediaFile cid={profileData.Picture} />
           </div>
         )}
         <p className="text-lg font-semibold text-text">{profileData?.Name}</p>
@@ -66,7 +66,7 @@ const UserProfile = ({ userAccountId }: { userAccountId: string }) => {
                   >
                     {profileData.Picture && (
                       <div className="w-32 h-32 md:w-48 md:h-48 rounded-full mx-auto md:mx-0 mb-4 md:mb-0">
-                        <ReadIPFSData cid={profileData.Picture} />
+                        <ReadMediaFile cid={profileData.Picture} />
                       </div>
                     )}
                     <div className="text-left">

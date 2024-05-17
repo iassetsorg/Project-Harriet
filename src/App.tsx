@@ -6,7 +6,6 @@ import About from "./components/about";
 import ReadSharedThread from "./components/read shared message/read_shared_thread";
 import ReadSharedPost from "./components/read shared message/read_shared_post";
 import ReadSharedPoll from "./components/read shared message/read_shared_poll";
-
 import {
   BrowserRouter as Router,
   Route,
@@ -45,7 +44,6 @@ export default function App() {
             {/* Catch-all route */}
           </Routes>
         </div>
-
         <BottomBar />
         <NewMessage />
       </Router>

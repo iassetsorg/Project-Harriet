@@ -1,25 +1,23 @@
+// useUploadToArweave.ts
 import { useState, useCallback } from "react";
 import axios from "axios";
 
-const useUploadToIPFS = () => {
+const useUploadToArweave = () => {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [ipfsHash, setIpfsHash] = useState<string | null>(null);
+  const [arweaveId, setArweaveId] = useState<string | null>(null);
 
-  const uploadToNFTStorage = useCallback(async (file: File) => {
+  const uploadToArweave = useCallback(async (file: File) => {
     try {
       setUploading(true);
       setProgress(0);
-      const ipfsKey = localStorage.getItem("ipfsKey");
-      if (!ipfsKey) {
-        throw new Error(
-          "IPFS key not found. Please set the key in local storage."
-        );
-      }
+      const apiKey = "LYzUaEbjLW5Fc2TQCzuq1731UCPIguHwaGQn3MAb";
+
       const config = {
         headers: {
-          Authorization: `Bearer ${ipfsKey}`,
+          Accept: "application/json",
+          "Api-Key": apiKey,
           "Content-Type": file.type,
         },
         onUploadProgress: (progressEvent: any) => {
@@ -30,26 +28,26 @@ const useUploadToIPFS = () => {
         },
       };
       const response = await axios.post(
-        "https://api.nft.storage/upload",
+        "https://api.akord.com/files",
         file,
         config
       );
-      const nftStorageResult = response.data;
-      const hash = `ipfs://${nftStorageResult.value.cid}`;
-      setIpfsHash(hash);
+      const arweaveResult = response.data;
+      const id = arweaveResult.tx.id;
+      setArweaveId(id);
       setUploading(false);
-      return hash; // Return the hash directly here
+      return `ar://${id}`; // Return the ID directly here
     } catch (error) {
       setError(
         (error as Error).message ||
-          "An error occurred while uploading to NFT.STORAGE"
+          "An error occurred while uploading to Arweave"
       );
       setUploading(false);
       throw error; // Rethrow the error to handle it in the caller
     }
   }, []);
 
-  return { uploadToNFTStorage, uploading, ipfsHash, error, progress };
+  return { uploadToArweave, uploading, arweaveId, error, progress };
 };
 
-export default useUploadToIPFS;
+export default useUploadToArweave;
