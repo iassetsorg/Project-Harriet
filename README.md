@@ -193,7 +193,7 @@ iBird consists of two main components:
 
 3.  **Media Storage**
 
-    - All media files are stored on IPFS (InterPlanetary File System).
+    - All media files are stored on IPFS and Arweave.
 
       ```json
       {
@@ -202,8 +202,6 @@ iBird consists of two main components:
         "Media": "ipfs://bafkreic35uavltr2pb6gsoisv54fytj77felckswkzlglakt25vcbpil6y"
       }
       ```
-
-    - Users can obtain a free key from [NFT.storage](https://app.nft.storage/v1/docs/how-to/api-key), an IPFS provider, to store their media.
 
 ## User Profiles
 
