@@ -82,7 +82,7 @@ const Navbar: React.FC = () => {
             iBird
           </h1>
           <span className="text-background text-sm bg-gradient-to-r from-primary to-accent rounded p-1">
-            v0.0.7
+            v0.0.8
           </span>
         </div>
         <div className="flex items-center">
