@@ -12,7 +12,7 @@ const DarkModeToggle: React.FC = () => {
     darkMode
       ? document.documentElement.classList.add("dark")
       : document.documentElement.classList.remove("dark");
-  }, [darkMode]); 
+  }, [darkMode]);
 
   // Function to toggle dark mode state
   const toggleDarkMode = () => {
@@ -23,10 +23,15 @@ const DarkModeToggle: React.FC = () => {
   return (
     <button
       onClick={toggleDarkMode}
-      className="font-semibold ml-auto p-1 text-background bg-primary rounded-lg text-xl hover:bg-accent transition duration-300"
+      className="flex items-center justify-center  text-background bg-primary rounded-xl hover:bg-accent transition duration-300 py-2 px-4"
     >
       {/* Render the icon based on the darkMode state */}
-      {darkMode ? <MdLightMode /> : <MdDarkMode />}
+      {darkMode ? (
+        <MdLightMode className="text-3xl mr-2" />
+      ) : (
+        <MdDarkMode className="text-3xl mr-2" />
+      )}
+      <span>{darkMode ? "Light Mode" : "Dark Mode"}</span>
     </button>
   );
 };

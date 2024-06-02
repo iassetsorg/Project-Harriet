@@ -7,7 +7,6 @@ import { useHashConnectContext } from "../../hashconnect/hashconnect";
 import Modal from "../../common/modal";
 import Tip from "../tip/tip";
 import Pair from "../../hashconnect/pair";
-import ReadIPFSData from "../ipfs/read_ipfs_data";
 import ReadMediaFile from "../media/read_media_file";
 import UserProfile from "../profile/user_profile";
 

@@ -273,7 +273,6 @@ When a user creates a profile:
 - Develop mobile applications for iBird.
 - Track the number of messages sent on the platform.
 - Solve the challenge of storing follower and following relationships on-chain.
-- Integrate additional decentralized data storage methods.
 - Implement a reward engine to incentivize user participation and growth.
 
 ## Building Together

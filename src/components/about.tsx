@@ -79,13 +79,7 @@ const About: React.FC = () => (
             <span>✅ </span>v0.0.1 Threads
           </h3>
           <ul>
-            <li> 🟠 Connect wallet</li>
-            <ul className="ml-4 ">
-              <li>🟢 HashPack </li>
-              <li> 🟠 Blade </li>
-              <li> 🟠 Metamask </li>
-              <li> 🟠 Wallet Connect </li>
-            </ul>
+            <li>🟢 Connect wallet</li>
             <li>🟢 Create threads</li>
             <li>🟢 Read thread's data</li>
             <li>🟢 Send message to threads</li>
@@ -212,13 +206,13 @@ const About: React.FC = () => (
         {/* v0.0.8 Interactive Polls */}
         <div className="mb-6">
           <h3 className="text-2xl text-primary mb-2">
-            <span>⏳</span> v0.0.8 Reward & Analyze
+            <span>✅</span> v0.0.8 Reward & Analyze
           </h3>
 
           <ul>
             <li>
-              <li> 🟠 Reward engine</li>
-              <li> 🟠 System Analytics</li>
+              <li> 🟢 Reward engine</li>
+              <li> 🟢 System Analytics</li>
             </li>
           </ul>
         </div>
@@ -252,6 +246,16 @@ const About: React.FC = () => (
               <span className="text-text"> </span>
               Holders propose and vote on key platform updates
             </li>
+          </ul>
+        </div>
+        {/* v0.1.1 Community Governance */}
+        <div className="mb-6">
+          <h3 className="text-2xl text-primary mb-2">
+            <span>⏳</span> v0.1.1 Followers and Channels
+          </h3>
+          <ul>
+            <li>🟠 Followers</li>
+            <li>🟠 Channels</li>
           </ul>
         </div>
       </div>
