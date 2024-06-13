@@ -45,20 +45,15 @@ const useGetData = (
   initialNextLink: string | null = null,
   isNew = false
 ) => {
-  // State variables to store messages, loading state, and the next link for pagination
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [nextLink, setNextLink] = useState<string | null>(initialNextLink);
 
-  // Function to fetch messages from the API
   const fetchMessages = async (topicIdOrLink: string | null) => {
-    // setMessages([]);
+    setMessages([]);
     setNextLink(null);
-
-    // Setting loading state to true to indicate that a fetch operation is in progress
     setLoading(true);
 
-    // Constructing the API URL based on the provided topic ID or link
     let apiUrl =
       topicIdOrLink && /^\/api\//.test(topicIdOrLink)
         ? `https://mainnet-public.mirrornode.hedera.com${topicIdOrLink}`
@@ -66,109 +61,109 @@ const useGetData = (
             topicIdOrLink || initialTopicId
           }/messages${isNew ? "?order=desc" : ""}`;
 
+    console.log("Fetching from URL:", apiUrl);
+
     try {
-      // Fetching data from the API
       const response = await fetch(apiUrl);
 
-      // Checking if the response is successful (status code 200)
       if (response.ok) {
-        // Parsing the response JSON
-        let data = await response.json();
+        const data = await response.json();
 
-        // Mapping the raw message data to a more structured format
-        const responseData = data.messages.map((message: any) => {
-          const decodedMessage = new TextDecoder("utf-8").decode(
-            Uint8Array.from(atob(message.message), (c) => c.charCodeAt(0))
-          );
-          const {
-            Message,
-            Media,
-            Identifier,
-            Author,
-            Like_to,
-            DisLike_to,
-            Reply_to,
-            Thread,
-            Status,
-            Type,
-            Name,
-            Bio,
-            Website,
-            Location,
-            UserMessages,
-            Followings,
-            Picture,
-            Banner,
-            Post,
-            Poll,
-            Choice,
-            Choice1,
-            Choice2,
-            Choice3,
-            Choice4,
-            Choice5,
-          } = JSON.parse(decodedMessage);
+        const responseData = data.messages
+          .map((message: any) => {
+            const decodedMessage = new TextDecoder("utf-8").decode(
+              Uint8Array.from(atob(message.message), (c) => c.charCodeAt(0))
+            );
 
-          return {
-            message_id: message.consensus_timestamp,
-            sender: message.payer_account_id,
-            Message,
-            Media,
-            Identifier,
-            Author,
-            Like_to,
-            DisLike_to,
-            Reply_to,
-            Thread,
-            Status,
-            Type,
-            Name,
-            Bio,
-            Website,
-            Location,
-            UserMessages,
-            Followings,
-            Picture,
-            Banner,
-            Post,
-            Poll,
-            Choice,
-            Choice1,
-            Choice2,
-            Choice3,
-            Choice4,
-            Choice5,
-            sequence_number: message.sequence_number,
-            message: decodedMessage,
-          };
-        });
+            try {
+              const {
+                Message,
+                Media,
+                Identifier,
+                Author,
+                Like_to,
+                DisLike_to,
+                Reply_to,
+                Thread,
+                Status,
+                Type,
+                Name,
+                Bio,
+                Website,
+                Location,
+                UserMessages,
+                Followings,
+                Picture,
+                Banner,
+                Post,
+                Poll,
+                Choice,
+                Choice1,
+                Choice2,
+                Choice3,
+                Choice4,
+                Choice5,
+              } = JSON.parse(decodedMessage);
 
-        // Updating state with the new messages and next link for pagination
-        setMessages((prev) => [...responseData]);
-        // Holds previous messages:
-        // setMessages((prev) => [...prev, ...responseData]);
+              return {
+                message_id: message.consensus_timestamp,
+                sender: message.payer_account_id,
+                Message,
+                Media,
+                Identifier,
+                Author,
+                Like_to,
+                DisLike_to,
+                Reply_to,
+                Thread,
+                Status,
+                Type,
+                Name,
+                Bio,
+                Website,
+                Location,
+                UserMessages,
+                Followings,
+                Picture,
+                Banner,
+                Post,
+                Poll,
+                Choice,
+                Choice1,
+                Choice2,
+                Choice3,
+                Choice4,
+                Choice5,
+                sequence_number: message.sequence_number,
+                message: decodedMessage,
+              };
+            } catch (error) {
+              console.warn("Invalid message format:", decodedMessage);
+              return null;
+            }
+          })
+          .filter((message: any): message is Message => message !== null);
+
+        setMessages(responseData);
         setNextLink(data.links?.next || null);
       } else if (response.status === 404) {
-        // Handling the case where the requested topic is not found
         toast.error("Topic Not Found");
         setMessages([]);
         setNextLink(null);
       } else {
-        // Handling other errors and displaying an error toast
-        toast.error("Error fetching messages");
+        toast.error(`Error fetching messages: ${response.statusText}`);
         console.error("Error fetching messages:", response.statusText);
       }
-    } catch (error) {
-      // Handling network errors and displaying an error toast
-      toast.error("Network Error: Failed to fetch messages");
+    } catch (error: any) {
+      toast.error(
+        `Network Error: ${error.message || "Failed to fetch messages"}`
+      );
       console.error("Error fetching messages:", error);
     } finally {
-      // Setting loading state to false after the fetch operation is complete
       setLoading(false);
     }
   };
 
-  // Returning the state variables and the fetchMessages function for external use
   return {
     messages,
     loading,
@@ -177,5 +172,4 @@ const useGetData = (
   };
 };
 
-// Exporting the custom hook for use in other components
 export default useGetData;
