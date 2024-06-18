@@ -6,6 +6,8 @@ import Modal from "../../common/modal";
 import Spinner from "../../common/Spinner";
 import UserProfile from "../profile/user_profile";
 import ReadMediaFile from "../media/read_media_file";
+import LinkAndHashtagReader from "../../common/link_and_hashtag_reader";
+
 function ReadThread({ topicId }: { topicId?: string }) {
   const [showComments, setShowComments] = useState<number | null>(null);
   const { messages, loading, fetchMessages, nextLink } = useGetData(topicId);
@@ -52,6 +54,15 @@ function ReadThread({ topicId }: { topicId?: string }) {
     setShowComments(null);
   };
 
+  // Format the consensus timestamp
+  const formatTimestamp = (timestamp: string) => {
+    const date = new Date(Number(timestamp) * 1000); // Convert to milliseconds
+    return new Intl.DateTimeFormat("en-US", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }).format(date);
+  };
+
   return (
     <div className="bg-background text-text">
       {loading && allMessages.length === 0 && <Spinner />}
@@ -89,6 +100,7 @@ function ReadThread({ topicId }: { topicId?: string }) {
                   author: m.sender,
                   message: m.Message,
                 })),
+              consensus_timestamp: message.consensus_timestamp?.toString(), // Add the consensus_timestamp
             };
 
             try {
@@ -99,13 +111,14 @@ function ReadThread({ topicId }: { topicId?: string }) {
                 >
                   <UserProfile userAccountId={messageDetails.author} />
                   <p className="mb-3 text-text whitespace-pre-line">
-                    {messageDetails.message}
+                    <LinkAndHashtagReader message={messageDetails.message} />
                   </p>
                   <div className="flex items-center md:w-1/6 md:justify-start w-full">
                     {messageDetails.media && (
                       <ReadMediaFile cid={messageDetails.media} />
                     )}
                   </div>
+
                   {topicId && (
                     <div className="flex items-center space-x-1">
                       <Replay
@@ -142,7 +155,9 @@ function ReadThread({ topicId }: { topicId?: string }) {
                       </button>
                     )}
                   </div>
-
+                  <p className="text-sm ml-3 text-gray-500">
+                    {formatTimestamp(messageDetails.consensus_timestamp || "")}
+                  </p>
                   {showComments === messageDetails.sequence_number && (
                     <Modal isOpen={isModalOpen} onClose={closeModal}>
                       <div className="mb-2 p-4">Comments: </div>

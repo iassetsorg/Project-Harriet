@@ -1,10 +1,10 @@
-// Explorer.tsx
 import React, { useEffect } from "react";
 import useGetData from "../../hooks/use_get_data";
 import Spinner from "../../common/Spinner";
 import ReadThread from "../read message/read_thread";
 import ReadPost from "../read message/read_post";
 import ReadPoll from "../read message/read_poll";
+
 function Explorer() {
   const explorerTopicID = process.env.REACT_APP_EXPLORER_TOPIC || "";
   const { messages, loading, fetchMessages, nextLink } = useGetData(
@@ -35,6 +35,9 @@ function Explorer() {
                   media={message.Media}
                   message_id={message.message_id}
                   sequence_number={message.sequence_number.toString()}
+                  consensus_timestamp={
+                    message.consensus_timestamp?.toString() || "0"
+                  } // Provide a default value
                 />
               </div>
             );

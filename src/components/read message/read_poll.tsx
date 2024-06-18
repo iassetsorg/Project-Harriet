@@ -6,6 +6,7 @@ import Spinner from "../../common/Spinner";
 import ReadMediaFile from "../media/read_media_file";
 import ReplayPoll from "../replay/replay_to_poll";
 import UserProfile from "../profile/user_profile";
+import LinkAndHashtagReader from "../../common/link_and_hashtag_reader";
 
 function ReadPoll({ topicId }: { topicId?: string }) {
   const [showComments, setShowComments] = useState<number | null>(null);
@@ -73,6 +74,15 @@ function ReadPoll({ topicId }: { topicId?: string }) {
     return ((votes / totalVotes) * 100).toFixed(1);
   };
 
+  // Format the consensus timestamp
+  const formatTimestamp = (timestamp: string) => {
+    const date = new Date(Number(timestamp) * 1000); // Convert to milliseconds
+    return new Intl.DateTimeFormat("en-US", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }).format(date);
+  };
+
   return (
     <div className="bg-background text-text">
       {loading && allMessages.length === 0 && <Spinner />}
@@ -126,6 +136,7 @@ function ReadPoll({ topicId }: { topicId?: string }) {
                 .length,
               Choice5Votes: allMessages.filter((m) => m.Choice === "Choice5")
                 .length,
+              consensus_timestamp: message.consensus_timestamp?.toString(), // Add the consensus_timestamp
             };
 
             const totalVotes = getTotalVotes(messageDetails);
@@ -146,7 +157,7 @@ function ReadPoll({ topicId }: { topicId?: string }) {
                   >
                     <UserProfile userAccountId={messageDetails.author} />
                     <p className="mb-3 text-text whitespace-pre-line">
-                      {messageDetails.message}
+                      <LinkAndHashtagReader message={messageDetails.message} />
                     </p>
 
                     {/* Choice options */}
@@ -325,7 +336,11 @@ function ReadPoll({ topicId }: { topicId?: string }) {
                         </button>
                       )}
                     </div>
-
+                    <p className="text-sm ml-3 text-gray-500">
+                      {formatTimestamp(
+                        messageDetails.consensus_timestamp || ""
+                      )}
+                    </p>
                     {showComments === messageDetails.sequence_number && (
                       <Modal isOpen={isModalOpen} onClose={closeModal}>
                         <div className="mb-2 p-4">Comments: </div>

@@ -1,4 +1,3 @@
-// ReadPost.tsx
 import React, { useEffect, useState } from "react";
 import { FiShare2, FiHash } from "react-icons/fi";
 import { toast } from "react-toastify";
@@ -9,6 +8,7 @@ import Tip from "../tip/tip";
 import Pair from "../../hashconnect/pair";
 import ReadMediaFile from "../media/read_media_file";
 import UserProfile from "../profile/user_profile";
+import LinkAndHashtagReader from "../../common/link_and_hashtag_reader";
 
 function ReadPost({
   sender,
@@ -16,12 +16,14 @@ function ReadPost({
   media,
   sequence_number,
   message_id,
+  consensus_timestamp,
 }: {
   sender: string;
   message: string;
   media?: string;
   sequence_number: string;
   message_id: string;
+  consensus_timestamp?: string; // Add the consensus_timestamp prop
 }) {
   const { state, pairingData } = useHashConnectContext();
   const signingAccount = pairingData?.accountIds[0] || "";
@@ -46,6 +48,7 @@ function ReadPost({
     const shareLink = `${window.location.origin}/Posts/${sequence_number}?sender=${sender}&message=${encodedMessage}&media=${media}&message_id=${message_id}`;
     return shareLink;
   };
+
   const copyShareLink = (
     sender: string,
     message: string,
@@ -90,11 +93,22 @@ function ReadPost({
     openTipModal();
   };
 
+  // Format the consensus timestamp
+  const formatTimestamp = (timestamp: string) => {
+    const date = new Date(Number(timestamp) * 1000); // Convert to milliseconds
+    return new Intl.DateTimeFormat("en-US", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }).format(date);
+  };
+
   return (
     <div>
       <div className="p-4 border border-primary rounded mb-4 bg-secondary overflow-y-auto">
         <UserProfile userAccountId={sender} />
-        <p className="mb-3 text-text whitespace-pre-line">{message}</p>
+        <p className="mb-1 text-text whitespace-pre-line">
+          <LinkAndHashtagReader message={message} />
+        </p>
         {media && (
           <div className="flex items-center md:w-1/6 md:justify-start w-full">
             <ReadMediaFile cid={media} />
@@ -133,6 +147,9 @@ function ReadPost({
             <FiHash />
           </a>
         </div>
+        <p className="text-sm ml-3 text-gray-500">
+          {formatTimestamp(consensus_timestamp?.toString() || "")}
+        </p>
       </div>
       {isConnectModalOpen && (
         <Modal isOpen={isConnectModalOpen} onClose={closeConnectModal}>

@@ -34,6 +34,7 @@ interface Message {
   Choice3?: string;
   Choice4?: string;
   Choice5?: string;
+  consensus_timestamp?: string;
 }
 
 // Function to decode a base64 string
@@ -136,6 +137,7 @@ const useGetData = (
                 Choice5,
                 sequence_number: message.sequence_number,
                 message: decodedMessage,
+                consensus_timestamp: message.consensus_timestamp,
               };
             } catch (error) {
               console.warn("Invalid message format:", decodedMessage);

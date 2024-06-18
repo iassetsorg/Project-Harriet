@@ -243,7 +243,11 @@ const SendNewThread = ({ onClose }: { onClose: () => void }) => {
                 id="messageContent"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
+                maxLength={850}
               />
+              <div className="text-right text-sm text-text mt-1">
+                {message.length}/850
+              </div>
             </div>
           </section>
           <section>

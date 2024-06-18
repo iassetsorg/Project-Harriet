@@ -265,18 +265,22 @@ const SendNewPoll = ({ onClose }: { onClose: () => void }) => {
               className="block text-sm font-semibold text-text"
             >
               Question:
-            </label>
+            </label>{" "}
             <div className="mt-2">
               <textarea
-                className="w-full px-4 py-2 rounded-lg text-base bg-secondary text-text"
+                className="w-full h-48 mt-2 px-4 py-2 rounded-lg text-base bg-secondary text-text"
                 name="question"
                 id="question"
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
+                maxLength={650}
               />
+              <div className="text-right text-sm text-text mt-1">
+                {question.length}/650
+              </div>
             </div>
           </section>
-          <section className="py-4 px-8">
+          <section className="pb-4  px-8">
             <label className="block text-sm font-semibold text-text">
               Choices:
             </label>
@@ -288,7 +292,11 @@ const SendNewPoll = ({ onClose }: { onClose: () => void }) => {
                     className="w-full px-4 py-2 rounded-lg text-base bg-secondary text-text"
                     value={choice}
                     onChange={(e) => updateChoice(index, e.target.value)}
+                    maxLength={50}
                   />
+                  <div className="text-right text-sm text-text mt-1 ml-2">
+                    {choice.length}/50
+                  </div>
                   <button
                     className="ml-2 text-error"
                     onClick={() => removeChoice(index)}
