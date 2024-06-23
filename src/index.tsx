@@ -9,10 +9,10 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 // Detect user's theme preference from localStorage or default to dark mode
-const preferredTheme = localStorage.getItem("theme") || "dark";
+const preferredTheme = localStorage.getItem("darkMode") || "false";
 
 // Apply the preferred theme by adding the appropriate class to the <html> element
-if (preferredTheme === "dark") {
+if (preferredTheme === "true") {
   document.documentElement.classList.add("dark");
 } else {
   document.documentElement.classList.remove("dark");

@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useHashConnectContext } from "../../hashconnect/hashconnect";
 import useProfileData from "../../hooks/use_profile_data";
 import { toast } from "react-toastify";
 import useSendMessage from "../../hooks/use_send_message";
 import useUploadToArweave from "../media/use_upload_to_arweave";
+import ReadMediaFile from "../media/read_media_file";
 
 const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
   const { pairingData } = useHashConnectContext();
@@ -20,6 +21,9 @@ const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
   const [location, setLocation] = useState("");
   const [picture, setPicture] = useState<File | null>(null);
   const [banner, setBanner] = useState<File | null>(null);
+  // Add state for image preview
+  const [picturePreview, setPicturePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (signingAccount && profileData && profileData) {
@@ -29,6 +33,12 @@ const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
       setLocation(profileData.Location || "");
     }
   }, [signingAccount, profileData]);
+
+  useEffect(() => {
+    if (profileData && profileData.Picture) {
+      setPicturePreview(profileData.Picture);
+    }
+  }, [profileData]);
 
   const updateProfile = async () => {
     let pictureHash = null;
@@ -73,6 +83,28 @@ const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
       toast.success("Profile Updated Successfully");
     } else {
       toast.error("Failed to Update Profile");
+    }
+  };
+
+  const handlePictureChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files ? event.target.files[0] : null;
+    setPicture(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPicturePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setPicturePreview(profileData ? profileData.Picture : null);
+    }
+  };
+
+  const clearImage = () => {
+    setPicture(null);
+    setPicturePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -121,11 +153,30 @@ const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
         <label className="text-text ml-1">Profile Picture:</label>
         <input
           type="file"
-          onChange={(e) =>
-            e.target.files && e.target.files[0] && setPicture(e.target.files[0])
-          }
+          ref={fileInputRef}
+          onChange={handlePictureChange}
           className="w-full px-4 py-2 rounded-lg bg-secondary text-text"
         />
+        {picturePreview && (
+          <div className="mt-2 flex flex-col items-center">
+            {picture && (
+              <img
+                src={picturePreview}
+                alt="Profile Preview"
+                className="mt-4"
+              />
+            )}
+            {!picture && profileData?.Picture && (
+              <ReadMediaFile cid={profileData.Picture} />
+            )}
+            <button
+              onClick={clearImage}
+              className="mt-2 text-error font-semibold"
+            >
+              Clear Image
+            </button>
+          </div>
+        )}
       </div>
       {/* <div className="mb-3">
         <label className="text-text ml-1">Banner Image:</label>

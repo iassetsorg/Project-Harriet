@@ -37,32 +37,14 @@ function ReadPost({
     setIsConnectModalOpen(false);
   };
 
-  const generateShareLink = (
-    sender: string,
-    message: string,
-    media: string,
-    sequence_number: string,
-    message_id: string
-  ) => {
+  const generateShareLink = (sequence_number: string) => {
     const encodedMessage = encodeURIComponent(message);
-    const shareLink = `${window.location.origin}/Posts/${sequence_number}?sender=${sender}&message=${encodedMessage}&media=${media}&message_id=${message_id}`;
+    const shareLink = `${window.location.origin}/Posts/${sequence_number}`;
     return shareLink;
   };
 
-  const copyShareLink = (
-    sender: string,
-    message: string,
-    media: string,
-    sequence_number: string,
-    message_id: string
-  ) => {
-    const link = generateShareLink(
-      sender,
-      message,
-      media,
-      sequence_number,
-      message_id
-    );
+  const copyShareLink = (sequence_number: string) => {
+    const link = generateShareLink(sequence_number);
     navigator.clipboard.writeText(link).then(() => {
       toast("Link copied to clipboard!");
     });
@@ -109,6 +91,7 @@ function ReadPost({
         <p className="mb-1 text-text whitespace-pre-line">
           <LinkAndHashtagReader message={message} />
         </p>
+        <h1>{}</h1>
         {media && (
           <div className="flex items-center md:w-1/6 md:justify-start w-full">
             <ReadMediaFile cid={media} />
@@ -128,13 +111,7 @@ function ReadPost({
           <button
             className="bg-secondary hover:bg-background text-text py-1 px-1 rounded-lg mt-2 ml-2 flex items-center"
             onClick={() => {
-              copyShareLink(
-                sender.toString(),
-                message.toString(),
-                media || "",
-                sequence_number.toString(),
-                message_id.toString()
-              );
+              copyShareLink(sequence_number.toString());
             }}
           >
             <FiShare2 className="text-text" />

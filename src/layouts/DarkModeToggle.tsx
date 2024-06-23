@@ -4,7 +4,7 @@ import { MdDarkMode, MdLightMode } from "react-icons/md";
 const DarkModeToggle: React.FC = () => {
   // Use React state to track dark mode state
   const [darkMode, setDarkMode] = useState(
-    document.documentElement.classList.contains("dark")
+    JSON.parse(localStorage.getItem("darkMode") || "false")
   );
 
   // Effect to add or remove the 'dark' class based on the darkMode state
@@ -12,6 +12,7 @@ const DarkModeToggle: React.FC = () => {
     darkMode
       ? document.documentElement.classList.add("dark")
       : document.documentElement.classList.remove("dark");
+    localStorage.setItem("darkMode", JSON.stringify(darkMode));
   }, [darkMode]);
 
   // Function to toggle dark mode state
@@ -37,4 +38,3 @@ const DarkModeToggle: React.FC = () => {
 };
 
 export default DarkModeToggle;
-// Re-run the effect when darkMode state changes

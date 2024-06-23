@@ -138,7 +138,7 @@ const Profile: React.FC = () => {
 
         {!isLoading && profileData && !isCheckingProfile && (
           <div className="w-full max-w-4xl shadow-xl rounded-xl bg-background border border-secondary">
-            <UserExplorer />
+            <UserExplorer userAddress={signingAccount} />
           </div>
         )}
 

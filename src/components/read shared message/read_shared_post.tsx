@@ -1,36 +1,41 @@
+import React from "react";
 import Modal from "../../common/modal";
-import React, { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import useGetPostData from "../../hooks/use_get_post_data";
 import ReadPost from "../read message/read_post";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { toast } from "react-toastify";
+import UserProfile from "../profile/user_profile";
 
 function ReadSharedPost() {
-  const [isModalOpen, setIsModalOpen] = useState(true);
-  const navigate = useNavigate();
-  const sequenceNumber = useParams().sequence_Number || "";
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
+  const sequence_Number = useParams().sequenceNumber;
 
-  const sender = searchParams.get("sender") || "";
-  const message = searchParams.get("message") || "";
-  const media = searchParams.get("media") || "";
-  const messageId = searchParams.get("message_id") || "";
+  const { postData, loading, error } = useGetPostData(sequence_Number);
+  const navigate = useNavigate();
 
   const closeModal = () => {
-    setIsModalOpen(false);
     navigate("/Explore");
   };
 
   return (
-    <Modal isOpen={isModalOpen} onClose={closeModal}>
+    <Modal isOpen={true} onClose={closeModal}>
       <div className="bg-background p-4 rounded-lg">
-        <ReadPost
-          sender={sender}
-          message={decodeURIComponent(message)}
-          media={media}
-          message_id={messageId}
-          sequence_number={sequenceNumber}
-        />
+        {error ? (
+          <p>{error}</p>
+        ) : loading ? (
+          <p>Loading...</p>
+        ) : (
+          postData && (
+            <div>
+              <ReadPost
+                sender={postData.sender || "Unknown Sender"}
+                message={postData.Message || "No message content available"}
+                media={postData.Media || ""}
+                message_id={postData.message_id || ""}
+                sequence_number={sequence_Number || ""}
+                consensus_timestamp={postData.consensus_timestamp || ""}
+              />
+            </div>
+          )
+        )}
       </div>
     </Modal>
   );

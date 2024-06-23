@@ -37,6 +37,9 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
   const [isBreak, setIsBreak] = useState(false);
   const [currentStepStatus, setCurrentStepStatus] = useState(0);
   const isBreakRef = useRef(false);
+  // Add state for image preview
+  const [picturePreview, setPicturePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   let currentStep = 0;
 
@@ -91,16 +94,14 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
       }
 
       // Step 1: Create User Messages Topic
-      toast(`Starting process`);
 
       if (currentStep === 0) {
         if (isBreakRef.current) {
-          toast("Process Cancelled");
+          toast("Profile creation cancelled");
           setIsProcess(false);
           break;
         }
-
-        toast(`Start the process`);
+        toast("Step 1/6: Creating your message storage");
         const createUserMessagesTopicId = await create(
           "ibird UserMessages",
           "",
@@ -112,18 +113,18 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
           setCurrentStepStatus(1);
           UserMessagesTopicId = createUserMessagesTopicId;
         }
-        toast(`UserMessagesTopic Created`);
+        toast("Message storage created successfully");
       }
 
       // Step 2: Initiating Messages Topic
       if (currentStep === 1) {
         if (isBreakRef.current) {
-          toast("Process Cancelled");
+          toast("Profile creation cancelled");
           setIsProcess(false);
           break;
         }
 
-        toast(`Initiating UserMessagesTopic`);
+        toast("Step 2/6: Setting up your message board");
         const InitiatingUserMessagesTopic = {
           Identifier: "iAssets",
           Type: "UserMessages",
@@ -138,42 +139,42 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
         if (initiatingUserMessages?.receipt.status.toString() === "SUCCESS") {
           currentStep++;
           setCurrentStepStatus(2);
-          toast("UserMessages Initiated");
+          toast("Message board set up successfully");
         }
       }
 
       // Step 3: Creating User Profile Topic
       if (currentStep === 2) {
         if (isBreakRef.current) {
-          toast("Process Cancelled");
+          toast("Profile creation cancelled");
           setIsProcess(false);
           break;
         }
-        toast("Creating user Porfile");
+        toast("Step 3/6: Creating your profile container");
         const userProfileTopicId = await create(
           "ibird UserProfile",
           "",
           submitKey
         );
         if (!userProfileTopicId) {
-          toast("Failed to create UserProfile topic");
+          toast("Failed to create profile container. Please try again.");
         }
         if (userProfileTopicId) {
           currentStep++;
           setCurrentStepStatus(3);
           if (userProfileTopicId) ProfileTopicId = userProfileTopicId;
-          toast("User Profile Created");
+          toast("Profile container created successfully");
         }
       }
 
       // Step 4: Initiating User Profile
       if (currentStep === 3) {
         if (isBreakRef.current) {
-          toast("Process Cancelled");
+          toast("Profile creation cancelled");
           setIsProcess(false);
           break;
         }
-        toast("Initiating UserProfile");
+        toast("Step 4/6: Setting up your profile information");
 
         const InitiatingUserProfileMessage = {
           Identifier: "iAssets",
@@ -196,7 +197,7 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
         if (initiatingUserProfile?.receipt.status.toString() === "SUCCESS") {
           currentStep++;
           setCurrentStepStatus(4);
-          toast("User Profile Initiated");
+          toast("Profile information set up successfully");
         }
       }
 
@@ -204,11 +205,11 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
 
       if (currentStep === 4) {
         if (isBreakRef.current) {
-          toast("Process Cancelled");
+          toast("Profile creation cancelled");
           setIsProcess(false);
           break;
         }
-        toast("Creating User Profile NFT");
+        toast("Step 5/6: Creating your unique profile token");
         // Create Token Transaction
         let createTokenTransaction = new TokenCreateTransaction()
           .setTokenName("iAssets Profile")
@@ -246,7 +247,7 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
             profileTokenId = responseData.receipt.tokenId.toString();
             currentStep++;
             setCurrentStepStatus(5);
-            toast("Profile Token Created");
+            toast("Profile token created successfully");
           }
         } else {
           if (response.error) {
@@ -259,11 +260,11 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
 
       if (currentStep === 5) {
         if (isBreakRef.current) {
-          toast("Process Cancelled");
+          toast("Profile creation cancelled");
           setIsProcess(false);
           break;
         }
-        toast("Minting User Profile NFT");
+        toast("Step 6/6: Finalizing your profile");
 
         let mintTokenTransaction = new TokenMintTransaction()
           .setMetadata([Buffer.from(ProfileTopicId)])
@@ -292,7 +293,7 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
           if (responseData?.receipt.status.toString() === "SUCCESS") {
             currentStep++;
             setCurrentStepStatus(6);
-            toast("Profile Token Created");
+            toast("Profile creation completed successfully!");
             onClose();
             window.location.reload();
           } else {
@@ -304,6 +305,28 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
           }
         }
       }
+    }
+  };
+
+  // Modify the onChange handler for the profile picture input
+  const handlePictureChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files ? event.target.files[0] : null;
+    setPicture(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPicturePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setPicturePreview(null);
+    }
+  };
+  const clearImage = () => {
+    setPicture(null);
+    setPicturePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -397,7 +420,6 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
           </section>
 
           <section className="py-4 px-8">
-            {/* Profile Picture Input */}
             <label
               htmlFor="picture"
               className="block text-sm font-semibold text-text"
@@ -407,15 +429,25 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
             <div className="mt-2">
               <input
                 type="file"
+                ref={fileInputRef}
+                onChange={handlePictureChange}
                 className="w-full px-4 py-2 rounded-lg border-secondary text-base bg-secondary"
-                name="picture"
-                id="picture"
-                onChange={(e) =>
-                  e.target.files &&
-                  e.target.files[0] &&
-                  setPicture(e.target.files[0])
-                }
               />
+              {picturePreview && (
+                <>
+                  <img
+                    src={picturePreview}
+                    alt="Profile Preview"
+                    className="mt-4"
+                  />
+                  <button
+                    onClick={clearImage}
+                    className="mt-2 text-error font-semibold"
+                  >
+                    Clear Image
+                  </button>
+                </>
+              )}
             </div>
           </section>
 

@@ -72,13 +72,13 @@ const SendNewPoll = ({ onClose }: { onClose: () => void }) => {
 
   const createPoll = async () => {
     if (!question) {
-      toast("Please enter a question");
+      toast.error("Please enter a question for the poll.");
       setIsBreak(true);
       return;
     }
 
     if (choices.length < 2) {
-      toast("Please add at least 2 choices");
+      toast.error("A minimum of two choices are required to create a poll.");
       setIsBreak(true);
       return;
     }
@@ -99,7 +99,7 @@ const SendNewPoll = ({ onClose }: { onClose: () => void }) => {
           break;
         }
         toast("Start the process, Step:" + currentStep);
-        const topicId = await create("ibird Poll", "", false);
+        const topicId = await create("iBird Poll", "", false);
 
         if (topicId) {
           currentStep++;
@@ -127,7 +127,7 @@ const SendNewPoll = ({ onClose }: { onClose: () => void }) => {
         if (initiatingPoll?.receipt.status.toString() === "SUCCESS") {
           currentStep++;
           setCurrentStepStatus(2);
-          toast("Poll Initiated, Step:" + currentStep);
+          toast(`Poll Initiated, Step: ${currentStep + 1}`);
         }
       }
 
@@ -154,7 +154,7 @@ const SendNewPoll = ({ onClose }: { onClose: () => void }) => {
           if (publishingExplore?.receipt.status.toString() === "SUCCESS") {
             currentStep++;
             setCurrentStepStatus(3);
-            toast("Poll Published On Explorer, Step:" + currentStep);
+            toast(`Poll Published On Explorer, Step: ${currentStep + 1}`);
           }
         }
       }
@@ -176,7 +176,7 @@ const SendNewPoll = ({ onClose }: { onClose: () => void }) => {
           if (sentToProfile?.receipt.status.toString() === "SUCCESS") {
             currentStep++;
             setCurrentStepStatus(4);
-            toast("Poll Published On Profile, Step:" + currentStep);
+            toast(`Poll Published On Profile, Step: ${currentStep + 1}`);
           }
         }
       }
@@ -228,7 +228,7 @@ const SendNewPoll = ({ onClose }: { onClose: () => void }) => {
           setCurrentStepStatus(5);
           onClose();
           window.location.reload();
-          toast("Poll Sent, Step:" + currentStep);
+          toast(`Poll Sent, Step: ${currentStep + 1}`);
         }
       }
     }
