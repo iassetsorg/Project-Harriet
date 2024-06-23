@@ -80,7 +80,7 @@ const SendNewPost = ({ onClose }: { onClose: () => void }) => {
           }
         }
 
-        toast(`Posting on explorer, Step: ${currentStep + 1}`);
+        toast.info(`Step ${currentStep + 1}/2: Posting on explorer...`);
         const postPayload = {
           Type: "Post",
           Message: message,
@@ -91,7 +91,9 @@ const SendNewPost = ({ onClose }: { onClose: () => void }) => {
         if (postExplorer?.receipt.status.toString() === "SUCCESS") {
           currentStep++;
           setCurrentStepStatus(1);
-          toast(`Posted on explorer, Step: ${currentStep + 1}`);
+          toast.success(
+            `Step ${currentStep}/2: Posted on explorer successfully.`
+          );
         }
       }
 
@@ -101,7 +103,7 @@ const SendNewPost = ({ onClose }: { onClose: () => void }) => {
           setIsProcess(false);
           break;
         }
-        toast(`Adding to Profile, Step: ${currentStep + 1}`);
+        toast.info(`Step ${currentStep + 1}/2: Adding to Profile...`);
         const postPayload = {
           Type: "Post",
           Message: message,
@@ -112,7 +114,9 @@ const SendNewPost = ({ onClose }: { onClose: () => void }) => {
         if (postUserMessages?.receipt.status.toString() === "SUCCESS") {
           currentStep++;
           setCurrentStepStatus(2);
-          toast(`Posted on profile, Step: ${currentStep + 1}`);
+          toast.success(
+            `Step ${currentStep}/2: Posted on profile successfully.`
+          );
         }
       }
     }

@@ -223,7 +223,7 @@ const About: React.FC = () => (
             <span>⏳</span> v0.0.9 Applications
           </h3>
           <ul>
-            <li> 🟢 Time and Data </li>
+            <li> 🟢 Date & Time Stamps </li>
             <li> 🟢 Character Counter</li>
             <li> 🟢 Link, #, $ Reader</li>
             <li> 🟢 Explorer Infinite Scrolling</li>
