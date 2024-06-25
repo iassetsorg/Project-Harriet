@@ -98,8 +98,8 @@ const SendNewPoll = ({ onClose }: { onClose: () => void }) => {
           setIsProcess(false);
           break;
         }
-        toast("Start the process, Step:" + currentStep);
-        const topicId = await create("iBird Poll", "", false);
+        toast(`Start the process, Step: ${currentStep + 1}`);
+        const topicId = await create("ibird Poll", "", false);
 
         if (topicId) {
           currentStep++;
@@ -107,7 +107,7 @@ const SendNewPoll = ({ onClose }: { onClose: () => void }) => {
           if (topicId) topic = topicId;
         }
 
-        toast("Poll Created, Step:" + currentStep);
+        toast(`Poll Created, Step: ${currentStep + 1}`);
       }
 
       // Sending Initiating Poll Message
@@ -176,7 +176,7 @@ const SendNewPoll = ({ onClose }: { onClose: () => void }) => {
           if (sentToProfile?.receipt.status.toString() === "SUCCESS") {
             currentStep++;
             setCurrentStepStatus(4);
-            toast(`Poll Published On Profile, Step: ${currentStep + 1}`);
+            toast(`Poll Published On Your Profile, Step: ${currentStep + 1}`);
           }
         }
       }
@@ -226,12 +226,14 @@ const SendNewPoll = ({ onClose }: { onClose: () => void }) => {
         if (sendingMessage?.receipt.status.toString() === "SUCCESS") {
           currentStep++;
           setCurrentStepStatus(5);
-          onClose();
-          window.location.reload();
-          toast(`Poll Sent, Step: ${currentStep + 1}`);
+
+          toast("Poll Sent, Step:" + currentStep);
         }
       }
     }
+    onClose();
+    setIsProcess(false);
+    window.location.reload();
   };
 
   const addChoice = () => {

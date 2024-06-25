@@ -122,9 +122,11 @@ const SendNewPost = ({ onClose }: { onClose: () => void }) => {
     }
 
     setIsProcess(false);
-    onClose();
-    window.location.reload();
-    toast.success("Post sent successfully!");
+    if (currentStep === 2) {
+      onClose();
+      window.location.reload();
+      toast.success("Post sent successfully!");
+    }
   };
 
   return (

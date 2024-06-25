@@ -69,7 +69,8 @@ const SendNewThread = ({ onClose }: { onClose: () => void }) => {
   };
   const createThread = async () => {
     if (!message) {
-      toast.error("Please enter a message to start the thread.");
+      toast("Please enter a message");
+      setIsBreak(true);
       return;
     }
 
@@ -82,6 +83,7 @@ const SendNewThread = ({ onClose }: { onClose: () => void }) => {
       }
 
       // Creating Thread Topic
+
       if (currentStep === 0) {
         if (isBreakRef.current) {
           toast("Process Cancelled");
@@ -89,14 +91,15 @@ const SendNewThread = ({ onClose }: { onClose: () => void }) => {
           break;
         }
         toast(`Creating thread topic, Step: ${currentStep + 1}`);
-        const topicId = await create("iBird Thread", topicMemo, submitKey);
+        const topicId = await create("ibird Thread", "", submitKey);
 
         if (topicId) {
           currentStep++;
           setCurrentStepStatus(1);
-          topic = topicId;
-          toast(`Thread topic created, Step: ${currentStep + 1}`);
+          if (topicId) topic = topicId;
         }
+
+        toast(`Thread topic created, Step: ${currentStep + 1}`);
       }
 
       // Sending Initiating Thread Message
@@ -106,92 +109,114 @@ const SendNewThread = ({ onClose }: { onClose: () => void }) => {
           setIsProcess(false);
           break;
         }
-        toast(`Sending initiating message, Step: ${currentStep + 1}`);
-        const initiatingMessage = {
+        const InitiatingMessage = {
+          Identifier: "iAssets",
           Type: "Thread",
-          Message: message,
-          Media: null,
+          Author: signingAccount,
         };
-
-        const initiatingThread = await send(topic, initiatingMessage, memo);
+        toast(`initiating message, Step: ${currentStep + 1}`);
+        const initiatingThread = await send(topic, InitiatingMessage, "");
         if (initiatingThread?.receipt.status.toString() === "SUCCESS") {
           currentStep++;
           setCurrentStepStatus(2);
-          toast(`Initiating message sent, Step: ${currentStep + 1}`);
+          toast("Thread Initiated, Step:" + currentStep + 1);
         }
       }
 
-      // Optionally Publishing the Thread on Explore
-      if (currentStep === 2 && publishExplore) {
+      // Publishing on Explore
+      if (currentStep === 2) {
         if (isBreakRef.current) {
           toast("Process Cancelled");
           setIsProcess(false);
           break;
         }
-        toast(`Publishing thread on Explore, Step: ${currentStep + 1}`);
-        const publishingMessage = {
-          Type: "Thread",
-          Message: message,
-          Media: null,
-        };
+        // Conditional "Publish on Explore" message send
+        if (publishExplore) {
+          const PublishingOnExplore = {
+            Type: "Thread",
+            Thread: topic,
+          };
 
-        const publishedOnExplore = await send(
-          explorerTopic,
-          publishingMessage,
-          ""
-        );
-        if (publishedOnExplore?.receipt.status.toString() === "SUCCESS") {
-          currentStep++;
-          setCurrentStepStatus(3);
-          toast(`Thread published on Explore, Step: ${currentStep + 1}`);
+          const publishingExplore = await send(
+            explorerTopic,
+            PublishingOnExplore,
+            ""
+          );
+          toast(`Publishing thread on Explore, Step: ${currentStep + 1}`);
+          if (publishingExplore?.receipt.status.toString() === "SUCCESS") {
+            currentStep++;
+            setCurrentStepStatus(3);
+            toast(`Thread published on Explore, Step: ${currentStep + 1}`);
+          }
         }
       }
 
-      // Optionally Adding the Thread to the User's Profile
-      if (currentStep === 3 && addToProfile) {
+      // Adding To Profile
+      if (currentStep === 3) {
         if (isBreakRef.current) {
           toast("Process Cancelled");
           setIsProcess(false);
           break;
         }
-        toast(`Adding thread to profile, Step: ${currentStep + 1}`);
-        const profileMessage = {
-          Type: "Thread",
-          Message: message,
-          Media: null,
-        };
-
-        const addedToProfile = await send(profileId, profileMessage, "");
-        if (addedToProfile?.receipt.status.toString() === "SUCCESS") {
-          currentStep++;
-          setCurrentStepStatus(4);
-          toast(`Thread added to profile, Step: ${currentStep + 1}`);
+        if (addToProfile) {
+          const addingToProfile = {
+            Type: "Thread",
+            Thread: topic,
+          };
+          toast(`Adding thread to profile, Step: ${currentStep + 1}`);
+          const sentToProfile = await send(profileId, addingToProfile, "");
+          if (sentToProfile?.receipt.status.toString() === "SUCCESS") {
+            currentStep++;
+            setCurrentStepStatus(4);
+            toast(`Thread added to profile, Step: ${currentStep + 1}`);
+          }
         }
       }
 
-      // Sending the Final Thread Message
+      // Sending Message
       if (currentStep === 4) {
         if (isBreakRef.current) {
           toast("Process Cancelled");
           setIsProcess(false);
           break;
         }
-        toast(`Sending final message, Step: ${currentStep + 1}`);
-        const finalMessage = {
-          Type: "Thread",
+        // Check if there is a file to upload
+        if (file && file.size > maxSize) {
+          toast.error("The file exceeds 100MB.");
+          setIsProcess(false);
+          return;
+        }
+
+        let uploadedMediaId = null;
+        // Proceed with file upload if a file is selected
+        if (file) {
+          try {
+            setIsProcess(true);
+            uploadedMediaId = await uploadToArweave(file);
+            if (!uploadedMediaId) {
+              throw new Error("Failed to upload media to Arweave.");
+            }
+            setIsProcess(false);
+          } catch (error) {
+            toast.error("Media upload failed. Try again.");
+            setIsProcess(false);
+            return;
+          }
+        }
+
+        let Message: Message = {
           Message: message,
-          Media: null,
+          Media: uploadedMediaId || null,
         };
 
-        const finalThreadMessage = await send(topic, finalMessage, memo);
-        if (finalThreadMessage?.receipt.status.toString() === "SUCCESS") {
+        const sendingMessage = await send(topic, Message, memo);
+        if (sendingMessage?.receipt.status.toString() === "SUCCESS") {
           currentStep++;
           setCurrentStepStatus(5);
-          toast(`Final message sent, Step: ${currentStep + 1}`);
+          toast("Message Sent to Profile, Step:" + currentStep + 1);
         }
       }
     }
-
     setIsProcess(false);
     onClose();
     window.location.reload();
