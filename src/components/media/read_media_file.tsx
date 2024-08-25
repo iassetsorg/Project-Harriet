@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-
+import ReactPlayer from "react-player";
 interface Props {
   cid: string | null;
 }
@@ -44,9 +44,13 @@ const ReadMediaFile: React.FC<Props> = ({ cid }) => {
           );
         } else if (mimeType.startsWith("video/")) {
           setMediaElement(
-            <video controls>
-              <source src={objectURL} type={mimeType} />
-            </video>
+            <ReactPlayer
+              url={objectURL}
+              controls
+              width="100%"
+              height="100%"
+              className="max-w-full md:w-4xl"
+            />
           );
         } else if (mimeType.startsWith("audio/")) {
           setMediaElement(
