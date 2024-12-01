@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import Modal from "../../common/modal";
-import { useHashConnectContext } from "../../hashconnect/hashconnect";
 import useSendMessage from "../../hooks/use_send_message";
 import { FiShare2 } from "react-icons/fi";
 import Tip from "../tip/tip";
 import { BsCurrencyDollar } from "react-icons/bs";
-import Pair from "../../hashconnect/pair";
 import {
   AiOutlineLike,
   AiOutlineDislike,
@@ -13,120 +11,90 @@ import {
 } from "react-icons/ai";
 import { FiHash } from "react-icons/fi";
 import { toast } from "react-toastify";
+import ConnectModal from "../../wallet/ConnectModal";
+import { useWalletContext } from "../../wallet/WalletContext";
+import { useAccountId } from "@buidlerlabs/hashgraph-react-wallets";
+import { RiCheckLine, RiRefreshLine, RiDeleteBinLine } from "react-icons/ri";
+import { MdOutlinePermMedia } from "react-icons/md";
+import useUploadToArweave from "../media/use_upload_to_arweave";
+import { useRefreshTrigger } from "../../hooks/use_refresh_trigger";
+/**
+ * Interface for the props required by the ReplayPoll component
+ */
 interface ReplayProps {
-  sequenceNumber: number;
-  topicId: string;
-  author?: string | null | undefined;
-  message_id: string;
-  Choice: string;
+  sequenceNumber: number; // Unique identifier for the poll sequence
+  topicId: string; // Hedera topic ID
+  author?: string | null | undefined; // Author of the poll
+  message_id: string; // Unique message identifier
+  Choice?: string; // Selected poll choice
+  showVoteButton?: boolean; // Whether to display the vote button
+  className?: string; // Optional CSS classes
 }
 
+/**
+ * Interface defining the status of a processing step
+ */
+interface StepStatus {
+  status: "idle" | "loading" | "success" | "error"; // Current processing state
+  disabled: boolean; // Whether the step is currently disabled
+}
+
+/**
+ * Interface tracking the status of reply-related steps
+ */
+interface ReplyStepStatuses {
+  arweave?: StepStatus; // Status of Arweave media upload
+  reply: StepStatus; // Status of the reply submission
+}
+
+/**
+ * ReplayPoll Component
+ * Handles user interactions with polls including voting, replying, liking/disliking,
+ * and sharing functionality.
+ *
+ * @component
+ * @param {ReplayProps} props - Component props
+ */
 const ReplayPoll: React.FC<ReplayProps> = ({
   sequenceNumber,
   topicId,
   author,
   message_id,
   Choice,
+  showVoteButton = true,
 }) => {
   const { send } = useSendMessage();
-  const { state, pairingData } = useHashConnectContext();
-  useEffect(() => {
-    if (state === "Paired") {
-      closeModal();
-    }
-  }, [state]);
-  const signingAccount = pairingData?.accountIds[0] || "";
+  const { isConnected } = useWalletContext();
+  const { data: accountId } = useAccountId();
+
   const [replyContent, setReplyContent] = useState<string>("");
-  const [showReplyForm, setShowReplyForm] = useState<number | null>(null);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setShowReplyForm(null);
-  };
-
+  const [showReplyModal, setShowReplyModal] = useState<boolean>(false);
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
+  const [isTipModalOpen, setIsTipModalOpen] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const { uploadToArweave } = useUploadToArweave();
+  const [uploadedMediaId, setUploadedMediaId] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(true);
+  const [stepStatuses, setStepStatuses] = useState<ReplyStepStatuses>({
+    arweave: file ? { status: "idle", disabled: false } : undefined,
+    reply: { status: "idle", disabled: file ? true : false },
+  });
+  const { triggerRefresh } = useRefreshTrigger();
+
+  useEffect(() => {
+    if (isConnected) {
+      setIsConnectModalOpen(false);
+    }
+  }, [isConnected]);
+
   const openConnectModal = () => {
     setIsConnectModalOpen(true);
   };
+
   const closeConnectModal = () => {
     setIsConnectModalOpen(false);
   };
 
-  const handlePoll = async () => {
-    if (state !== "Paired") {
-      openConnectModal();
-      return;
-    }
-    const VoteMessage = {
-      Choice: Choice,
-    };
-
-    toast("Sending Vote");
-    await send(topicId, VoteMessage, "");
-    setTimeout(() => {
-      window.location.reload();
-    }, 2000);
-  };
-
-  const handleReply = async (sequenceNumber: number) => {
-    if (state !== "Paired") {
-      openConnectModal();
-      return;
-    }
-
-    const replyMessage = {
-      Reply_to: sequenceNumber.toString(),
-      Message: replyContent,
-    };
-
-    toast("Sending reply");
-    await send(topicId, replyMessage, "");
-    setReplyContent("");
-    setShowReplyForm(null);
-  };
-
-  const handleLike = async (sequenceNumber: number) => {
-    if (state !== "Paired") {
-      openConnectModal();
-      return;
-    }
-    const likeMessage = {
-      Author: signingAccount,
-      Like_to: sequenceNumber.toString(),
-    };
-
-    toast("Sending Like");
-    await send(topicId, likeMessage, "");
-  };
-
-  const handleDislike = async (sequenceNumber: number) => {
-    if (state !== "Paired") {
-      openConnectModal();
-      return;
-    }
-    const dislikeMessage = {
-      Author: signingAccount,
-      DisLike_to: sequenceNumber.toString(),
-    };
-
-    toast("Sending DisLike");
-    await send(topicId, dislikeMessage, "");
-  };
-  const generateShareLink = () => {
-    return `${window.location.origin}/Polls/${topicId}`;
-  };
-  const copyShareLink = () => {
-    const link = generateShareLink();
-    navigator.clipboard.writeText(link).then(() => {
-      toast("Link copied to clipboard!");
-    });
-  };
-
-  const [isTipModalOpen, setIsTipModalOpen] = useState(false);
   const openTipModal = () => {
     setIsTipModalOpen(true);
   };
@@ -134,59 +102,605 @@ const ReplayPoll: React.FC<ReplayProps> = ({
     setIsTipModalOpen(false);
   };
 
+  /**
+   * Handles the like action for a poll
+   * Validates connection status and sends like transaction to Hedera
+   */
+  const handleLike = async () => {
+    if (!isConnected) {
+      openConnectModal();
+      return;
+    }
+
+    setStepStatuses((prev) => ({
+      ...prev,
+      like: { status: "loading", disabled: true },
+    }));
+
+    const likeMessage = {
+      Author: accountId,
+      Like_to: sequenceNumber.toString(),
+    };
+
+    try {
+      const result = await send(topicId, likeMessage, "");
+      if (result?.receipt.result.toString() === "SUCCESS") {
+        setStepStatuses((prev) => ({
+          ...prev,
+          like: { status: "success", disabled: true },
+        }));
+        toast.success("Like sent successfully.");
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        triggerRefresh();
+      } else {
+        throw new Error("Failed to send like.");
+      }
+    } catch (error) {
+      setStepStatuses((prev) => ({
+        ...prev,
+        like: { status: "error", disabled: false },
+      }));
+      toast.error("Failed to send like.");
+    }
+  };
+
+  const handleDislike = async () => {
+    if (!isConnected) {
+      openConnectModal();
+      return;
+    }
+
+    setStepStatuses((prev) => ({
+      ...prev,
+      dislike: { status: "loading", disabled: true },
+    }));
+
+    const dislikeMessage = {
+      Author: accountId,
+      DisLike_to: sequenceNumber.toString(),
+    };
+
+    try {
+      const result = await send(topicId, dislikeMessage, "");
+      if (result?.receipt.result.toString() === "SUCCESS") {
+        setStepStatuses((prev) => ({
+          ...prev,
+          dislike: { status: "success", disabled: true },
+        }));
+        toast.success("Dislike sent successfully.");
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        triggerRefresh();
+      } else {
+        throw new Error("Failed to send dislike.");
+      }
+    } catch (error) {
+      setStepStatuses((prev) => ({
+        ...prev,
+        dislike: { status: "error", disabled: false },
+      }));
+      toast.error("Failed to send dislike.");
+    }
+  };
+
+  /**
+   * Initiates the reply process
+   * Validates content and file requirements before proceeding
+   */
+  const handleStartReply = () => {
+    if (!replyContent.trim() && !file) {
+      toast.error("Please enter a comment or add media.");
+      return;
+    }
+
+    if (file && file.size > 100 * 1024 * 1024) {
+      toast.error("The file exceeds 100MB.");
+      return;
+    }
+
+    if (file) {
+      setStepStatuses({
+        arweave: { status: "idle", disabled: false },
+        reply: { status: "idle", disabled: true },
+      });
+    } else {
+      setStepStatuses({
+        reply: { status: "idle", disabled: false },
+      });
+    }
+
+    setIsEditing(false);
+  };
+
+  /**
+   * Handles media upload to Arweave
+   * Manages upload status and updates UI accordingly
+   */
+  const handleArweaveUpload = async () => {
+    if (!file) return;
+
+    setStepStatuses((prev) => ({
+      ...prev,
+      arweave: { status: "loading", disabled: true },
+    }));
+
+    try {
+      toast.info("Uploading your media to Arweave...");
+      const mediaId = await uploadToArweave(file);
+      setUploadedMediaId(mediaId);
+      toast.success("Media uploaded to Arweave successfully.");
+
+      setStepStatuses((prev) => ({
+        ...prev,
+        arweave: { status: "success", disabled: true },
+        reply: { status: "idle", disabled: false },
+      }));
+    } catch (e) {
+      toast.error("Media upload failed.");
+      setStepStatuses((prev) => ({
+        ...prev,
+        arweave: { status: "error", disabled: false },
+      }));
+    }
+  };
+
+  const handleReply = async () => {
+    if (!isConnected) {
+      openConnectModal();
+      return;
+    }
+
+    if (!replyContent.trim() && !uploadedMediaId) {
+      toast.error("Please enter your comment or wait for media upload.");
+      return;
+    }
+
+    setStepStatuses((prev) => ({
+      ...prev,
+      reply: { status: "loading", disabled: true },
+    }));
+
+    const replyMessage = {
+      Author: accountId,
+      Reply_to: sequenceNumber.toString(),
+      Message: replyContent,
+      Media: uploadedMediaId,
+    };
+
+    try {
+      const result = await send(topicId, replyMessage, "");
+      if (result?.receipt.result.toString() === "SUCCESS") {
+        setStepStatuses((prev) => ({
+          ...prev,
+          reply: { status: "success", disabled: true },
+        }));
+        toast.success("Reply sent successfully.");
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        triggerRefresh();
+        setShowReplyModal(false);
+        setReplyContent("");
+        setIsEditing(true);
+        setStepStatuses({
+          arweave: file ? { status: "idle", disabled: false } : undefined,
+          reply: { status: "idle", disabled: file ? true : false },
+        });
+      } else {
+        throw new Error("Failed to send reply.");
+      }
+    } catch (error) {
+      setStepStatuses((prev) => ({
+        ...prev,
+        reply: { status: "error", disabled: false },
+      }));
+      toast.error("Failed to send reply.");
+    }
+  };
+
   const handleTip = () => {
-    if (signingAccount === author) {
+    if (accountId === author) {
       toast("You cannot tip yourself");
       return;
     }
-    if (state !== "Paired") {
+    if (!isConnected) {
       openConnectModal();
       return;
     }
     openTipModal();
   };
 
-  useEffect(() => {
-    if (state === "Paired") {
-      closeModal();
+  const generateShareLink = () => {
+    return `${window.location.origin}/Polls/${topicId}`;
+  };
+
+  const copyShareLink = () => {
+    const link = generateShareLink();
+    navigator.clipboard.writeText(link).then(() => {
+      toast("Link copied to clipboard!");
+    });
+  };
+
+  const handlePoll = async () => {
+    if (!isConnected) {
+      openConnectModal();
+      return;
     }
-  }, [state]);
+    if (Choice === "") {
+      toast("Please select a choice to vote");
+      return;
+    }
+    const VoteMessage = {
+      Choice: Choice,
+    };
+
+    toast("Sending Vote");
+    try {
+      const result = await send(topicId, VoteMessage, "");
+      if (result?.receipt.result.toString() === "SUCCESS") {
+        toast.success("Your vote has been submitted successfully!");
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        triggerRefresh();
+      } else {
+        throw new Error("Vote transaction failed.");
+      }
+    } catch (error) {
+      toast.error("Failed to submit your vote. Please try again.");
+    }
+  };
+
+  /**
+   * Renders a step button with appropriate status indicators
+   * @param {keyof ReplyStepStatuses} step - The step to render
+   * @param {string} label - Button label
+   * @param {Function} handler - Click handler
+   */
+  const renderStepButton = (
+    step: keyof ReplyStepStatuses,
+    label: string,
+    handler: () => void
+  ) => {
+    const status = stepStatuses[step];
+    if (!status) return null;
+
+    return (
+      <div
+        className="flex justify-between items-center p-3 hover:bg-secondary/30 rounded-lg transition-colors"
+        key={step}
+      >
+        <div className="flex-1">
+          <span
+            className={`text-base font-medium ${
+              status.status === "success"
+                ? "text-success"
+                : status.status === "error"
+                ? "text-error"
+                : status.disabled
+                ? "text-gray-500"
+                : "text-text"
+            }`}
+          >
+            {label}
+          </span>
+          {status.status === "error" && (
+            <p className="text-sm text-error/80 mt-1">
+              Failed. Please try again.
+            </p>
+          )}
+        </div>
+        <button
+          onClick={handler}
+          disabled={status.disabled || status.status === "loading"}
+          className={`px-6 py-2 rounded-lg transition-all duration-200 font-medium min-w-[120px] 
+                flex items-center justify-center ${
+                  status.status === "success"
+                    ? "bg-success text-white cursor-not-allowed"
+                    : status.status === "loading"
+                    ? "bg-secondary text-text animate-pulse cursor-not-allowed"
+                    : status.status === "error"
+                    ? "bg-error hover:bg-error/80 text-white"
+                    : status.disabled
+                    ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                    : "bg-primary hover:bg-accent text-background"
+                }`}
+        >
+          {status.status === "loading" ? (
+            "Processing..."
+          ) : status.status === "success" ? (
+            <>
+              <RiCheckLine className="mr-1.5" />
+              Done
+            </>
+          ) : status.status === "error" ? (
+            <>
+              <RiRefreshLine className="mr-1.5" />
+              Retry
+            </>
+          ) : (
+            "Start"
+          )}
+        </button>
+      </div>
+    );
+  };
+
+  const renderProcessingSteps = () => (
+    <div className="p-6">
+      <h1 className="text-xl font-semibold text-text mb-4">Send Comment</h1>
+
+      {/* Comment and Media Preview */}
+      <div className="mb-6 p-5 bg-secondary rounded-xl mx-4">
+        <p className="text-text break-words text-lg leading-relaxed">
+          {replyContent}
+        </p>
+        {file && (
+          <div className="mt-4">
+            <div className="relative rounded-lg overflow-hidden">
+              <img
+                src={URL.createObjectURL(file)}
+                alt="Preview"
+                className="w-full max-h-[300px] object-contain bg-black/5"
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Processing Steps */}
+      <div className="space-y-4 mx-4">
+        {file &&
+          renderStepButton(
+            "arweave",
+            "Upload Media to Arweave",
+            handleArweaveUpload
+          )}
+        {renderStepButton("reply", "Send Comment", handleReply)}
+        <button
+          onClick={() => {
+            setIsEditing(true);
+          }}
+          className="w-full bg-secondary hover:bg-error text-text py-2 mt-3 px-4 rounded-full"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+
+  /**
+   * Renders the reply form modal with editing and processing states
+   */
+  const renderReplyForm = () => (
+    <Modal isOpen={showReplyModal} onClose={() => setShowReplyModal(false)}>
+      <div className="flex flex-col max-h-[80vh] bg-background rounded-xl overflow-hidden">
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-text/10 flex items-center">
+          <div>
+            <h3 className="text-xl font-semibold text-primary">
+              Write a Comment
+            </h3>
+            <p className="text-sm text-text/60 mt-1">
+              Share your thoughts with the community
+            </p>
+          </div>
+        </div>
+
+        {/* Scrollable Content Area */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
+          {isEditing ? (
+            <>
+              {/* Compose Area */}
+              <div className="p-6">
+                <div className="relative mb-4">
+                  <textarea
+                    className="w-full bg-transparent text-text text-lg border-none
+                      focus:ring-0 outline-none resize-none h-auto custom-scrollbar
+                      placeholder:text-text/40"
+                    placeholder="What's on your mind?"
+                    value={replyContent}
+                    onChange={(e) => setReplyContent(e.target.value)}
+                    maxLength={850}
+                    rows={3}
+                    style={{
+                      minHeight: "120px",
+                      maxHeight: "300px",
+                      overflow: "auto",
+                    }}
+                  />
+                  {/* Character limit warning */}
+                  {replyContent.length > 800 && (
+                    <div
+                      className="absolute bottom-2 right-2 text-xs text-error/80 
+                        bg-error/10 px-2 py-1 rounded-full"
+                    >
+                      {850 - replyContent.length} characters left
+                    </div>
+                  )}
+                </div>
+                {/* Media Section */}
+                <div className="space-y-4">
+                  {/* Media Preview */}
+                  {file && (
+                    <div className="rounded-xl overflow-hidden bg-secondary/20">
+                      {/* Image Preview */}
+                      <div className="relative">
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt="Preview"
+                          className="w-full max-h-[300px] object-contain bg-black/5"
+                        />
+                      </div>
+
+                      {/* File Info and Remove Button */}
+                      <div className="p-3 border-t border-text/5">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1 min-w-0 mr-4">
+                            <p
+                              className="text-sm text-text truncate"
+                              title={file.name}
+                            >
+                              {file.name}
+                            </p>
+                            <p className="text-xs text-text/50 mt-0.5">
+                              {(file.size / (1024 * 1024)).toFixed(1)} MB
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => {
+                              setFile(null);
+                              setStepStatuses((prev) => {
+                                const newStatuses = { ...prev };
+                                delete newStatuses.arweave;
+                                return {
+                                  ...newStatuses,
+                                  reply: { status: "idle", disabled: false },
+                                };
+                              });
+                            }}
+                            className="flex items-center px-3 py-1.5 rounded-lg
+                              bg-error/10 hover:bg-error/20 text-error/80 hover:text-error 
+                              transition-all duration-200"
+                            title="Remove media"
+                          >
+                            <RiDeleteBinLine className="text-lg mr-1.5" />
+                            <span className="text-sm font-medium">Remove</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Media Upload Button (only show if no file) */}
+                  {!file && (
+                    <div className="mt-4">
+                      <label
+                        htmlFor="fileUpload"
+                        className="group cursor-pointer block w-full border-2 border-dashed 
+                            border-text/10 rounded-xl hover:border-primary/50 
+                            transition-all duration-200"
+                      >
+                        <div className="flex flex-col items-center justify-center py-8 px-4">
+                          <div
+                            className="w-12 h-12 rounded-full bg-primary/10 flex items-center 
+                              justify-center group-hover:scale-110 transition-transform duration-200"
+                          >
+                            <MdOutlinePermMedia className="text-2xl text-primary" />
+                          </div>
+                          <p className="mt-2 text-sm font-medium text-text">
+                            Add Media
+                          </p>
+                          <p className="text-xs text-text/50 mt-1">
+                            Up to 100MB
+                          </p>
+                        </div>
+                        <input
+                          type="file"
+                          id="fileUpload"
+                          className="hidden"
+                          accept="image/*"
+                          onChange={(e) => {
+                            if (e.target.files?.[0]) {
+                              setFile(e.target.files[0]);
+                              e.target.value = "";
+                              setStepStatuses((prev) => ({
+                                ...prev,
+                                arweave: { status: "idle", disabled: false },
+                                reply: { status: "idle", disabled: true },
+                              }));
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Bottom Controls */}
+              <div className="border-t border-text/10 bg-background/95 backdrop-blur-sm">
+                <div className="px-6 py-4 flex items-center justify-between">
+                  {/* Character Count */}
+                  <div
+                    className={`text-sm font-medium ${
+                      replyContent.length > 800
+                        ? "text-error"
+                        : replyContent.length > 700
+                        ? "text-primary"
+                        : "text-text/50"
+                    }`}
+                  >
+                    {replyContent.length}/850
+                  </div>
+
+                  {/* Start Reply Button */}
+                  <button
+                    onClick={handleStartReply}
+                    disabled={!replyContent.trim() && !file}
+                    className={`px-8 py-2.5 font-semibold rounded-full transition-all 
+                      duration-200 hover:shadow-lg active:scale-98 ${
+                        !replyContent.trim() && !file
+                          ? "bg-primary/30 text-text/30 cursor-not-allowed"
+                          : "bg-primary hover:bg-accent text-background"
+                      }`}
+                  >
+                    Reply
+                  </button>
+                </div>
+              </div>
+            </>
+          ) : (
+            renderProcessingSteps()
+          )}
+        </div>
+      </div>
+    </Modal>
+  );
+
   return (
     <>
       <div className="flex">
         <button
           className="bg-secondary hover:bg-background text-text py-1 px-2 rounded-lg mt-2 ml-2 flex items-center"
-          onClick={() => handleLike(sequenceNumber)}
+          onClick={() => {
+            setStepStatuses((prev) => ({
+              ...prev,
+              like: { status: "idle", disabled: false },
+            }));
+            handleLike();
+          }}
         >
           <AiOutlineLike className="text-text" />
         </button>
         <button
           className="bg-secondary hover:bg-background text-text py-1 px-2 rounded-lg ml-2 mt-2 flex items-center"
-          onClick={() => handleDislike(sequenceNumber)}
+          onClick={() => {
+            setStepStatuses((prev) => ({
+              ...prev,
+              dislike: { status: "idle", disabled: false },
+            }));
+            handleDislike();
+          }}
         >
           <AiOutlineDislike className="text-text" />
         </button>
         <button
           className="bg-secondary hover:bg-background text-text  py-1 px-2 rounded-lg mt-2 ml-2 flex items-center"
           onClick={() => {
-            if (state !== "Paired") {
+            if (!isConnected) {
               openConnectModal();
               return;
             }
-
-            openModal();
-            setShowReplyForm(sequenceNumber);
+            setShowReplyModal(true);
           }}
         >
           <AiOutlineMessage className="text-text" />
         </button>
         <a
           href={`https://hashscan.io/mainnet/transaction/${message_id}`}
-          target="blank"
+          target="_blank"
+          rel="noopener noreferrer"
           className="bg-secondary hover:bg-background text-text  py-1 px-1 rounded-lg mt-2 ml-2 flex items-center"
         >
           <FiHash />
         </a>
+
         <button
           className="bg-secondary hover:bg-background text-text  py-1 px-2 rounded-lg mt-2 ml-2 flex items-center"
           onClick={() => {
@@ -195,6 +709,7 @@ const ReplayPoll: React.FC<ReplayProps> = ({
         >
           <BsCurrencyDollar className="text-text" />
         </button>
+
         <button
           className="bg-secondary hover:bg-background text-text  py-1 px-2 rounded-lg mt-2 ml-2 flex items-center"
           onClick={() => {
@@ -203,50 +718,27 @@ const ReplayPoll: React.FC<ReplayProps> = ({
         >
           <FiShare2 className="text-text" />
         </button>
-        <button
-          className={`py-1 px-2 rounded-lg mt-2 ml-2 flex items-center ${
-            Choice === ""
-              ? " text-text bg-secondary"
-              : "text-background bg-primary hover:bg-accent transition duration-300"
-          }`}
-          onClick={() => {
-            if (Choice === "") {
-              toast("Please select a choice to vote");
-            } else {
-              handlePoll();
-            }
-          }}
-        >
-          Vote
-        </button>
+        {showVoteButton && (
+          <button
+            className={`py-1 px-2 rounded-lg mt-2 ml-2 flex items-center ${
+              Choice === ""
+                ? " text-text bg-secondary"
+                : "text-background bg-primary hover:bg-accent transition duration-300"
+            }`}
+            onClick={handlePoll}
+          >
+            Vote
+          </button>
+        )}
       </div>
 
-      {showReplyForm === sequenceNumber && (
-        <Modal isOpen={isModalOpen} onClose={closeModal}>
-          <div className="max-w-md mx-auto mt-3 text-center flex flex-col justify-center rounded-lg bg-background p-6 text-text">
-            <h3 className="mb-3 font-semibold text-xl">Write a comment</h3>
-            <textarea
-              className="h-24 w-full border border-background rounded mb-3 p-2 bg-secondary text-text"
-              placeholder="Type your reply here"
-              value={replyContent}
-              onChange={(event) => setReplyContent(event.target.value)}
-            />
-            <button
-              className=" text-background bg-primary rounded-full hover:bg-accent transition duration-300 py-2 px-4  w-full"
-              onClick={() => handleReply(sequenceNumber)}
-            >
-              Send
-            </button>
-          </div>
-        </Modal>
-      )}
+      {/* Render Modals */}
+      {showReplyModal && renderReplyForm()}
+
       {isConnectModalOpen && (
-        <Modal isOpen={isConnectModalOpen} onClose={closeConnectModal}>
-          <Pair />
-        </Modal>
+        <ConnectModal isOpen={isConnectModalOpen} onClose={closeConnectModal} />
       )}
 
-      {/* Display comments in a modal if showComments is set to the current sequence number */}
       {isTipModalOpen && (
         <Modal isOpen={isTipModalOpen} onClose={closeTipModal}>
           <div className="bg-background p-4 rounded-lg">

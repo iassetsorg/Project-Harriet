@@ -1,37 +1,73 @@
-import React, { useEffect, useRef, useState } from "react";
+/**
+ * UserExplorer is a component that displays messages from a specific user with infinite scroll.
+ * Features:
+ * - User-specific message loading
+ * - Infinite scroll pagination
+ * - Multiple message type support (Post, Thread, Poll)
+ * - Loading states and transitions
+ */
+
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import useGetData from "../../hooks/use_get_data";
 import Spinner from "../../common/Spinner";
 import ReadThread from "../read message/read_thread";
 import ReadPost from "../read message/read_post";
 import ReadPoll from "../read message/read_poll";
 import useProfileData from "../../hooks/use_profile_data";
-import { useHashConnectContext } from "../../hashconnect/hashconnect";
+import { TransitionGroup, CSSTransition } from "react-transition-group";
 
+/**
+ * Props interface for UserExplorer
+ * @property {string} userAddress - The address/ID of the user whose messages to display
+ */
 interface UserExplorerProps {
   userAddress: string;
 }
 
+/**
+ * UserExplorer component fetches and displays messages from a specific user.
+ * Uses Intersection Observer API for infinite scrolling functionality.
+ */
 function UserExplorer({ userAddress }: UserExplorerProps) {
-  const { pairingData } = useHashConnectContext();
-  const signingAccount = pairingData?.accountIds[0] || "";
+  // Fetch user profile data including their messages topic ID
   const { profileData, isLoading, error } = useProfileData(userAddress);
   const explorerTopicID = profileData?.UserMessages;
+
+  // Custom hook for fetching message data
   const { messages, loading, fetchMessages, nextLink } = useGetData(
     explorerTopicID,
     null,
     true
   );
-  const [allMessages, setAllMessages] = useState<typeof messages>([]);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
+  // State management
+  const [allMessages, setAllMessages] = useState<typeof messages>([]); // Accumulated messages
+  const [isLoadingMore, setIsLoadingMore] = useState(false); // Loading state for pagination
+
+  // Reference for intersection observer
   const observerRef = useRef<HTMLDivElement | null>(null);
 
+  // Add new state for tracking scroll position
+  const [scrollTop, setScrollTop] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Add new loading state for pull-to-refresh
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  /**
+   * Initial data fetch when topic ID is available
+   * Triggered when profile data is loaded
+   */
   useEffect(() => {
     if (explorerTopicID) {
       fetchMessages(explorerTopicID);
     }
   }, [explorerTopicID]);
 
+  /**
+   * Intersection Observer callback
+   * Handles infinite scroll loading when user reaches bottom of content
+   */
   const handleObserver = (entries: IntersectionObserverEntry[]) => {
     const target = entries[0];
     if (target.isIntersecting && nextLink) {
@@ -40,6 +76,10 @@ function UserExplorer({ userAddress }: UserExplorerProps) {
     }
   };
 
+  /**
+   * Sets up the Intersection Observer
+   * Monitors scroll position to trigger loading more content
+   */
   useEffect(() => {
     const option = {
       root: null,
@@ -55,6 +95,10 @@ function UserExplorer({ userAddress }: UserExplorerProps) {
     };
   }, [nextLink]);
 
+  /**
+   * Updates allMessages state when new messages are fetched
+   * Filters out duplicates and appends new messages
+   */
   useEffect(() => {
     if (messages.length > 0) {
       setAllMessages((prevMessages) => {
@@ -70,49 +114,94 @@ function UserExplorer({ userAddress }: UserExplorerProps) {
     }
   }, [messages]);
 
+  // Modify the scroll handler
+  const handleScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>) => {
+      const element = e.currentTarget;
+      setScrollTop(element.scrollTop);
+
+      // Trigger refresh when scrolling up at the top
+      if (element.scrollTop === 0 && scrollTop > 0 && explorerTopicID) {
+        setIsRefreshing(true);
+        fetchMessages(explorerTopicID).finally(() => {
+          setIsRefreshing(false);
+        });
+      }
+    },
+    [explorerTopicID, fetchMessages, scrollTop]
+  );
+
   return (
     <div className="">
       <h1 className="text-2xl mt-5 ml-5 font-semibold text-text mb-4">
         Messages
       </h1>
 
-      <div className="overflow-y-auto w-full h-screen bg-background shadow-xl p-6 text-text">
-        {loading && allMessages.length === 0 && <Spinner />}
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="relative w-full h-screen overflow-y-scroll bg-background p-6 text-text shadow-xl"
+      >
+        {/* Pull to refresh indicator */}
+        {isRefreshing && (
+          <div className="sticky top-0 z-10 -mt-6 pt-2 pb-2 bg-background">
+            <Spinner />
+          </div>
+        )}
 
-        {allMessages.map((message) => {
-          if (message.Type === "Post") {
+        {/* Initial loading state */}
+        {loading && allMessages.length === 0 && (
+          <div className="flex h-full items-center justify-center">
+            <Spinner />
+          </div>
+        )}
+
+        {/* Message list with transition animations */}
+        <TransitionGroup className="space-y-6">
+          {allMessages.map((message) => {
+            // Common props shared between all message types
+            const commonProps = {
+              key: message.message_id,
+              message_id: message.message_id,
+              sender: message.sender,
+              sequence_number: message.sequence_number.toString(),
+              consensus_timestamp:
+                message.consensus_timestamp?.toString() || "0",
+            };
+
+            // Render different components based on message type
             return (
-              <div key={message.message_id} className="">
-                <ReadPost
-                  sender={message.sender}
-                  message={message.Message}
-                  media={message.Media}
-                  message_id={message.message_id}
-                  sequence_number={message.sequence_number.toString()}
-                  consensus_timestamp={
-                    message.consensus_timestamp?.toString() || "0"
-                  }
-                />
-              </div>
+              <CSSTransition
+                key={message.message_id}
+                timeout={300}
+                classNames="fade"
+              >
+                <div>
+                  {message.Type === "Post" && (
+                    <ReadPost
+                      {...commonProps}
+                      message={message.Message}
+                      media={message.Media}
+                    />
+                  )}
+                  {message.Type === "Thread" && (
+                    <ReadThread {...commonProps} topicId={message.Thread} />
+                  )}
+                  {message.Type === "Poll" && (
+                    <ReadPoll {...commonProps} topicId={message.Poll} />
+                  )}
+                </div>
+              </CSSTransition>
             );
-          } else if (message.Type === "Thread") {
-            return (
-              <div key={message.message_id} className="">
-                <ReadThread topicId={message.Thread} />
-              </div>
-            );
-          } else if (message.Type === "Poll") {
-            return (
-              <div key={message.message_id} className="">
-                <ReadPoll topicId={message.Poll} />
-              </div>
-            );
-          }
-          return null;
-        })}
+          })}
+        </TransitionGroup>
+
+        {/* Intersection observer target element */}
         <div ref={observerRef}></div>
+
+        {/* Loading indicator for next page */}
         {isLoadingMore && (
-          <div className="flex justify-center mt-4">
+          <div className="flex items-center justify-center mt-4">
             <Spinner />
           </div>
         )}

@@ -4,6 +4,7 @@
   "version": "0.0.9",
   "private": true,
   "dependencies": {
+    "@buidlerlabs/hashgraph-react-wallets": "^2.1.2",
     "@fortawesome/free-solid-svg-icons": "^6.4.2",
     "@reduxjs/toolkit": "^2.2.7",
     "@testing-library/jest-dom": "^5.17.0",
@@ -13,7 +14,9 @@
     "@types/node": "^16.18.59",
     "@types/react": "^18.2.30",
     "@types/react-dom": "^18.2.14",
+    "@types/react-transition-group": "^4.4.11",
     "axios": "^1.7.2",
+    "buffer": "^6.0.3",
     "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",
     "hashconnect": "^0.2.4",
@@ -29,6 +32,7 @@
     "react-router-dom": "^6.21.0",
     "react-scripts": "5.0.1",
     "react-toastify": "^9.1.3",
+    "react-transition-group": "^4.4.5",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },

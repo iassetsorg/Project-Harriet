@@ -1,7 +1,41 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-// Defining the structure of the Message interface
+/**
+ * @interface Message
+ * @description Defines the structure for message objects in the application
+ * @property {string} Choice - User's choice selection
+ * @property {string} Media - Media content associated with the message
+ * @property {string} Identifier - Unique identifier for the message
+ * @property {string} message_id - Consensus timestamp used as message ID
+ * @property {string} sender - Account ID of the message sender
+ * @property {string} Message - Main message content
+ * @property {string} message - Raw decoded message content
+ * @property {number} sequence_number - Message sequence number
+ * @property {string} Author - Author of the message
+ * @property {string} [Reply_to] - Optional reference to replied message
+ * @property {string} [Like_to] - Optional reference to liked message
+ * @property {string} [DisLike_to] - Optional reference to disliked message
+ * @property {string} [Thread] - Optional reference to the thread
+ * @property {string} [Status] - Optional status of the message
+ * @property {string} [Type] - Optional type of the message
+ * @property {string} [Name] - Optional name of the message author
+ * @property {string} [Bio] - Optional bio of the message author
+ * @property {string} [Website] - Optional website of the message author
+ * @property {string} [Location] - Optional location of the message author
+ * @property {string} [UserMessages] - Optional user messages of the message author
+ * @property {string} [Followings] - Optional followings of the message author
+ * @property {string} [Picture] - Optional picture of the message author
+ * @property {string} [Banner] - Optional banner of the message author
+ * @property {string} [Post] - Optional post of the message author
+ * @property {string} [Poll] - Optional poll of the message author
+ * @property {string} [Choice1] - Optional choice 1 of the poll
+ * @property {string} [Choice2] - Optional choice 2 of the poll
+ * @property {string} [Choice3] - Optional choice 3 of the poll
+ * @property {string} [Choice4] - Optional choice 4 of the poll
+ * @property {string} [Choice5] - Optional choice 5 of the poll
+ * @property {string} [consensus_timestamp] - Optional consensus timestamp of the message
+ */
 interface Message {
   filter(arg0: (m: any) => boolean): unknown;
   Choice: string;
@@ -37,10 +71,26 @@ interface Message {
   consensus_timestamp?: string;
 }
 
-// Function to decode a base64 string
+/**
+ * @function decodeBase64
+ * @description Decodes a base64 encoded string to its original form
+ * @param {string} base64String - The base64 encoded string to decode
+ * @returns {string} The decoded string
+ */
 const decodeBase64 = (base64String: string) => atob(base64String);
 
-// Custom React hook for fetching messages based on a topic ID or a link
+/**
+ * @hook useGetData
+ * @description Custom React hook for fetching and managing message data from the Hedera network
+ * @param {string} initialTopicId - Initial topic ID to fetch messages from
+ * @param {string | null} initialNextLink - Initial pagination link for subsequent data fetching
+ * @param {boolean} isNew - Flag to determine message ordering (desc/asc)
+ * @returns {Object} Hook state and controls
+ *    @returns {Message[]} messages - Array of fetched messages
+ *    @returns {boolean} loading - Loading state indicator
+ *    @returns {string | null} nextLink - Link for next page of results
+ *    @returns {Function} fetchMessages - Function to trigger message fetching
+ */
 const useGetData = (
   initialTopicId = "",
   initialNextLink: string | null = null,
@@ -50,6 +100,11 @@ const useGetData = (
   const [loading, setLoading] = useState<boolean>(false);
   const [nextLink, setNextLink] = useState<string | null>(initialNextLink);
 
+  /**
+   * @function fetchMessages
+   * @description Fetches messages from either a topic ID or a specific API link
+   * @param {string | null} topicIdOrLink - Topic ID or API link to fetch messages from
+   */
   const fetchMessages = async (topicIdOrLink: string | null) => {
     setMessages([]);
     setNextLink(null);
@@ -70,6 +125,11 @@ const useGetData = (
       if (response.ok) {
         const data = await response.json();
 
+        /**
+         * @description Transforms raw message data into structured Message objects
+         * @param {any} message - Raw message data from the API
+         * @returns {Message | null} Structured message object or null if parsing fails
+         */
         const responseData = data.messages
           .map((message: any) => {
             const decodedMessage = new TextDecoder("utf-8").decode(

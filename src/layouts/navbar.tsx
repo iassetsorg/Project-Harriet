@@ -1,23 +1,32 @@
+/**
+ * @file Navbar.tsx
+ * @description Main navigation component for the iBird application that provides access to
+ * core functionalities including wallet connection, trading, and analytics.
+ */
+
 import React, { useState, useEffect } from "react";
-import { useHashConnectContext } from "../hashconnect/hashconnect";
+
 import { useNavigate } from "react-router-dom";
-import Pair from "../hashconnect/pair";
+
 import Modal from "../common/modal";
 import { RiMoneyDollarCircleLine } from "react-icons/ri";
 import { IoAnalyticsOutline } from "react-icons/io5";
 import { BsLightningCharge } from "react-icons/bs";
 import DarkModeToggle from "./DarkModeToggle";
 import useGetAnalyticsData from "../hooks/use_get_analytics_data";
+import Wallet from "../wallet/wallet";
 
+/**
+ * @component Navbar
+ * @description Primary navigation component that renders the application header with logo,
+ * version indicator, and interactive modal controls for various features.
+ */
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
-  const { state, pairingData, disconnect } = useHashConnectContext();
 
-  const handleDisconnect = () => {
-    disconnect();
-    navigate("/explore"); // Replace '/explore' with your desired path
-  };
-
+  /**
+   * Modal state management for the main wallet connection
+   */
   const [isModalOpen, setIsModalOpen] = useState(false);
   const openModal = () => {
     closeAllModals();
@@ -27,6 +36,9 @@ const Navbar: React.FC = () => {
     setIsModalOpen(false);
   };
 
+  /**
+   * Modal state management for the trading interface
+   */
   const [isTradeModalOpen, setIsTradeModalOpen] = useState(false);
   const openTradeModal = () => {
     closeAllModals();
@@ -36,6 +48,9 @@ const Navbar: React.FC = () => {
     setIsTradeModalOpen(false);
   };
 
+  /**
+   * Modal state management for analytics display
+   */
   const [isAnalyticsModalOpen, setIsAnalyticsModalOpen] = useState(false);
   const openAnalyticsModal = () => {
     closeAllModals();
@@ -45,6 +60,9 @@ const Navbar: React.FC = () => {
     setIsAnalyticsModalOpen(false);
   };
 
+  /**
+   * Modal state management for the main menu
+   */
   const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
   const openMenuModal = () => {
     closeAllModals();
@@ -54,6 +72,10 @@ const Navbar: React.FC = () => {
     setIsMenuModalOpen(false);
   };
 
+  /**
+   * Utility function to ensure only one modal is open at a time
+   * by closing all modals before opening a new one
+   */
   const closeAllModals = () => {
     setIsModalOpen(false);
     setIsTradeModalOpen(false);
@@ -61,17 +83,16 @@ const Navbar: React.FC = () => {
     setIsMenuModalOpen(false);
   };
 
+  /**
+   * Fetch analytics data for the specified topic
+   */
   const { topicData, loading, error } = useGetAnalyticsData("0.0.6014086");
 
-  useEffect(() => {
-    if (state === "Paired") {
-      closeModal();
-    }
-  }, [state]);
-
   return (
-    <nav className="py-3 px-6 shadow-lg border-y bg-background border-secondary">
+    <nav className="py-3 px-6 bg-background">
+      {/* Main navigation container */}
       <div className="container mx-auto flex justify-between items-center">
+        {/* Logo and branding section */}
         <div className="flex items-center">
           <img
             src={process.env.PUBLIC_URL + "/ibird1.png"}
@@ -82,39 +103,24 @@ const Navbar: React.FC = () => {
             iBird
           </h1>
           <span className="text-background text-sm bg-gradient-to-r from-primary to-accent rounded p-1">
-            v0.0.8
+            v0.0.9
           </span>
         </div>
+
+        {/* Action buttons section */}
         <div className="flex items-center">
           <button
             onClick={openMenuModal}
-            className="font-semibold text-background bg-primary rounded-xl hover:bg-accent transition duration-300 ml-2 p-0.5"
+            className="font-semibold mr-2 text-background bg-primary rounded-xl hover:bg-accent transition duration-300 ml-2 p-0.5"
           >
             <BsLightningCharge className="text-3xl" />
           </button>
 
-          {state !== "Paired" ? (
-            <button
-              onClick={openModal}
-              className="py-2 px-3 ml-3 font-semibold text-background bg-primary rounded-xl hover:bg-accent transition duration-300"
-            >
-              CONNECT
-            </button>
-          ) : (
-            <button
-              onClick={handleDisconnect}
-              className="py-1 px-3 ml-3 font-semibold text-background bg-primary rounded-xl hover:bg-accent transition duration-300"
-            >
-              {pairingData?.accountIds.join(", ")}
-            </button>
-          )}
+          <Wallet />
         </div>
-        {isModalOpen && (
-          <Modal isOpen={isModalOpen} onClose={closeModal}>
-            <Pair />
-          </Modal>
-        )}
 
+        {/* Modal Components */}
+        {/* Trading Modal: Provides links to various trading and asset acquisition options */}
         {isTradeModalOpen && (
           <Modal isOpen={isTradeModalOpen} onClose={closeTradeModal}>
             <div className="text-text bg-background text-center flex flex-col space-y-3 px-12 pb-6 pt-12 rounded-full">
@@ -135,7 +141,7 @@ const Navbar: React.FC = () => {
                 Get ASSET (HTS)
               </a>
               <a
-                href="https://iassets.org/upgrade/"
+                href="https://iassets.org/convert"
                 className="text-md text-center py-2 px-3 font-semibold text-background bg-primary rounded-xl hover:bg-accent transition duration-300"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -154,6 +160,7 @@ const Navbar: React.FC = () => {
           </Modal>
         )}
 
+        {/* Analytics Modal: Displays platform statistics and metrics */}
         {isAnalyticsModalOpen && (
           <Modal isOpen={isAnalyticsModalOpen} onClose={closeAnalyticsModal}>
             <div className="text-text bg-background text-center flex flex-col space-y-3 px-12 pb-6 pt-12 rounded-full">
@@ -196,6 +203,7 @@ const Navbar: React.FC = () => {
           </Modal>
         )}
 
+        {/* Menu Modal: Contains main navigation options and theme toggle */}
         {isMenuModalOpen && (
           <Modal isOpen={isMenuModalOpen} onClose={closeMenuModal}>
             <div className="text-text bg-background text-center flex flex-col space-y-6 px-12 pb-6 pt-12 rounded-full">

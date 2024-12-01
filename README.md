@@ -10,6 +10,16 @@ iBird is a decentralized social media platform built on the Hedera Hashgraph net
 
 ![iBird Banner](public/banner.png)
 
+## Key Features 🌟
+
+- **Post Messages**: Share your thoughts with text and media
+- **Create Threads**: Start conversations and discussions
+- **Create Polls**: Get community opinions
+- **Tip Content Creators**: Support your favorite creators directly
+- **Own Your Profile**: Your profile is an NFT that you control
+- **Censorship Resistant**: No central authority can remove your content
+- **Media Storage**: All media is stored on Arweave for permanence
+
 ## Architecture
 
 iBird consists of two main components:
@@ -22,6 +32,42 @@ iBird consists of two main components:
 2. **Frontend: User Interface and Logic**
    - Handles the interface and user interactions.
    - Includes the logic for writing data to and reading data from the Hedera network.
+
+### Data Flow Architecture 🔄
+
+1. **Message Publishing Flow**
+
+   - User creates content
+   - Content is serialized to JSON
+   - Media (if any) is uploaded to Arweave
+   - Message is submitted to appropriate HCS topic
+   - Message is mirrored across the network
+   - Client applications receive updates via mirror nodes
+
+2. **Topic Hierarchy**
+
+   ```
+   Root
+   ├── Universal Explorer (0.0.4976953)
+   │   ├── Posts
+   │   ├── Thread References
+   │   └── Poll References
+   │
+   └── User Profiles
+       ├── Profile Topic
+       │   └── Profile Information
+       └── User Messages Topic
+           ├── Personal Posts
+           ├── Thread Participations
+           └── Poll Participations
+   ```
+
+3. **NFT Profile System**
+   - Metadata contains:
+     - Profile Topic ID
+     - User Messages Topic ID
+     - Account ID
+     - Creation timestamp
 
 ## Data Structure and Communication
 
@@ -158,7 +204,7 @@ iBird consists of two main components:
         ```json
         {
           "Message": "Question?",
-          "Media": "ipfs://bafkreicsd3imsxhqyjbew2uldrojftxkwcz2w2zjs2jjismdf4d75ns7hu",
+          "Media": "ar://bafkreicsd3imsxhqyjbew2uldrojftxkwcz2w2zjs2jjismdf4d75ns7hu",
           "Choice1": "A",
           "Choice2": "B",
           "Choice3": null,
@@ -193,13 +239,13 @@ iBird consists of two main components:
 
 3.  **Media Storage**
 
-    - All media files are stored on IPFS and Arweave.
+    - All media files are stored on Arweave.
 
       ```json
       {
         "Type": "Post",
         "Message": "ASSET Token holders have just received their income share from iBird, the open-source, community-driven, web3 social media built on hedera.",
-        "Media": "ipfs://bafkreic35uavltr2pb6gsoisv54fytj77felckswkzlglakt25vcbpil6y"
+        "Media": "ar://bafkreic35uavltr2pb6gsoisv54fytj77felckswkzlglakt25vcbpil6y"
       }
       ```
 
@@ -225,7 +271,7 @@ When a user creates a profile:
        "Website": "ibird.community",
        "Location": "",
        "UserMessages": "0.0.5706263",
-       "Picture": "ipfs://bafkreieltouugsbgruyd7u2pbwlp2oe2xd7scmvjzdkgv6a7a6gosksram",
+       "Picture": "ar://bafkreieltouugsbgruyd7u2pbwlp2oe2xd7scmvjzdkgv6a7a6gosksram",
        "Banner": null
      }
      ```
@@ -259,6 +305,18 @@ When a user creates a profile:
        | Creating User Profile NFT      | $1      |
        | Minting User Profile NFT       | $0.02   |
 
+#### Transaction Flow
+
+**Content Creation**
+
+```mermaid
+sequenceDiagram
+User->>Wallet: Sign transaction
+Wallet->>HCS: Submit to topic
+HCS->>Mirror Nodes: Consensus & mirror
+Mirror Nodes->>Client: Update feed
+```
+
 ## Tipping and Rewards
 
 - iBird supports user tipping, with 99% of each tip going to the content creator and 1% to iBird for platform improvement.
@@ -271,13 +329,18 @@ When a user creates a profile:
 ## Future Plans
 
 - Develop mobile applications for iBird.
-- Track the number of messages sent on the platform.
+- Quote feature enabling users to share and comment on existing posts while preserving attribution.
 - Solve the challenge of storing follower and following relationships on-chain.
-- Implement a reward engine to incentivize user participation and growth.
+
+## Getting Started 🚀
+
+1. Connect your Hedera wallet
+2. Create your profile (costs ~$1.04)
+3. Start posting, commenting, and engaging!
 
 ## Building Together
 
-iBird leverages the power of the Hedera Hashgraph network to create a decentralized, censorship-resistant social media platform. By utilizing HCS for message ordering and timestamping, HTS for user profile management, and IPFS for media storage, iBird offers a unique and innovative approach to social networking. The open-source nature of the platform ensures transparency and allows for community-driven development, while the decentralized architecture provides users with control over their data and interactions. Feel free to participate in the project, propose improvements, or raise issues. Whether you're making changes to the existing code or suggesting new features, your contribution will shape the future!
+iBird leverages the power of the Hedera Hashgraph network to create a decentralized, censorship-resistant social media platform. By utilizing HCS for message ordering and timestamping, HTS for user profile management, and Arweave for media storage, iBird offers a unique and innovative approach to social networking. The open-source nature of the platform ensures transparency and allows for community-driven development, while the decentralized architecture provides users with control over their data and interactions. Feel free to participate in the project, propose improvements, or raise issues. Whether you're making changes to the existing code or suggesting new features, your contribution will shape the future!
 
 ## License
 

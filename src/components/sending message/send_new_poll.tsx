@@ -1,18 +1,49 @@
-import { useState, useRef } from "react";
-import { FaCheck } from "react-icons/fa";
-import { useHashConnectContext } from "../../hashconnect/hashconnect";
-import useProfileData from "../../hooks/use_profile_data";
-
+import React, { useState } from "react";
 import { toast } from "react-toastify";
-import useSendMessage from "../../hooks/use_send_message";
-import useCreateTopic from "../../hooks/use_create_topic";
-import { HiOutlineDotsHorizontal } from "react-icons/hi";
-import { MdFileDownloadDone } from "react-icons/md";
-import useUploadToArweave from "../media/use_upload_to_arweave";
 import { MdOutlinePermMedia } from "react-icons/md";
 import { FiDelete } from "react-icons/fi";
+import { useAccountId } from "@buidlerlabs/hashgraph-react-wallets";
+import { RiCheckLine, RiRefreshLine, RiDeleteBinLine } from "react-icons/ri";
 
+import useProfileData from "../../hooks/use_profile_data";
+import useSendMessage from "../../hooks/use_send_message";
+import useCreateTopic from "../../hooks/use_create_topic";
+import useUploadToArweave from "../media/use_upload_to_arweave";
+import { useRefreshTrigger } from "../../hooks/use_refresh_trigger";
+import eventService from "../../services/event_service";
 const explorerTopic = process.env.REACT_APP_EXPLORER_TOPIC || "";
+
+/**
+ * Represents the status and disabled state of a poll creation step
+ * @interface StepStatus
+ * @property {('idle' | 'loading' | 'success' | 'error')} status - Current status of the step
+ * @property {boolean} disabled - Whether the step is currently disabled
+ */
+interface StepStatus {
+  status: "idle" | "loading" | "success" | "error";
+  disabled: boolean;
+}
+
+/**
+ * Tracks the status of each step in the poll creation process
+ * @interface PollStepStatuses
+ */
+interface PollStepStatuses {
+  createTopic: StepStatus;
+  initiateMessage: StepStatus;
+  publishExplore: StepStatus;
+  addToProfile: StepStatus;
+  arweave?: StepStatus; // Optional, only if file is uploaded
+  sendPoll: StepStatus;
+}
+
+/**
+ * Represents the structure of a poll message
+ * @interface Message
+ * @property {string} Message - The poll question
+ * @property {string | null} [Media] - Optional Arweave media ID
+ * @property {string | null} [Choice1-5] - Poll choices (1-5)
+ */
 interface Message {
   Message: string;
   Media?: string | null;
@@ -23,219 +54,314 @@ interface Message {
   Choice5?: string | null;
 }
 
-// Component for Creating a Poll
+/**
+ * SendNewPoll Component - Handles the creation and submission of new polls
+ * @component
+ * @param {Object} props - Component props
+ * @param {() => void} props.onClose - Function to close the poll creation modal
+ */
 const SendNewPoll = ({ onClose }: { onClose: () => void }) => {
+  const { data: accountId } = useAccountId();
+  const { profileData } = useProfileData(accountId);
+  const profileId = profileData ? profileData.UserMessages : "";
+
   const [question, setQuestion] = useState("");
-  const [choices, setChoices] = useState<string[]>([]);
-  const { pairingData } = useHashConnectContext();
-  const signingAccount = pairingData?.accountIds[0] || "";
+  const [choices, setChoices] = useState<string[]>(["", ""]);
+  const [file, setFile] = useState<File | null>(null);
+  const [isEditing, setIsEditing] = useState(true);
+  const [topicId, setTopicId] = useState("");
+  const { triggerRefresh } = useRefreshTrigger();
+  const maxSize = 100 * 1024 * 1024; // 100 MB
+
   const { send } = useSendMessage();
   const { create } = useCreateTopic();
-  const [publishExplore, setPublishExplore] = useState(true);
-  const [addToProfile, setAddToProfile] = useState(true);
-  const { profileData } = useProfileData(signingAccount);
-  const profileId = profileData ? profileData.UserMessages : "";
-  const [isProcess, setIsProcess] = useState(false);
-  const [isBreak, setIsBreak] = useState(false);
-  const [currentStepStatus, setCurrentStepStatus] = useState(0);
-  const isBreakRef = useRef(false);
+  const {
+    uploadToArweave,
+    uploading,
+    arweaveId,
+    error: arweaveError,
+  } = useUploadToArweave();
 
-  const [file, setFile] = useState<File | null>(null);
-  const maxSize = 100 * 1024 * 1024; // 100 MB
-  const { uploadToArweave, uploading, arweaveId, error } = useUploadToArweave();
+  // Initialize step statuses
+  const [stepStatuses, setStepStatuses] = useState<PollStepStatuses>({
+    createTopic: { status: "idle", disabled: false },
+    initiateMessage: { status: "idle", disabled: true },
+    publishExplore: { status: "idle", disabled: true },
+    addToProfile: { status: "idle", disabled: true },
+    arweave: file ? { status: "idle", disabled: true } : undefined,
+    sendPoll: { status: "idle", disabled: true },
+  });
 
-  //Steps
-  let currentStep = 0;
-  let topic = "";
-  // Function for creating a poll
+  const [uploadedMediaId, setUploadedMediaId] = useState<string | null>(null);
+
   /**
-   * Creates a new poll by:
-   * 1. Creating a poll topic
-   * 2. Sending an initiating message to start the poll
-   * 3. Optionally publishing the poll on Explore
-   * 4. Optionally adding the poll to the user's profile
-   * 5. Sending the poll message
-   *
-   * Steps are tracked through the currentStep variable.
-   * Toasts provide user feedback at each step.
+   * Clears the uploaded file and resets related state
    */
-  const breakStep = () => {
-    isBreakRef.current = true;
-    setIsBreak(true);
-    onClose(); // Assuming you want to reset the process state as well
-    // Additional logic if needed when breaking the process
-  };
-
   const clearFile = () => {
     setFile(null);
+    setStepStatuses((prev) => {
+      const newStatuses = { ...prev };
+      delete newStatuses.arweave;
+      return newStatuses;
+    });
   };
 
-  const createPoll = async () => {
-    if (!question) {
+  /**
+   * Validates poll inputs and initiates the poll creation process
+   * Checks for:
+   * - Valid question
+   * - At least 2 choices
+   * - File size limits
+   */
+  const handleStartPoll = () => {
+    if (!question.trim()) {
       toast.error("Please enter a question for the poll.");
-      setIsBreak(true);
+      return;
+    }
+
+    if (!choices[0].trim() || !choices[1].trim()) {
+      toast.error("The first two choices are required.");
       return;
     }
 
     if (choices.length < 2) {
       toast.error("A minimum of two choices are required to create a poll.");
-      setIsBreak(true);
       return;
     }
 
-    setIsProcess(true);
-    isBreakRef.current = false;
-
-    while (currentStep < 5) {
-      if (isBreak) {
-        break;
-      }
-
-      // Creating Poll Topic
-      if (currentStep === 0) {
-        if (isBreakRef.current) {
-          toast("Process Cancelled");
-          setIsProcess(false);
-          break;
-        }
-        toast(`Start the process, Step: ${currentStep + 1}`);
-        const topicId = await create("ibird Poll", "", false);
-
-        if (topicId) {
-          currentStep++;
-          setCurrentStepStatus(1);
-          if (topicId) topic = topicId;
-        }
-
-        toast(`Poll Created, Step: ${currentStep + 1}`);
-      }
-
-      // Sending Initiating Poll Message
-      if (currentStep === 1) {
-        if (isBreakRef.current) {
-          toast("Process Cancelled");
-          setIsProcess(false);
-          break;
-        }
-        const InitiatingMessage = {
-          Identifier: "iAssets",
-          Type: "Poll",
-          Author: signingAccount,
-        };
-
-        const initiatingPoll = await send(topic, InitiatingMessage, "");
-        if (initiatingPoll?.receipt.status.toString() === "SUCCESS") {
-          currentStep++;
-          setCurrentStepStatus(2);
-          toast(`Poll Initiated, Step: ${currentStep + 1}`);
-        }
-      }
-
-      // Publishing on Explore
-      if (currentStep === 2) {
-        if (isBreakRef.current) {
-          toast("Process Cancelled");
-          setIsProcess(false);
-          break;
-        }
-        // Conditional "Publish on Explore" message send
-        if (publishExplore) {
-          const PublishingOnExplore = {
-            Type: "Poll",
-            Poll: topic,
-          };
-
-          const publishingExplore = await send(
-            explorerTopic,
-            PublishingOnExplore,
-            ""
-          );
-
-          if (publishingExplore?.receipt.status.toString() === "SUCCESS") {
-            currentStep++;
-            setCurrentStepStatus(3);
-            toast(`Poll Published On Explorer, Step: ${currentStep + 1}`);
-          }
-        }
-      }
-
-      // Adding To Profile
-      if (currentStep === 3) {
-        if (isBreakRef.current) {
-          toast("Process Cancelled");
-          setIsProcess(false);
-          break;
-        }
-        if (addToProfile) {
-          const addingToProfile = {
-            Type: "Poll",
-            Poll: topic,
-          };
-
-          const sentToProfile = await send(profileId, addingToProfile, "");
-          if (sentToProfile?.receipt.status.toString() === "SUCCESS") {
-            currentStep++;
-            setCurrentStepStatus(4);
-            toast(`Poll Published On Your Profile, Step: ${currentStep + 1}`);
-          }
-        }
-      }
-
-      // Sending Message
-      if (currentStep === 4) {
-        if (isBreakRef.current) {
-          toast("Process Cancelled");
-          setIsProcess(false);
-          break;
-        }
-        // Check if there is a file to upload
-        if (file && file.size > maxSize) {
-          toast.error("The file exceeds 100MB.");
-          setIsProcess(false);
-          return;
-        }
-
-        let uploadedMediaId = null;
-        // Proceed with file upload if a file is selected
-        if (file) {
-          try {
-            setIsProcess(true); // Indicate uploading process
-            uploadedMediaId = await uploadToArweave(file);
-            if (!uploadedMediaId) {
-              throw new Error("Failed to upload media to IPFS.");
-            }
-            setIsProcess(false); // End uploading indication
-          } catch (error) {
-            toast.error("Media upload failed. Try again.");
-            setIsProcess(false);
-            return;
-          }
-        }
-
-        let Message: Message = {
-          Message: question,
-          Media: uploadedMediaId || null,
-          Choice1: choices[0] || null,
-          Choice2: choices[1] || null,
-          Choice3: choices[2] || null,
-          Choice4: choices[3] || null,
-          Choice5: choices[4] || null,
-        };
-
-        const sendingMessage = await send(topic, Message, "");
-        if (sendingMessage?.receipt.status.toString() === "SUCCESS") {
-          currentStep++;
-          setCurrentStepStatus(5);
-
-          toast("Poll Sent, Step:" + currentStep);
-        }
-      }
+    if (file && file.size > maxSize) {
+      toast.error("The file exceeds 100MB.");
+      return;
     }
-    onClose();
-    setIsProcess(false);
-    window.location.reload();
+
+    setIsEditing(false);
+
+    setStepStatuses({
+      createTopic: { status: "idle", disabled: false },
+      initiateMessage: { status: "idle", disabled: true },
+      publishExplore: { status: "idle", disabled: true },
+      addToProfile: { status: "idle", disabled: true },
+      arweave: file ? { status: "idle", disabled: true } : undefined,
+      sendPoll: { status: "idle", disabled: true },
+    });
   };
 
+  /**
+   * Creates a new HCS topic for the poll
+   * @returns {Promise<void>}
+   */
+  const handleCreateTopic = async () => {
+    setStepStatuses((prev) => ({
+      ...prev,
+      createTopic: { status: "loading", disabled: true },
+    }));
+
+    try {
+      const topic = await create("ibird Poll", "", false);
+      if (topic) {
+        setTopicId(topic);
+        setStepStatuses((prev) => ({
+          ...prev,
+          createTopic: { status: "success", disabled: true },
+          initiateMessage: { status: "idle", disabled: false },
+        }));
+        toast.success("Poll topic created successfully.");
+      } else {
+        throw new Error("Failed to create poll topic.");
+      }
+    } catch (error) {
+      setStepStatuses((prev) => ({
+        ...prev,
+        createTopic: { status: "error", disabled: false },
+        initiateMessage: { status: "idle", disabled: true },
+      }));
+      toast.error("Failed to create poll topic.");
+    }
+  };
+
+  /**
+   * Initiates the poll by sending the first message to the topic
+   * @returns {Promise<void>}
+   */
+  const handleInitiatePollMessage = async () => {
+    setStepStatuses((prev) => ({
+      ...prev,
+      initiateMessage: { status: "loading", disabled: true },
+    }));
+
+    try {
+      const initiatingMessage = {
+        Identifier: "iAssets",
+        Type: "Poll",
+        Author: accountId,
+      };
+
+      const initiatingPoll = await send(topicId, initiatingMessage, "");
+      if (initiatingPoll?.receipt.result.toString() === "SUCCESS") {
+        setStepStatuses((prev) => ({
+          ...prev,
+          initiateMessage: { status: "success", disabled: true },
+          publishExplore: { status: "idle", disabled: false },
+        }));
+        toast.success("Poll initiated successfully.");
+      } else {
+        throw new Error("Failed to initiate poll.");
+      }
+    } catch (error) {
+      setStepStatuses((prev) => ({
+        ...prev,
+        initiateMessage: { status: "error", disabled: false },
+      }));
+      toast.error("Failed to initiate poll.");
+    }
+  };
+
+  const handlePublishExplore = async () => {
+    setStepStatuses((prev) => ({
+      ...prev,
+      publishExplore: { status: "loading", disabled: true },
+    }));
+
+    try {
+      const publishingOnExplore = {
+        Type: "Poll",
+        Poll: topicId,
+      };
+
+      const publishingExplore = await send(
+        explorerTopic,
+        publishingOnExplore,
+        ""
+      );
+      if (publishingExplore?.receipt.result.toString() === "SUCCESS") {
+        setStepStatuses((prev) => ({
+          ...prev,
+          publishExplore: { status: "success", disabled: true },
+          addToProfile: { status: "idle", disabled: false },
+        }));
+        toast.success("Poll published on Explore successfully.");
+      } else {
+        throw new Error("Failed to publish on Explore.");
+      }
+    } catch (error) {
+      setStepStatuses((prev) => ({
+        ...prev,
+        publishExplore: { status: "error", disabled: false },
+      }));
+      toast.error("Failed to publish on Explore.");
+    }
+  };
+
+  const handleAddToProfile = async () => {
+    setStepStatuses((prev) => ({
+      ...prev,
+      addToProfile: { status: "loading", disabled: true },
+    }));
+
+    try {
+      const addingToProfile = {
+        Type: "Poll",
+        Poll: topicId,
+      };
+
+      const sentToProfile = await send(profileId, addingToProfile, "");
+      if (sentToProfile?.receipt.result.toString() === "SUCCESS") {
+        setStepStatuses((prev) => ({
+          ...prev,
+          addToProfile: { status: "success", disabled: true },
+          arweave: file ? { status: "idle", disabled: false } : undefined,
+          sendPoll: !file ? { status: "idle", disabled: false } : prev.sendPoll,
+        }));
+        toast.success("Poll added to profile successfully.");
+      } else {
+        throw new Error("Failed to add poll to profile.");
+      }
+    } catch (error) {
+      setStepStatuses((prev) => ({
+        ...prev,
+        addToProfile: { status: "error", disabled: false },
+      }));
+      toast.error("Failed to add poll to profile.");
+    }
+  };
+
+  const handleUploadToArweave = async () => {
+    if (!file) return;
+
+    setStepStatuses((prev) => ({
+      ...prev,
+      arweave: { status: "loading", disabled: true },
+    }));
+
+    try {
+      const mediaId = await uploadToArweave(file);
+      setUploadedMediaId(mediaId);
+
+      if (mediaId) {
+        setStepStatuses((prev) => ({
+          ...prev,
+          arweave: { status: "success", disabled: true },
+          sendPoll: { status: "idle", disabled: false },
+        }));
+        toast.success("Media uploaded to Arweave successfully.");
+      } else {
+        throw new Error("Failed to upload media.");
+      }
+    } catch (error) {
+      setStepStatuses((prev) => ({
+        ...prev,
+        arweave: { status: "error", disabled: false },
+      }));
+      toast.error("Failed to upload media.");
+    }
+  };
+
+  const handleSendPoll = async () => {
+    setStepStatuses((prev) => ({
+      ...prev,
+      sendPoll: { status: "loading", disabled: true },
+    }));
+
+    try {
+      let Message: Message = {
+        Message: question,
+        Media: uploadedMediaId || null,
+        Choice1: choices[0] || null,
+        Choice2: choices[1] || null,
+        Choice3: choices[2] || null,
+        Choice4: choices[3] || null,
+        Choice5: choices[4] || null,
+      };
+
+      const sendingMessage = await send(topicId, Message, "");
+      if (sendingMessage?.receipt.result.toString() === "SUCCESS") {
+        setStepStatuses((prev) => ({
+          ...prev,
+          sendPoll: { status: "success", disabled: true },
+        }));
+
+        toast.success("Your poll sent to Hedera successfully!");
+        onClose();
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        eventService.emit("refreshExplorer");
+      } else {
+        throw new Error("Failed to send poll.");
+      }
+    } catch (error) {
+      setStepStatuses((prev) => ({
+        ...prev,
+        sendPoll: { status: "error", disabled: false },
+      }));
+      toast.error("Failed to send poll.");
+    }
+  };
+
+  /**
+   * Adds or removes poll choices
+   * - Maximum 5 choices allowed
+   * - Minimum 2 choices required
+   * - First two choices cannot be removed
+   */
   const addChoice = () => {
     if (choices.length < 5) {
       setChoices([...choices, ""]);
@@ -249,203 +375,400 @@ const SendNewPoll = ({ onClose }: { onClose: () => void }) => {
   };
 
   const removeChoice = (index: number) => {
+    if (choices.length <= 2) return;
+
+    if (index < 2) return;
+
     const updatedChoices = [...choices];
     updatedChoices.splice(index, 1);
     setChoices(updatedChoices);
   };
 
-  return (
-    <div className="modal-content max-w-md mx-auto bg-background rounded-lg shadow-xl p-3 text-text">
-      {!isProcess ? (
-        <>
-          <h3 className="text-xl py-4 px-8 font-semibold text-primary">
-            New Poll
-          </h3>
-          <section className="py-4 px-8">
-            <label
-              htmlFor="question"
-              className="block text-sm font-semibold text-text"
-            >
-              Question:
-            </label>{" "}
-            <div className="mt-2">
-              <textarea
-                className="w-full h-48 mt-2 px-4 py-2 rounded-lg text-base bg-secondary text-text"
-                name="question"
-                id="question"
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                maxLength={650}
+  /**
+   * Renders the step-by-step poll creation process
+   * Shows:
+   * - Question preview
+   * - Media preview (if any)
+   * - Choices preview
+   * - Processing steps with status indicators
+   */
+  const renderProcessingSteps = () => (
+    <div className="p-6">
+      <h1 className="text-xl font-semibold text-text mb-4">Create Poll</h1>
+
+      {/* Question and Media Preview */}
+      <div className="mb-6 p-5 bg-secondary rounded-xl mx-4">
+        <p className="text-text break-words text-lg leading-relaxed">
+          {question}
+        </p>
+        {file && (
+          <div className="mt-4">
+            <div className="relative rounded-lg overflow-hidden">
+              <img
+                src={URL.createObjectURL(file)}
+                alt="Preview"
+                className="w-full max-h-[300px] object-contain bg-black/5"
               />
-              <div className="text-right text-sm text-text mt-1">
-                {question.length}/650
-              </div>
             </div>
-          </section>
-          <section className="pb-4  px-8">
-            <label className="block text-sm font-semibold text-text">
+          </div>
+        )}
+      </div>
+
+      {/* Choices Preview */}
+      <div className="mb-6 p-5 bg-secondary rounded-xl mx-4">
+        <h3 className="text-lg font-semibold mb-3">Choices:</h3>
+        <ul className="list-decimal list-inside space-y-1">
+          {choices.map((choice, index) => (
+            <li key={index} className="text-text">
+              {choice}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Processing Steps */}
+      <div className="space-y-4 mx-4">
+        {renderStepButton(
+          "createTopic",
+          "Create Poll Topic",
+          handleCreateTopic
+        )}
+        {renderStepButton(
+          "initiateMessage",
+          "Initiate Poll",
+          handleInitiatePollMessage
+        )}
+        {renderStepButton(
+          "publishExplore",
+          "Publish to Explore",
+          handlePublishExplore
+        )}
+        {renderStepButton("addToProfile", "Add to Profile", handleAddToProfile)}
+        {file &&
+          renderStepButton(
+            "arweave",
+            "Upload Media to Arweave",
+            handleUploadToArweave
+          )}
+        {renderStepButton("sendPoll", "Send Poll", handleSendPoll)}
+        <button
+          onClick={onClose}
+          className="w-full bg-secondary hover:bg-error text-text py-2 mt-3 px-4 rounded-full"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+
+  /**
+   * Renders a single step button with appropriate status styling
+   * @param {keyof PollStepStatuses} step - The step identifier
+   * @param {string} label - Display label for the step
+   * @param {() => void} handler - Click handler for the step
+   */
+  const renderStepButton = (
+    step: keyof PollStepStatuses,
+    label: string,
+    handler: () => void
+  ) => {
+    const status = stepStatuses[step];
+    if (!status) return null;
+
+    return (
+      <div
+        className="flex justify-between items-center p-3 hover:bg-secondary/30 rounded-lg transition-colors"
+        key={step}
+      >
+        <div className="flex-1">
+          <span
+            className={`text-base font-medium ${
+              status.status === "success"
+                ? "text-success"
+                : status.status === "error"
+                ? "text-error"
+                : status.disabled
+                ? "text-text/50"
+                : "text-text"
+            }`}
+          >
+            {label}
+          </span>
+          {status.status === "error" && (
+            <p className="text-sm text-error/80 mt-1">
+              Failed. Please try again.
+            </p>
+          )}
+        </div>
+        <button
+          onClick={handler}
+          disabled={status.disabled || status.status === "loading"}
+          className={`px-6 py-2 ml-3 rounded-lg transition-all duration-200 font-medium min-w-[120px] 
+                  flex items-center justify-center ${
+                    status.status === "success"
+                      ? "bg-success text-white"
+                      : status.status === "loading"
+                      ? "bg-secondary text-text animate-pulse cursor-not-allowed"
+                      : status.status === "error"
+                      ? "bg-error hover:bg-error/80 text-white"
+                      : status.disabled
+                      ? "bg-text/10 text-text/50 cursor-not-allowed"
+                      : "bg-primary hover:bg-accent text-background"
+                  }`}
+        >
+          {status.status === "loading" ? (
+            "Processing..."
+          ) : status.status === "success" ? (
+            <>
+              <RiCheckLine className="mr-1.5" />
+              Done
+            </>
+          ) : status.status === "error" ? (
+            <>
+              <RiRefreshLine className="mr-1.5" />
+              Retry
+            </>
+          ) : (
+            "Start"
+          )}
+        </button>
+      </div>
+    );
+  };
+
+  /**
+   * Renders the poll creation form
+   * Features:
+   * - Question input with character limit
+   * - Choice management
+   * - Media upload
+   * - Input validation
+   */
+  const renderEditForm = () => (
+    <div className="flex flex-col max-h-[80vh] bg-background rounded-xl overflow-hidden">
+      {/* Header */}
+      <div className="px-6 py-4 border-b border-text/10">
+        <h3 className="text-xl font-semibold text-primary">Create Poll</h3>
+        <p className="text-sm text-text/60 mt-1">
+          Engage the community with a new poll
+        </p>
+      </div>
+
+      {/* Scrollable Content Area */}
+      <div className="flex-1 overflow-y-auto custom-scrollbar">
+        {/* Compose Area */}
+        <div className="p-6">
+          {/* Question Input */}
+          <div className="mb-6">
+            <label className="block text-sm font-semibold text-text mb-2">
+              Question:
+            </label>
+            <textarea
+              className="w-full bg-secondary text-text text-lg border-none rounded-lg
+                  focus:ring-0 outline-none resize-none h-auto custom-scrollbar
+                  placeholder:text-text/40 p-4"
+              placeholder="What's your poll question?"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              maxLength={650}
+              rows={4}
+              style={{
+                minHeight: "100px",
+                maxHeight: "200px",
+                overflow: "auto",
+              }}
+            />
+            <div className="text-right text-sm text-text mt-1">
+              {question.length}/650
+            </div>
+          </div>
+
+          {/* Choices Input */}
+          <div className="mb-6">
+            <label className="block text-sm font-semibold text-text mb-2">
               Choices:
             </label>
-            <div className="mt-2">
-              {choices.map((choice, index) => (
-                <div key={index} className="flex items-center mb-2">
+            {choices.map((choice, index) => (
+              <div key={index} className="flex flex-col mb-3">
+                <div className="flex items-center">
                   <input
                     type="text"
-                    className="w-full px-4 py-2 rounded-lg text-base bg-secondary text-text"
+                    className={`flex-1 px-4 py-2 rounded-lg text-base ${
+                      index < 2
+                        ? "bg-secondary text-text cursor-default"
+                        : "bg-secondary text-text focus:outline-none focus:ring-2 focus:ring-primary"
+                    }`}
                     value={choice}
                     onChange={(e) => updateChoice(index, e.target.value)}
                     maxLength={50}
+                    placeholder={`Choice ${index + 1}`}
                   />
-                  <div className="text-right text-sm text-text mt-1 ml-2">
-                    {choice.length}/50
-                  </div>
-                  <button
-                    className="ml-2 text-error"
-                    onClick={() => removeChoice(index)}
-                  >
-                    Remove
-                  </button>
+                  {index >= 2 && (
+                    <button
+                      className="ml-2 text-error hover:text-error-dark transition duration-200"
+                      onClick={() => removeChoice(index)}
+                      title="Remove choice"
+                    >
+                      <RiDeleteBinLine className="text-xl" />
+                    </button>
+                  )}
                 </div>
-              ))}
-              {choices.length < 5 && (
-                <button
-                  className="mt-2 px-4 py-2 bg-primary text-background rounded-full"
-                  onClick={addChoice}
+                {/* Add character counter */}
+                <div
+                  className={`text-right text-xs mt-1 ${
+                    choice.length > 40
+                      ? "text-error"
+                      : choice.length > 30
+                      ? "text-primary"
+                      : "text-text/50"
+                  }`}
                 >
-                  Add Choice
-                </button>
-              )}
-            </div>
-          </section>
-          <section>
-            {!file && (
-              <label
-                htmlFor="fileUpload"
-                className="cursor-pointer flex items-center justify-center p-4 mx-4 border-2 border-dashed mb-3 border-secondary"
+                  {choice.length}/50
+                </div>
+              </div>
+            ))}
+            {choices.length < 5 && (
+              <button
+                className="mt-2 px-4 py-2 bg-primary text-background rounded-full hover:bg-accent transition duration-300"
+                onClick={addChoice}
               >
-                <input
-                  type="file"
-                  id="fileUpload"
-                  style={{ display: "none" }}
-                  onChange={(e) => {
-                    if (e.target.files && e.target.files[0]) {
-                      setFile(e.target.files[0]);
-                    }
-                  }}
-                />
-                <MdOutlinePermMedia className="text-xl" />
-                <span>Add Media</span>
-              </label>
+                Add Choice
+              </button>
             )}
+          </div>
 
+          {/* Media Section */}
+          <div className="space-y-4">
+            {/* Media Preview */}
             {file && (
-              <div className="flex justify-center items-center p-4">
-                <img
-                  src={URL.createObjectURL(file)}
-                  alt="Selected File"
-                  className="w-24 h-24 object-cover mr-4"
-                />
-                <FiDelete
-                  className="text-2xl hover:cursor-pointer"
-                  onClick={clearFile}
-                />
+              <div className="rounded-xl overflow-hidden bg-secondary/20">
+                {/* Image Preview */}
+                <div className="relative">
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt="Preview"
+                    className="w-full max-h-[300px] object-contain bg-black/5"
+                  />
+                </div>
+
+                {/* File Info and Remove Button */}
+                <div className="p-3 border-t border-text/5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 min-w-0 mr-4">
+                      <p
+                        className="text-sm text-text truncate"
+                        title={file.name}
+                      >
+                        {file.name}
+                      </p>
+                      <p className="text-xs text-text/50 mt-0.5">
+                        {(file.size / (1024 * 1024)).toFixed(1)} MB
+                      </p>
+                    </div>
+                    <button
+                      onClick={clearFile}
+                      className="flex items-center px-3 py-1.5 rounded-lg
+                        bg-error/10 hover:bg-error/20 text-error/80 hover:text-error 
+                        transition-all duration-200"
+                      title="Remove media"
+                    >
+                      <RiDeleteBinLine className="text-lg mr-1.5" />
+                      <span className="text-sm font-medium">Remove</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
-            {uploading && <p>Uploading Media to IPFS...</p>}
-          </section>
-          <button
-            onClick={createPoll}
-            className="w-full p-3 text-background bg-primary rounded-full hover:bg-accent transition duration-300 py-3 px-6"
+
+            {/* Media Upload Button (only show if no file) */}
+            {!file && (
+              <div className="mt-4">
+                <label
+                  htmlFor="fileUpload"
+                  className="group cursor-pointer block w-full border-2 border-dashed 
+                      border-text/10 rounded-xl hover:border-primary/50 
+                      transition-all duration-200"
+                >
+                  <div className="flex flex-col items-center justify-center py-8 px-4">
+                    <div
+                      className="w-12 h-12 rounded-full bg-primary/10 flex items-center 
+                          justify-center group-hover:scale-110 transition-transform duration-200"
+                    >
+                      <MdOutlinePermMedia className="text-2xl text-primary" />
+                    </div>
+                    <p className="mt-2 text-sm font-medium text-text">
+                      Add Media
+                    </p>
+                    <p className="text-xs text-text/50 mt-1">Up to 100MB</p>
+                  </div>
+                  <input
+                    type="file"
+                    id="fileUpload"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={(e) => {
+                      if (e.target.files?.[0]) {
+                        setFile(e.target.files[0]);
+                        e.target.value = "";
+                        setStepStatuses((prev) => ({
+                          ...prev,
+                          arweave: { status: "idle", disabled: true },
+                        }));
+                      }
+                    }}
+                  />
+                </label>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Controls */}
+      <div className="border-t border-text/10 bg-background/95 backdrop-blur-sm">
+        <div className="px-6 py-4 flex items-center justify-between">
+          {/* Character Count */}
+          <div
+            className={`text-sm font-medium ${
+              question.length > 600
+                ? "text-error"
+                : question.length > 500
+                ? "text-primary"
+                : "text-text/50"
+            }`}
           >
-            Send Poll
-          </button>
-        </>
-      ) : (
-        <div className="p-4">
-          <h1 className="text-text mb-3">Network fees: $0.0104</h1>
-          <div className="flex flex-col justify-between mb-2">
-            <span className="text-sm text-secondary">$0.01</span>
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold mr-3">
-                Creating Poll Topic
-              </h3>
-              <span>
-                {currentStepStatus >= 1 ? (
-                  <MdFileDownloadDone className="text-xl text-success" />
-                ) : (
-                  <HiOutlineDotsHorizontal className="text-xl text-waiting" />
-                )}
-              </span>
-            </div>
+            {question.length}/650
           </div>
 
-          <div className="flex flex-col justify-between mb-2">
-            <span className="text-sm text-secondary">$0.0001</span>
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold mr-3">
-                Initiating Poll Topic
-              </h3>
-              <span>
-                {currentStepStatus >= 2 ? (
-                  <MdFileDownloadDone className="text-xl text-success" />
-                ) : (
-                  <HiOutlineDotsHorizontal className="text-xl text-waiting" />
-                )}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex flex-col justify-between mb-2">
-            <span className="text-sm text-secondary">$0.0001</span>
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold mr-3">
-                Publishing on Explore
-              </h3>
-              <span>
-                {currentStepStatus >= 3 ? (
-                  <MdFileDownloadDone className="text-xl text-success" />
-                ) : (
-                  <HiOutlineDotsHorizontal className="text-xl text-waiting" />
-                )}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex flex-col justify-between mb-2">
-            <span className="text-sm text-secondary">$0.0001</span>
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold mr-3">Adding To Profile</h3>
-              <span>
-                {currentStepStatus >= 4 ? (
-                  <MdFileDownloadDone className="text-xl text-success" />
-                ) : (
-                  <HiOutlineDotsHorizontal className="text-xl text-waiting" />
-                )}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex flex-col justify-between mb-2">
-            <span className="text-sm text-secondary">$0.0001</span>
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold mr-3">Sending Message</h3>
-              <span>
-                {currentStepStatus >= 5 ? (
-                  <MdFileDownloadDone className="text-xl text-success" />
-                ) : (
-                  <HiOutlineDotsHorizontal className="text-xl text-waiting" />
-                )}
-              </span>
-            </div>
-          </div>
+          {/* Create Poll Button */}
           <button
-            onClick={breakStep}
-            className="w-full bg-error hover:bg-secondary text-text py-2 mt-3 px-4 rounded-full"
+            onClick={handleStartPoll}
+            disabled={
+              !question.trim() ||
+              !choices[0].trim() ||
+              !choices[1].trim() ||
+              choices.length < 2
+            }
+            className={`px-8 py-2.5 font-semibold rounded-full transition-all 
+                    duration-200 hover:shadow-lg active:scale-98 ${
+                      !question.trim() ||
+                      !choices[0].trim() ||
+                      !choices[1].trim() ||
+                      choices.length < 2
+                        ? "bg-primary/30 text-text/30 cursor-not-allowed"
+                        : "bg-primary hover:bg-accent text-background"
+                    }`}
           >
-            Cancel
+            Create Poll
           </button>
         </div>
-      )}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="max-w-md mx-auto bg-background rounded-lg shadow-xl p-3 text-text">
+      {isEditing ? renderEditForm() : renderProcessingSteps()}
     </div>
   );
 };

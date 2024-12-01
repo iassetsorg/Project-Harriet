@@ -1,3 +1,12 @@
+/**
+ * Spinner is a simple loading indicator component that displays a rotating circle.
+ * Features:
+ * - Centered positioning
+ * - Smooth animation
+ * - Consistent sizing
+ * - Primary color theme integration
+ */
+
 import React from "react";
 
 const Spinner = () => {

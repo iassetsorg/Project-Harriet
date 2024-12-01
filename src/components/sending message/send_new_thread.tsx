@@ -1,437 +1,660 @@
-import { useState, useRef } from "react";
-import { FaCheck } from "react-icons/fa";
-import { useHashConnectContext } from "../../hashconnect/hashconnect";
-import useProfileData from "../../hooks/use_profile_data";
-
+import React, { useState } from "react";
 import { toast } from "react-toastify";
-import useSendMessage from "../../hooks/use_send_message";
-import useCreateTopic from "../../hooks/use_create_topic";
-import { HiOutlineDotsHorizontal } from "react-icons/hi";
-import { MdFileDownloadDone } from "react-icons/md";
-import useUploadToArweave from "../media/use_upload_to_arweave";
 import { MdOutlinePermMedia } from "react-icons/md";
-import { FiDelete } from "react-icons/fi";
+import { RiDeleteBinLine, RiCheckLine, RiRefreshLine } from "react-icons/ri";
+import useSendMessage from "../../hooks/use_send_message";
+import useProfileData from "../../hooks/use_profile_data";
+import useCreateTopic from "../../hooks/use_create_topic";
+import useUploadToArweave from "../media/use_upload_to_arweave";
+import { useAccountId } from "@buidlerlabs/hashgraph-react-wallets";
+import { useRefreshTrigger } from "../../hooks/use_refresh_trigger";
+import eventService from "../../services/event_service";
 const explorerTopic = process.env.REACT_APP_EXPLORER_TOPIC || "";
 
-interface Message {
+/**
+ * Represents the status and disabled state of a single step in the thread creation process
+ * @interface StepStatus
+ */
+interface StepStatus {
+  status: "idle" | "loading" | "success" | "error";
+  disabled: boolean;
+}
+
+/**
+ * Tracks the status of all steps in the thread creation workflow
+ * @interface ThreadStepStatuses
+ */
+interface ThreadStepStatuses {
+  createTopic: StepStatus;
+  initThread: StepStatus;
+  explorer: StepStatus;
+  profile: StepStatus;
+  arweave?: StepStatus;
+  message: StepStatus;
+}
+
+/**
+ * Structure for the message payload sent to Hedera
+ * @interface MessagePayload
+ */
+interface MessagePayload {
   Message: string;
   Media?: string | null;
 }
 
-// Component for Creating a Topic
+/**
+ * SendNewThread Component
+ * Handles the creation and posting of new threads with optional media attachments.
+ * Implements a multi-step process:
+ * 1. Create Topic
+ * 2. Initialize Thread
+ * 3. Publish to Explorer
+ * 4. Add to Profile
+ * 5. Upload Media (optional)
+ * 6. Send Final Message
+ *
+ * @component
+ * @param {Object} props
+ * @param {Function} props.onClose - Callback function to close the thread creation modal
+ */
 const SendNewThread = ({ onClose }: { onClose: () => void }) => {
+  const { data: accountId } = useAccountId();
   const [message, setMessage] = useState("");
-  const { sendTransaction, pairingData } = useHashConnectContext();
-  const signingAccount = pairingData?.accountIds[0] || "";
-  const [topicMemo, setTopicMemo] = useState("");
-  const [memo, setMemo] = useState("");
-  const [submitKey, setSubmitKey] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [isEditing, setIsEditing] = useState(true);
+  const { triggerRefresh } = useRefreshTrigger();
+  const maxSize = 100 * 1024 * 1024; // 100 MB
+
   const { send } = useSendMessage();
   const { create } = useCreateTopic();
-  const [publishExplore, setPublishExplore] = useState(true);
-  const [addToProfile, setAddToProfile] = useState(true);
-  const { profileData } = useProfileData(signingAccount);
+  const { profileData } = useProfileData(accountId);
+  const {
+    uploadToArweave,
+    arweaveId,
+    error: arweaveError,
+  } = useUploadToArweave();
+
   const profileId = profileData ? profileData.UserMessages : "";
-  const [isProcess, setIsProcess] = useState(false);
-  const [isBreak, setIsBreak] = useState(false);
-  const [currentStepStatus, setCurrentStepStatus] = useState(0);
-  const isBreakRef = useRef(false);
+  const [topic, setTopic] = useState("");
 
-  const [file, setFile] = useState<File | null>(null);
-  const maxSize = 100 * 1024 * 1024; // 100 MB
-  const { uploadToArweave, uploading, arweaveId, error } = useUploadToArweave();
+  // State to manage each step's status
+  const [stepStatuses, setStepStatuses] = useState<ThreadStepStatuses>({
+    createTopic: { status: "idle", disabled: false },
+    initThread: { status: "idle", disabled: true },
+    explorer: { status: "idle", disabled: true },
+    profile: { status: "idle", disabled: true },
+    arweave: file ? { status: "idle", disabled: true } : undefined,
+    message: { status: "idle", disabled: true },
+  });
 
-  // Steps
+  const [uploadedMediaId, setUploadedMediaId] = useState<string | null>(null);
 
-  let currentStep = 0;
-  let topic = "";
-  // Function for creating a topic
   /**
-   * Creates a new thread by:
-   * 1. Creating a thread topic
-   * 2. Sending an initiating message to start the thread
-   * 3. Optionally publishing the thread on Explore
-   * 4. Optionally adding the thread to the user's profile
-   * 5. Sending the thread message
-   *
-   * Steps are tracked through the currentStep variable.
-   * Toasts provide user feedback at each step.
+   * Clears the selected file and resets related state
    */
-  const breakStep = () => {
-    isBreakRef.current = true;
-    setIsBreak(true);
-    onClose(); // Assuming you want to reset the process state as well
-    // Additional logic if needed when breaking the process
-  };
-
   const clearFile = () => {
     setFile(null);
+    setStepStatuses((prev) => {
+      const newStatuses = { ...prev };
+      delete newStatuses.arweave;
+      return newStatuses;
+    });
   };
-  const createThread = async () => {
-    if (!message) {
-      toast("Please enter a message");
-      setIsBreak(true);
+
+  /**
+   * Initiates the thread creation process after validation
+   * Validates message content and file size before proceeding
+   */
+  const handleStartThread = () => {
+    if (!message.trim()) {
+      toast.error("Please enter a message");
       return;
     }
 
-    setIsProcess(true);
-    isBreakRef.current = false;
-
-    while (currentStep < 5) {
-      if (isBreak) {
-        break;
-      }
-
-      // Creating Thread Topic
-
-      if (currentStep === 0) {
-        if (isBreakRef.current) {
-          toast("Process Cancelled");
-          setIsProcess(false);
-          break;
-        }
-        toast(`Creating thread topic, Step: ${currentStep + 1}`);
-        const topicId = await create("ibird Thread", "", submitKey);
-
-        if (topicId) {
-          currentStep++;
-          setCurrentStepStatus(1);
-          if (topicId) topic = topicId;
-        }
-
-        toast(`Thread topic created, Step: ${currentStep + 1}`);
-      }
-
-      // Sending Initiating Thread Message
-      if (currentStep === 1) {
-        if (isBreakRef.current) {
-          toast("Process Cancelled");
-          setIsProcess(false);
-          break;
-        }
-        const InitiatingMessage = {
-          Identifier: "iAssets",
-          Type: "Thread",
-          Author: signingAccount,
-        };
-        toast(`initiating message, Step: ${currentStep + 1}`);
-        const initiatingThread = await send(topic, InitiatingMessage, "");
-        if (initiatingThread?.receipt.status.toString() === "SUCCESS") {
-          currentStep++;
-          setCurrentStepStatus(2);
-          toast("Thread Initiated, Step:" + currentStep + 1);
-        }
-      }
-
-      // Publishing on Explore
-      if (currentStep === 2) {
-        if (isBreakRef.current) {
-          toast("Process Cancelled");
-          setIsProcess(false);
-          break;
-        }
-        // Conditional "Publish on Explore" message send
-        if (publishExplore) {
-          const PublishingOnExplore = {
-            Type: "Thread",
-            Thread: topic,
-          };
-
-          const publishingExplore = await send(
-            explorerTopic,
-            PublishingOnExplore,
-            ""
-          );
-          toast(`Publishing thread on Explore, Step: ${currentStep + 1}`);
-          if (publishingExplore?.receipt.status.toString() === "SUCCESS") {
-            currentStep++;
-            setCurrentStepStatus(3);
-            toast(`Thread published on Explore, Step: ${currentStep + 1}`);
-          }
-        }
-      }
-
-      // Adding To Profile
-      if (currentStep === 3) {
-        if (isBreakRef.current) {
-          toast("Process Cancelled");
-          setIsProcess(false);
-          break;
-        }
-        if (addToProfile) {
-          const addingToProfile = {
-            Type: "Thread",
-            Thread: topic,
-          };
-          toast(`Adding thread to profile, Step: ${currentStep + 1}`);
-          const sentToProfile = await send(profileId, addingToProfile, "");
-          if (sentToProfile?.receipt.status.toString() === "SUCCESS") {
-            currentStep++;
-            setCurrentStepStatus(4);
-            toast(`Thread added to profile, Step: ${currentStep + 1}`);
-          }
-        }
-      }
-
-      // Sending Message
-      if (currentStep === 4) {
-        if (isBreakRef.current) {
-          toast("Process Cancelled");
-          setIsProcess(false);
-          break;
-        }
-        // Check if there is a file to upload
-        if (file && file.size > maxSize) {
-          toast.error("The file exceeds 100MB.");
-          setIsProcess(false);
-          return;
-        }
-
-        let uploadedMediaId = null;
-        // Proceed with file upload if a file is selected
-        if (file) {
-          try {
-            setIsProcess(true);
-            uploadedMediaId = await uploadToArweave(file);
-            if (!uploadedMediaId) {
-              throw new Error("Failed to upload media to Arweave.");
-            }
-            setIsProcess(false);
-          } catch (error) {
-            toast.error("Media upload failed. Try again.");
-            setIsProcess(false);
-            return;
-          }
-        }
-
-        let Message: Message = {
-          Message: message,
-          Media: uploadedMediaId || null,
-        };
-
-        const sendingMessage = await send(topic, Message, memo);
-        if (sendingMessage?.receipt.status.toString() === "SUCCESS") {
-          currentStep++;
-          setCurrentStepStatus(5);
-          toast("Message Sent to Profile, Step:" + currentStep + 1);
-        }
-      }
+    if (file && file.size > maxSize) {
+      toast.error("The file exceeds 100MB.");
+      return;
     }
-    setIsProcess(false);
-    onClose();
-    window.location.reload();
-    toast.success("Thread sent successfully!");
+
+    setIsEditing(false);
+
+    // Initialize the stepStatuses for the process
+    setStepStatuses({
+      createTopic: { status: "idle", disabled: false },
+      initThread: { status: "idle", disabled: true },
+      explorer: { status: "idle", disabled: true },
+      profile: { status: "idle", disabled: true },
+      arweave: file ? { status: "idle", disabled: true } : undefined,
+      message: { status: "idle", disabled: true },
+    });
   };
-  // Function to retry the current step
+
+  /**
+   * Creates a new topic on Hedera for the thread
+   * Updates step status and handles success/error states
+   */
+  const handleCreateTopic = async () => {
+    // Set loading state
+    setStepStatuses((prev) => ({
+      ...prev,
+      createTopic: { status: "loading", disabled: true },
+    }));
+
+    try {
+      const topicId = await create("ibird Thread", "", false);
+
+      // Check if topicId exists and update state accordingly
+      if (topicId) {
+        setTopic(topicId);
+        setStepStatuses((prev) => ({
+          ...prev,
+          createTopic: { status: "success", disabled: true },
+          initThread: { status: "idle", disabled: false },
+        }));
+        toast.success("Thread topic created successfully.");
+      } else {
+        // If no topicId, treat as error
+        setStepStatuses((prev) => ({
+          ...prev,
+          createTopic: { status: "error", disabled: false },
+        }));
+        toast.error("Failed to create thread topic.");
+      }
+    } catch (error) {
+      // On error, immediately show retry state
+      setStepStatuses((prev) => ({
+        ...prev,
+        createTopic: { status: "error", disabled: false },
+      }));
+      toast.error("Failed to create thread topic.");
+    }
+  };
+
+  const handleInitThread = async () => {
+    setStepStatuses((prev) => ({
+      ...prev,
+      initThread: { status: "loading", disabled: true },
+    }));
+
+    try {
+      const initiatingMessage = {
+        Identifier: "iAssets",
+        Type: "Thread",
+        Author: accountId,
+      };
+
+      const initiatingThread = await send(topic, initiatingMessage, "");
+      if (initiatingThread?.receipt.result.toString() === "SUCCESS") {
+        setStepStatuses((prev) => ({
+          ...prev,
+          initThread: { status: "success", disabled: true },
+          explorer: { status: "idle", disabled: false },
+        }));
+        toast.success("Thread initialized successfully.");
+      } else {
+        throw new Error("Thread initialization failed");
+      }
+    } catch (e) {
+      setStepStatuses((prev) => ({
+        ...prev,
+        initThread: { status: "error", disabled: false },
+      }));
+      toast.error("Failed to initialize thread.");
+    }
+  };
+
+  const handleExplorerPost = async () => {
+    setStepStatuses((prev) => ({
+      ...prev,
+      explorer: { status: "loading", disabled: true },
+    }));
+
+    try {
+      const publishingOnExplorer = {
+        Type: "Thread",
+        Thread: topic,
+      };
+
+      const publishingExplorer = await send(
+        explorerTopic,
+        publishingOnExplorer,
+        ""
+      );
+
+      if (publishingExplorer?.receipt.result.toString() === "SUCCESS") {
+        setStepStatuses((prev) => ({
+          ...prev,
+          explorer: { status: "success", disabled: true },
+          profile: { status: "idle", disabled: false },
+        }));
+        toast.success("Published to explorer successfully.");
+      } else {
+        setStepStatuses((prev) => ({
+          ...prev,
+          explorer: { status: "error", disabled: false },
+        }));
+        toast.error("Failed to publish to explorer.");
+      }
+    } catch (error) {
+      setStepStatuses((prev) => ({
+        ...prev,
+        explorer: { status: "error", disabled: false },
+      }));
+      toast.error("Failed to publish to explorer.");
+    }
+  };
+
+  const handleProfilePost = async () => {
+    setStepStatuses((prev) => ({
+      ...prev,
+      profile: { status: "loading", disabled: true },
+    }));
+
+    try {
+      const addingToProfile = {
+        Type: "Thread",
+        Thread: topic,
+      };
+
+      const sentToProfile = await send(profileId, addingToProfile, "");
+
+      if (sentToProfile?.receipt.result.toString() === "SUCCESS") {
+        setStepStatuses((prev) => ({
+          ...prev,
+          profile: { status: "success", disabled: true },
+          arweave: file ? { status: "idle", disabled: false } : undefined,
+          message: !file ? { status: "idle", disabled: false } : prev.message,
+        }));
+        toast.success("Added to profile successfully.");
+      } else {
+        setStepStatuses((prev) => ({
+          ...prev,
+          profile: { status: "error", disabled: false },
+        }));
+        toast.error("Failed to add to profile.");
+      }
+    } catch (error) {
+      setStepStatuses((prev) => ({
+        ...prev,
+        profile: { status: "error", disabled: false },
+      }));
+      toast.error("Failed to add to profile.");
+    }
+  };
+
+  const handleArweaveUpload = async () => {
+    if (!file) return;
+
+    setStepStatuses((prev) => ({
+      ...prev,
+      arweave: { status: "loading", disabled: true },
+    }));
+
+    try {
+      const mediaId = await uploadToArweave(file);
+      setUploadedMediaId(mediaId); // Store the ID in state
+
+      if (mediaId) {
+        setStepStatuses((prev) => ({
+          ...prev,
+          arweave: { status: "success", disabled: true },
+          message: { status: "idle", disabled: false },
+        }));
+        toast.success("Media uploaded successfully.");
+      } else {
+        throw new Error("Failed to upload media.");
+      }
+    } catch (error) {
+      setStepStatuses((prev) => ({
+        ...prev,
+        arweave: { status: "error", disabled: false },
+      }));
+      toast.error("Failed to upload media.");
+    }
+  };
+
+  const handleFinalMessage = async () => {
+    setStepStatuses((prev) => ({
+      ...prev,
+      message: { status: "loading", disabled: true },
+    }));
+
+    try {
+      const messagePayload: MessagePayload = {
+        Message: message,
+        Media: uploadedMediaId,
+      };
+
+      const sendingMessage = await send(topic, messagePayload, "");
+
+      if (sendingMessage?.receipt.result.toString() === "SUCCESS") {
+        setStepStatuses((prev) => ({
+          ...prev,
+          message: { status: "success", disabled: true },
+        }));
+        toast.success("Your thread sent to Hedera successfully!");
+        onClose();
+        // Add delay before refresh
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        eventService.emit("refreshExplorer");
+      } else {
+        setStepStatuses((prev) => ({
+          ...prev,
+          message: { status: "error", disabled: false },
+        }));
+        toast.error("Failed to send message.");
+      }
+    } catch (error) {
+      setStepStatuses((prev) => ({
+        ...prev,
+        message: { status: "error", disabled: false },
+      }));
+      toast.error("Failed to send message.");
+    }
+  };
+
+  /**
+   * Renders a single step button with appropriate status indicators
+   * @param {keyof ThreadStepStatuses} step - The step identifier
+   * @param {string} label - Display label for the step
+   * @param {Function} handler - Click handler for the step
+   * @returns {JSX.Element | null}
+   */
+  const renderStepButton = (
+    step: keyof ThreadStepStatuses,
+    label: string,
+    handler: () => void
+  ) => {
+    const status = stepStatuses[step];
+    if (!status) return null;
+
+    return (
+      <div
+        className="flex justify-between items-center p-3 hover:bg-secondary/30 rounded-lg transition-colors"
+        key={step}
+      >
+        <div className="flex-1">
+          <span
+            className={`text-base font-medium ${
+              status.status === "success"
+                ? "text-success"
+                : status.status === "error"
+                ? "text-error"
+                : status.disabled
+                ? "text-gray-500"
+                : "text-text"
+            }`}
+          >
+            {label}
+          </span>
+          {status.status === "error" && (
+            <p className="text-sm text-error/80 mt-1">
+              Failed. Please try again.
+            </p>
+          )}
+        </div>
+        <button
+          onClick={handler}
+          disabled={status.disabled || status.status === "loading"}
+          className={`px-6 py-2 ml-3 rounded-lg transition-all duration-200 font-medium min-w-[120px] 
+                flex items-center justify-center ${
+                  status.status === "success"
+                    ? "bg-success text-white"
+                    : status.status === "loading"
+                    ? "bg-secondary text-text animate-pulse cursor-not-allowed"
+                    : status.status === "error"
+                    ? "bg-error hover:bg-error/80 text-white"
+                    : status.disabled
+                    ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                    : "bg-primary hover:bg-accent text-background"
+                }`}
+        >
+          {status.status === "loading" ? (
+            "Processing..."
+          ) : status.status === "success" ? (
+            <>
+              <RiCheckLine className="mr-1.5" />
+              Done
+            </>
+          ) : status.status === "error" ? (
+            <>
+              <RiRefreshLine className="mr-1.5" />
+              Retry
+            </>
+          ) : (
+            "Start"
+          )}
+        </button>
+      </div>
+    );
+  };
+
+  /**
+   * Renders the processing steps view showing all steps and their current status
+   * @returns {JSX.Element}
+   */
+  const renderProcessingSteps = () => (
+    <div className="p-6">
+      <h1 className="text-xl font-semibold text-text mb-4">Create Thread</h1>
+
+      {/* Message and Media Preview */}
+      <div className="mb-6 p-5 bg-secondary rounded-xl mx-4">
+        <p className="text-text break-words text-lg leading-relaxed">
+          {message}
+        </p>
+        {file && (
+          <div className="mt-4">
+            <div className="relative rounded-lg overflow-hidden">
+              <img
+                src={URL.createObjectURL(file)}
+                alt="Preview"
+                className="w-full max-h-[300px] object-contain bg-black/5"
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Processing Steps */}
+      <div className="space-y-2  mx-4">
+        {renderStepButton(
+          "createTopic",
+          "Create Thread Topic",
+          handleCreateTopic
+        )}
+        {renderStepButton("initThread", "Initialize Thread", handleInitThread)}
+        {renderStepButton(
+          "explorer",
+          "Publish to Explorer",
+          handleExplorerPost
+        )}
+        {renderStepButton("profile", "Add to Profile", handleProfilePost)}
+        {file &&
+          renderStepButton(
+            "arweave",
+            "Upload Media to Arweave",
+            handleArweaveUpload
+          )}
+        {renderStepButton("message", "Send Message", handleFinalMessage)}
+        <button
+          onClick={onClose}
+          className="w-full bg-secondary hover:bg-error text-text py-2 mt-3 px-4 rounded-full"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+
+  /**
+   * Renders the initial message composition form
+   * Includes media upload and character limit tracking
+   * @returns {JSX.Element}
+   */
+  const renderEditForm = () => (
+    <div className="flex flex-col max-h-[80vh] bg-background rounded-xl overflow-hidden">
+      {/* Header */}
+      <div className="px-6 py-4 border-b border-text/10">
+        <h3 className="text-xl font-semibold text-primary">Create Thread</h3>
+        <p className="text-sm text-text/60 mt-1">
+          Start a new conversation with the community
+        </p>
+      </div>
+
+      {/* Scrollable Content Area */}
+      <div className="flex-1 overflow-y-auto custom-scrollbar">
+        {/* Compose Area */}
+        <div className="p-6">
+          <div className="relative mb-4">
+            <textarea
+              className="w-full bg-transparent text-text text-lg border-none
+                focus:ring-0 outline-none resize-none h-auto custom-scrollbar
+                placeholder:text-text/40"
+              placeholder="What's on your mind?"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              maxLength={850}
+              rows={3}
+              style={{
+                minHeight: "120px",
+                maxHeight: "300px",
+                overflow: "auto",
+              }}
+            />
+            {/* Character limit warning */}
+            {message.length > 800 && (
+              <div
+                className="absolute bottom-2 right-2 text-xs text-error/80 
+                  bg-error/10 px-2 py-1 rounded-full"
+              >
+                {850 - message.length} characters left
+              </div>
+            )}
+          </div>
+          {/* Media Section */}
+          <div className="space-y-4">
+            {/* Media Preview */}
+            {file && (
+              <div className="rounded-xl overflow-hidden bg-secondary/20">
+                {/* Image Preview */}
+                <div className="relative">
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt="Preview"
+                    className="w-full max-h-[300px] object-contain bg-black/5"
+                  />
+                </div>
+
+                {/* File Info and Remove Button */}
+                <div className="p-3 border-t border-text/5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 min-w-0 mr-4">
+                      <p
+                        className="text-sm text-text truncate"
+                        title={file.name}
+                      >
+                        {file.name}
+                      </p>
+                      <p className="text-xs text-text/50 mt-0.5">
+                        {(file.size / (1024 * 1024)).toFixed(1)} MB
+                      </p>
+                    </div>
+                    <button
+                      onClick={clearFile}
+                      className="flex items-center px-3 py-1.5 rounded-lg
+                        bg-error/10 hover:bg-error/20 text-error/80 hover:text-error 
+                        transition-all duration-200"
+                      title="Remove media"
+                    >
+                      <RiDeleteBinLine className="text-lg mr-1.5" />
+                      <span className="text-sm font-medium">Remove</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Media Upload Button (only show if no file) */}
+            {!file && (
+              <div className="mt-4">
+                <label
+                  htmlFor="fileUpload"
+                  className="group cursor-pointer block w-full border-2 border-dashed 
+                      border-text/10 rounded-xl hover:border-primary/50 
+                      transition-all duration-200"
+                >
+                  <div className="flex flex-col items-center justify-center py-8 px-4">
+                    <div
+                      className="w-12 h-12 rounded-full bg-primary/10 flex items-center 
+                        justify-center group-hover:scale-110 transition-transform duration-200"
+                    >
+                      <MdOutlinePermMedia className="text-2xl text-primary" />
+                    </div>
+                    <p className="mt-2 text-sm font-medium text-text">
+                      Add Media
+                    </p>
+                    <p className="text-xs text-text/50 mt-1">Up to 100MB</p>
+                  </div>
+                  <input
+                    type="file"
+                    id="fileUpload"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={(e) => {
+                      if (e.target.files?.[0]) {
+                        setFile(e.target.files[0]);
+                        e.target.value = "";
+                        setStepStatuses((prev) => ({
+                          ...prev,
+                          arweave: { status: "idle", disabled: true },
+                        }));
+                      }
+                    }}
+                  />
+                </label>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Controls */}
+      <div className="border-t border-text/10 bg-background/95 backdrop-blur-sm">
+        <div className="px-6 py-4 flex items-center justify-between">
+          {/* Character Count */}
+          <div
+            className={`text-sm font-medium ${
+              message.length > 800
+                ? "text-error"
+                : message.length > 700
+                ? "text-primary"
+                : "text-text/50"
+            }`}
+          >
+            {message.length}/850
+          </div>
+
+          {/* Create Thread Button */}
+          <button
+            onClick={handleStartThread}
+            disabled={!message.trim()}
+            className={`px-8 py-2.5 font-semibold rounded-full transition-all 
+                duration-200 hover:shadow-lg active:scale-98 ${
+                  !message.trim()
+                    ? "bg-primary/30 text-text/30 cursor-not-allowed"
+                    : "bg-primary hover:bg-accent text-background"
+                }`}
+          >
+            Create Thread
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="max-w-md mx-auto bg-background rounded-lg shadow-xl p-3 text-text">
-      {!isProcess ? (
-        <>
-          <h3 className="text-xl pt-4  px-8 font-semibold text-primary">
-            NEW THREAD
-          </h3>
-          <section className="pb-4  px-8 ">
-            <label
-              htmlFor="messageContent"
-              className=" text-sm font-semibold text-text"
-            >
-              Message:
-            </label>
-            <div className="mt-2">
-              <textarea
-                className="w-full h-48 px-4 py-2 rounded-lg text-base bg-secondary text-text"
-                name="messageContent"
-                id="messageContent"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                maxLength={850}
-              />
-              <div className="text-right text-sm text-text mt-1">
-                {message.length}/850
-              </div>
-            </div>
-          </section>
-          <section>
-            {!file && (
-              <label
-                htmlFor="fileUpload"
-                className="cursor-pointer flex items-center justify-center p-4 mx-4 border-2 border-dashed mb-3 border-secondary"
-              >
-                <input
-                  type="file"
-                  id="fileUpload"
-                  style={{ display: "none" }}
-                  onChange={(e) => {
-                    if (e.target.files && e.target.files[0]) {
-                      setFile(e.target.files[0]);
-                    }
-                  }}
-                />
-                <MdOutlinePermMedia className="text-xl" />
-                <span>Add Media</span>
-              </label>
-            )}
-
-            {file && (
-              <div className="flex justify-center items-center p-4">
-                <img
-                  src={URL.createObjectURL(file)}
-                  alt="Selected File"
-                  className="w-24 h-24 object-cover mr-4"
-                />
-                <FiDelete
-                  className="text-2xl hover:cursor-pointer"
-                  onClick={clearFile}
-                />
-              </div>
-            )}
-            {uploading && <p>Uploading Media to IPFS...</p>}
-          </section>
-          {/* <section className="py-4 px-8">
-            <label
-              htmlFor="messageMemo"
-              className="block text-sm font-semibold text-text"
-            >
-              Memo:
-            </label>
-            <div className="mt-2">
-              <input
-                type="text"
-                className="w-full px-4 py-2 rounded-lg border-2 border-gray-500  text-base bg-gray-800"
-                name="messageMemo"
-                id="messageMemo"
-                value={memo}
-                onChange={(e) => setMemo(e.target.value)}
-              />
-            </div>
-          </section> */}
-          {/* <div className="py-2 px-8 ">
-            <label className="flex items-center text-sm font-semibold text-text">
-              <input
-                type="checkbox"
-                checked={submitKey}
-                onChange={() => setSubmitKey(!submitKey)}
-                className="h-6 w-6 text-secondary border-2 border-secondary "
-              />
-              <span className="ml-3">No Reactions</span>
-            </label>
-          </div>
-          <div className="pb-2 px-8">
-            <label className="flex items-center text-sm font-semibold text-text">
-              <input
-                type="checkbox"
-                checked={addToProfile}
-                onChange={() => setAddToProfile(!addToProfile)}
-                className="h-6 w-6 "
-              />
-              <span className="ml-3">Add to Profile</span>
-            </label>
-          </div>
-          <div className="pb-4 px-8">
-            <label className="flex items-center text-sm font-semibold text-text">
-              <input
-                type="checkbox"
-                checked={publishExplore}
-                onChange={() => setPublishExplore(!publishExplore)}
-                className="h-6 w-6 "
-              />
-              <span className="ml-3">Publish on Explorer</span>
-            </label>
-          </div> */}
-          <button
-            onClick={() => createThread()}
-            className="w-full p-3  text-background bg-primary rounded-full hover:bg-accent transition duration-300 py-3 px-6 "
-          >
-            Send Thread
-          </button>
-        </>
-      ) : (
-        <div className="p-4 ">
-          <h1 className="text-text mb-3">Network fees: $0.0104</h1>
-          <div className="flex flex-col justify-between mb-2 ">
-            <span className="text-sm text-secondary">$0.01</span>
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold mr-3">
-                Creating Thread Topic
-              </h3>
-              <span>
-                {currentStepStatus >= 1 ? (
-                  <MdFileDownloadDone className="text-xl text-success" />
-                ) : (
-                  <HiOutlineDotsHorizontal className="text-xl text-waiting" />
-                )}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex flex-col justify-between mb-2">
-            <span className="text-sm text-secondary">$0.0001</span>
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold  mr-3">
-                Initiating Thread Topic
-              </h3>
-              <span>
-                {currentStepStatus >= 2 ? (
-                  <MdFileDownloadDone className="text-xl text-success" />
-                ) : (
-                  <HiOutlineDotsHorizontal className="text-xl text-waiting" />
-                )}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex flex-col justify-between mb-2">
-            <span className="text-sm text-secondary">$0.0001</span>
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold  mr-3">
-                Publishing on Explore
-              </h3>
-              <span>
-                {currentStepStatus >= 3 ? (
-                  <MdFileDownloadDone className="text-xl text-success" />
-                ) : (
-                  <HiOutlineDotsHorizontal className="text-xl text-waiting" />
-                )}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex flex-col justify-between mb-2">
-            <span className="text-sm text-secondary">$0.0001</span>
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold  mr-3">Adding To Profile</h3>
-              <span>
-                {currentStepStatus >= 4 ? (
-                  <MdFileDownloadDone className="text-xl text-success" />
-                ) : (
-                  <HiOutlineDotsHorizontal className="text-xl text-waiting" />
-                )}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex flex-col justify-between mb-2">
-            <span className="text-sm text-secondary">$0.0001</span>
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold  mr-3">Sending Message</h3>
-              <span>
-                {currentStepStatus >= 5 ? (
-                  <MdFileDownloadDone className="text-xl text-success" />
-                ) : (
-                  <HiOutlineDotsHorizontal className="text-xl text-waiting" />
-                )}
-              </span>
-            </div>
-          </div>
-          <button
-            onClick={breakStep}
-            className="w-full bg-error hover:bg-secondary text-text py-2 mt-3 px-4 rounded-full"
-          >
-            Cancel
-          </button>
-        </div>
-      )}
+      {isEditing ? renderEditForm() : renderProcessingSteps()}
     </div>
   );
 };

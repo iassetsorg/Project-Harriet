@@ -1,5 +1,12 @@
 import React from "react";
 
+/**
+ * Banner Component
+ * A navigation bar component that displays important links for the application.
+ * Provides quick access to various platform features and trading options.
+ * @component
+ * @returns {JSX.Element} A responsive banner with multiple action links
+ */
 const Banner = () => {
   return (
     <div className="bg-accent text-sm font-normal text-text p-1 shadow-md sm:p-1 text-center flex justify-center space-x-1">

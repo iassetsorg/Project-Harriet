@@ -1,42 +1,249 @@
+/* Tailwind Directives
+ * Import base styles, components, and utilities from Tailwind CSS framework
+ */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Mobile-specific styles for NewThreadButton
+ * Applies fixed positioning at the bottom-right corner
+ * with specific margin spacing for mobile views
+ */
 @media (max-width: 768px) {
-  /* // For mobile screens */
-  /**
-   * Positions the New Thread button fixed to the bottom right of the viewport, with margins from the edges.
-   */
   .NewThreadButton {
     @apply fixed bottom-0 right-0 mb-16 mr-8;
   }
 }
 
+/* Desktop-specific styles for NewThreadButton
+ * Positions the button at the bottom-left corner
+ * with adjusted margins for desktop views
+ */
 @media (min-width: 769px) {
-  /* // For larger screens */
   .NewThreadButton {
     @apply fixed bottom-0 left-1 mb-4 ml-0.5;
   }
 }
 
+/* Light Theme Configuration
+ * Default theme with crisp and modern aesthetics
+ * Variables defined:
+ * - background: Light gray for clean appearance
+ * - text: Deep blue for readability
+ * - primary/secondary: Blue-based color scheme
+ * - accent: Bright blue for highlights
+ * - status colors: Error (red), Success (green), Waiting (amber)
+ * - shadow/border/divider: Customizable strength values
+ */
 :root {
-  --color-background: #cbd5e1; /* Light mode background color */
-  --color-text: #1e293b; /* Light mode text color */
-  --color-primary: #075985; /* Light mode primary color */
-  --color-secondary: #94a3b8; /* Light mode secondary color */
-  --color-accent: #0c4a6e; /* Light mode accent color */
-  --color-error: #ae0808; /* Light mode error color */
-  --color-success: #0f9a29;
-  --color-waiting: #ea580c;
+  --color-background: #fafafa;
+  --color-text: #1a237e;
+  --color-primary: #2563eb;
+  --color-secondary: #f1f5f9;
+  --color-accent: #3b82f6;
+  --color-error: #ef4444;
+  --color-success: #10b981;
+  --color-waiting: #f59e0b;
+  --shadow-color: 217 92% 45%;
+  --shadow-strength: 8%;
+  --border-strength: 25%;
+  --divider-strength: 15%;
 }
 
+/* Dark Theme Configuration
+ * Sleek and premium dark mode appearance
+ * Features:
+ * - Deep blue-black background
+ * - Light text for contrast
+ * - Indigo-based primary/secondary colors
+ * - Increased shadow and border strength for better visibility
+ */
 .dark {
-  --color-background: rgb(31 41 55); /* Dark mode background color */
-  --color-text: rgb(209 213 219); /* Dark mode text color */
-  --color-primary: rgb(165 180 252); /* Dark mode primary color */
-  --color-secondary: rgb(55 65 81); /* Dark mode secondary color */
-  --color-accent: #818cf8; /* Dark mode accent color */
-  --color-error: #ae0808; /* Dark mode error color */
-  --color-success: #0f9a29;
-  --color-waiting: #ea580c;
+  --color-background: #1f1d2b;
+  --color-text: #e2e8f0;
+  --color-primary: #a5b4fc;
+  --color-secondary: #252836;
+  --color-accent: #c4cefa;
+  --color-error: #ef4444;
+  --color-success: #048a3e;
+  --color-waiting: #f59e0b;
+  --shadow-color: 250 95% 65%;
+  --shadow-strength: 10%;
+  --border-strength: 35%;
+  --divider-strength: 20%;
+}
+
+/* Blue Theme Configuration
+ * Deep ocean and neon-inspired color scheme
+ * Characteristics:
+ * - Navy background with light blue text
+ * - Sky blue accents
+ * - Enhanced border strength for definition
+ */
+.blue {
+  --color-background: #000c24;
+  --color-text: #e0f2fe;
+  --color-primary: #0ea5e9;
+  --color-secondary: #082f49;
+  --color-accent: #38bdf8;
+  --color-error: #ef4444;
+  --color-success: #10b981;
+  --color-waiting: #f59e0b;
+  --shadow-color: 199 95% 74%;
+  --shadow-strength: 10%;
+  --border-strength: 45%;
+  --divider-strength: 25%;
+}
+
+/* Orange Theme Configuration
+ * Warm sunset gradient theme
+ * Features:
+ * - Beige background with deep orange text
+ * - Orange-based accent colors
+ * - Softer shadows for a warm appearance
+ */
+.orange {
+  --color-background: #f8ecbe;
+  --color-text: #7c2d12;
+  --color-primary: #f97316;
+  --color-secondary: #fff7ed;
+  --color-accent: #fb923c;
+  --color-error: #ef4444;
+  --color-success: #10b981;
+  --color-waiting: #f59e0b;
+  --shadow-color: 25 95% 53%;
+  --shadow-strength: 8%;
+  --border-strength: 25%;
+  --divider-strength: 20%;
+}
+
+/* Green Theme Configuration
+ * Nature-inspired forest and spring theme
+ * Characteristics:
+ * - Mint background with forest green text
+ * - Emerald accents
+ * - Subtle borders and shadows
+ */
+.green {
+  --color-background: #f0fdf4;
+  --color-text: #064e3b;
+  --color-primary: #16a34a;
+  --color-secondary: #dcfce7;
+  --color-accent: #22c55e;
+  --color-error: #ef4444;
+  --color-success: #15803d;
+  --color-waiting: #f59e0b;
+  --shadow-color: 142 84% 45%;
+  --shadow-strength: 8%;
+  --border-strength: 20%;
+  --divider-strength: 15%;
+}
+
+/* Card Component Styles
+ * Theme-aware card design with glass morphism effect
+ * Features:
+ * - Rounded corners with padding
+ * - Semi-transparent background
+ * - Dynamic border and shadow based on theme
+ * - Hover effects for interaction feedback
+ */
+.theme-card {
+  @apply p-6 rounded-xl backdrop-blur-sm transition-all duration-200;
+  border: 1px solid hsl(var(--shadow-color) / var(--border-strength));
+  box-shadow: var(--shadow-md);
+  background: color-mix(in srgb, var(--color-secondary) 80%, transparent);
+}
+
+.theme-card:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: hsl(var(--shadow-color) / calc(var(--border-strength) + 20%));
+  background: color-mix(in srgb, var(--color-secondary) 90%, transparent);
+}
+
+/* Divider Component Styles
+ * Theme-aware horizontal dividers
+ * Characteristics:
+ * - Subtle line with theme-based color
+ * - Optional hover effect for interactive dividers
+ */
+.theme-divider {
+  @apply border-0 border-t;
+  border-top-color: hsl(var(--shadow-color) / var(--divider-strength));
+}
+
+.theme-divider-hover:hover {
+  border-top-color: hsl(
+    var(--shadow-color) / calc(var(--divider-strength) + 10%)
+  );
+}
+
+/* Comment Component Styles
+ * Theme-aware comment containers
+ * Features:
+ * - Rounded corners with padding
+ * - Semi-transparent background
+ * - Subtle shadows and borders
+ * - Enhanced hover effects
+ */
+.theme-comment {
+  @apply p-4 rounded-lg backdrop-blur-sm transition-all duration-200;
+  border: 1px solid hsl(var(--shadow-color) / var(--border-strength));
+  box-shadow: var(--shadow-sm);
+  background: color-mix(in srgb, var(--color-secondary) 60%, transparent);
+}
+
+.theme-comment:hover {
+  box-shadow: var(--shadow-md);
+  border-color: hsl(var(--shadow-color) / calc(var(--border-strength) + 15%));
+  background: color-mix(in srgb, var(--color-secondary) 70%, transparent);
+}
+
+/* Nested Comment Styles
+ * Modified styling for nested comment threads
+ * - Lighter background than parent comments
+ * - Maintains theme awareness
+ */
+.theme-comment-nested {
+  background: color-mix(in srgb, var(--color-secondary) 40%, transparent);
+}
+
+.theme-comment-nested:hover {
+  background: color-mix(in srgb, var(--color-secondary) 50%, transparent);
+}
+
+/* Glass Morphism Effect
+ * Creates a frosted glass appearance
+ * Features:
+ * - Semi-transparent background
+ * - Blur effect
+ * - Subtle border
+ */
+.glass-morphism {
+  background: color-mix(in srgb, var(--color-background) 10%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid color-mix(in srgb, var(--color-background) 20%, transparent);
+}
+
+/* Button Hover Effects
+ * Enhanced interaction feedback
+ * - Slight upward movement
+ * - Shadow enhancement
+ */
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Gradient Overlay
+ * Theme-aware gradient background
+ * - Combines primary and accent colors
+ * - Semi-transparent for subtle effect
+ */
+.gradient-overlay {
+  background: linear-gradient(
+    to bottom right,
+    color-mix(in srgb, var(--color-primary) 10%, transparent),
+    color-mix(in srgb, var(--color-accent) 10%, transparent)
+  );
 }
