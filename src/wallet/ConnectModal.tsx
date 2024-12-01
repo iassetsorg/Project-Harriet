@@ -56,12 +56,12 @@ const ConnectModal: React.FC<ConnectModalProps> = ({ isOpen, onClose }) => {
 
   /**
    * Configuration array for supported wallets
-   * Each wallet object contains a name and logo path
+   * Each wallet object contains a name, logo path, and title
    */
   const wallets = [
-    { name: "HashPack", logo: HashPackLogo },
-    { name: "Kabila", logo: KabilaLogo },
-    { name: "WalletConnect", logo: WalletConnectLogo },
+    { name: "HashPack", logo: HashPackLogo, title: "Desktop" },
+    { name: "Kabila", logo: KabilaLogo, title: "Desktop" },
+    { name: "WalletConnect", logo: WalletConnectLogo, title: "Mobile" },
   ];
 
   return (
@@ -107,7 +107,7 @@ const ConnectModal: React.FC<ConnectModalProps> = ({ isOpen, onClose }) => {
           {wallets.map((wallet) => (
             <button
               key={wallet.name}
-              className="w-full py-3 px-4 bg-secondary rounded-xl hover:bg-accent hover:text-background transition duration-300 text-text flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 px-4 bg-secondary rounded-xl hover:bg-accent hover:text-background transition duration-300 text-text flex items-center disabled:opacity-50 disabled:cursor-not-allowed group relative"
               onClick={() => handleConnect(wallet.name)}
               disabled={isLoading}
             >
@@ -117,6 +117,9 @@ const ConnectModal: React.FC<ConnectModalProps> = ({ isOpen, onClose }) => {
                 className="w-8 mr-2"
               />
               <span className="flex-1 text-left">{wallet.name}</span>
+              <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full group-hover:bg-background/20">
+                {wallet.title}
+              </span>
             </button>
           ))}
         </div>

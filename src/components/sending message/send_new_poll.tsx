@@ -393,7 +393,16 @@ const SendNewPoll = ({ onClose }: { onClose: () => void }) => {
    * - Processing steps with status indicators
    */
   const renderProcessingSteps = () => (
-    <div className="p-6">
+    <div
+      className="p-6 overflow-y-auto max-h-[80vh]
+      scrollbar scrollbar-w-2
+      scrollbar-thumb-accent hover:scrollbar-thumb-primary
+      scrollbar-track-secondary/10
+      scrollbar-thumb-rounded-full scrollbar-track-rounded-full
+      transition-colors duration-200 ease-in-out
+      dark:scrollbar-thumb-accent/50 dark:hover:scrollbar-thumb-primary/70
+      dark:scrollbar-track-secondary/5"
+    >
       <h1 className="text-xl font-semibold text-text mb-4">Create Poll</h1>
 
       {/* Question and Media Preview */}
@@ -555,7 +564,16 @@ const SendNewPoll = ({ onClose }: { onClose: () => void }) => {
       </div>
 
       {/* Scrollable Content Area */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar">
+      <div
+        className="flex-1 overflow-y-auto
+        scrollbar scrollbar-w-2
+        scrollbar-thumb-accent hover:scrollbar-thumb-primary
+        scrollbar-track-secondary/10
+        scrollbar-thumb-rounded-full scrollbar-track-rounded-full
+        transition-colors duration-200 ease-in-out
+        dark:scrollbar-thumb-accent/50 dark:hover:scrollbar-thumb-primary/70
+        dark:scrollbar-track-secondary/5"
+      >
         {/* Compose Area */}
         <div className="p-6">
           {/* Question Input */}

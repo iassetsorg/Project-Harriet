@@ -138,7 +138,14 @@ function Explorer() {
     <div
       ref={scrollRef}
       onScroll={handleScroll}
-      className="relative w-full h-screen overflow-y-scroll bg-background p-6 text-text"
+      className="relative w-full h-[calc(100vh-4rem)] overflow-y-auto bg-background p-0 sm:p-6 text-text
+        scrollbar scrollbar-w-2
+        scrollbar-thumb-accent hover:scrollbar-thumb-primary
+        scrollbar-track-secondary/10
+        scrollbar-thumb-rounded-full scrollbar-track-rounded-full
+        transition-colors duration-200 ease-in-out
+        dark:scrollbar-thumb-accent/50 dark:hover:scrollbar-thumb-primary/70
+        dark:scrollbar-track-secondary/5"
     >
       {/* Pull to refresh indicator */}
       {isRefreshing && (

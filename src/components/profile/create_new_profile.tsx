@@ -587,7 +587,16 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
    * Shows progress of profile creation steps
    */
   const renderProcessingSteps = () => (
-    <div className="p-6">
+    <div
+      className="p-6 overflow-y-auto max-h-[80vh]
+      scrollbar scrollbar-w-2
+      scrollbar-thumb-accent hover:scrollbar-thumb-primary
+      scrollbar-track-secondary/10
+      scrollbar-thumb-rounded-full scrollbar-track-rounded-full
+      transition-colors duration-200 ease-in-out
+      dark:scrollbar-thumb-accent/50 dark:hover:scrollbar-thumb-primary/70
+      dark:scrollbar-track-secondary/5"
+    >
       <h1 className="text-xl font-semibold text-text mb-4">
         Creating Your Profile
       </h1>
@@ -688,7 +697,16 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
       </div>
 
       {/* Scrollable Content Area */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar">
+      <div
+        className="flex-1 overflow-y-auto
+        scrollbar scrollbar-w-2
+        scrollbar-thumb-accent hover:scrollbar-thumb-primary
+        scrollbar-track-secondary/10
+        scrollbar-thumb-rounded-full scrollbar-track-rounded-full
+        transition-colors duration-200 ease-in-out
+        dark:scrollbar-thumb-accent/50 dark:hover:scrollbar-thumb-primary/70
+        dark:scrollbar-track-secondary/5"
+      >
         <div className="p-6 space-y-6">
           {/* Profile Picture Upload */}
           <div className="flex justify-center">
@@ -758,9 +776,16 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
                 onChange={(e) => setBio(e.target.value)}
                 className="w-full px-4 py-2.5 rounded-lg bg-secondary text-text
                   border-2 border-transparent focus:border-primary transition-colors
-                  duration-200 outline-none resize-none"
+                  duration-200 outline-none resize-none min-h-[120px]
+                  scrollbar scrollbar-w-2
+                  scrollbar-thumb-accent hover:scrollbar-thumb-primary
+                  scrollbar-track-secondary/10
+                  scrollbar-thumb-rounded-full scrollbar-track-rounded-full
+                  transition-colors duration-200 ease-in-out
+                  dark:scrollbar-thumb-accent/50 dark:hover:scrollbar-thumb-primary/70
+                  dark:scrollbar-track-secondary/5"
                 placeholder="Tell us about yourself"
-                rows={3}
+                rows={5}
               />
             </div>
 

@@ -70,7 +70,7 @@ const UserProfile = ({ userAccountId }: UserProfileProps) => {
             >
               <span className="sr-only">Close</span>
               <svg
-                className="h-4 w-4 transform group-hover:rotate-90 transition-transform duration-300"
+                className="h-4 w-4 transform group-hover:rotate-90 text-text transition-transform duration-300"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="none"
@@ -85,7 +85,7 @@ const UserProfile = ({ userAccountId }: UserProfileProps) => {
               <div className="absolute inset-0 rounded-full group-hover:bg-gradient-to-tr from-red-600 to-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
             </button>
           </div>
-          <div className="flex flex-col items-center w-full text-text p-6">
+          <div className="flex flex-col items-center w-full text-text p-0 sm:p-6 ">
             {isLoading && (
               <p className="text-xl font-semibold text-center text-primary/60 animate-pulse">
                 Loading...

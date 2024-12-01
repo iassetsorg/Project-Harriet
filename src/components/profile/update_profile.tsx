@@ -303,7 +303,16 @@ const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
    * @returns {JSX.Element} The processing steps interface
    */
   const renderProcessingSteps = () => (
-    <div className="p-6">
+    <div
+      className="p-6 overflow-y-auto max-h-[80vh]
+      scrollbar scrollbar-w-2
+      scrollbar-thumb-accent hover:scrollbar-thumb-primary
+      scrollbar-track-secondary/10
+      scrollbar-thumb-rounded-full scrollbar-track-rounded-full
+      transition-colors duration-200 ease-in-out
+      dark:scrollbar-thumb-accent/50 dark:hover:scrollbar-thumb-primary/70
+      dark:scrollbar-track-secondary/5"
+    >
       <h1 className="text-xl font-semibold text-text mb-4">Update Profile</h1>
 
       {/* Preview Section */}
@@ -415,7 +424,16 @@ const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
       </div>
 
       {/* Scrollable Content Area */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar">
+      <div
+        className="flex-1 overflow-y-auto
+        scrollbar scrollbar-w-2
+        scrollbar-thumb-accent hover:scrollbar-thumb-primary
+        scrollbar-track-secondary/10
+        scrollbar-thumb-rounded-full scrollbar-track-rounded-full
+        transition-colors duration-200 ease-in-out
+        dark:scrollbar-thumb-accent/50 dark:hover:scrollbar-thumb-primary/70
+        dark:scrollbar-track-secondary/5"
+      >
         <div className="p-6 space-y-6">
           {/* Name Input */}
           <div>
@@ -443,9 +461,17 @@ const UpdateProfile = ({ onClose }: { onClose: () => void }) => {
             <textarea
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-lg bg-secondary text-text focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+              className="w-full px-4 py-2.5 rounded-lg bg-secondary text-text 
+                focus:outline-none focus:ring-2 focus:ring-primary resize-none min-h-[120px]
+                scrollbar scrollbar-w-2
+                scrollbar-thumb-accent hover:scrollbar-thumb-primary
+                scrollbar-track-secondary/10
+                scrollbar-thumb-rounded-full scrollbar-track-rounded-full
+                transition-colors duration-200 ease-in-out
+                dark:scrollbar-thumb-accent/50 dark:hover:scrollbar-thumb-primary/70
+                dark:scrollbar-track-secondary/5"
               placeholder="Tell us about yourself"
-              rows={3}
+              rows={5}
               maxLength={160}
             />
             <div

@@ -247,3 +247,6 @@ button:hover {
     color-mix(in srgb, var(--color-accent) 10%, transparent)
   );
 }
+body {
+  overflow: hidden;
+}

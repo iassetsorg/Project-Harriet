@@ -98,11 +98,13 @@ export const NewMessage: FC = () => {
             openModal(setIsPostSelectionModalOpen);
           }
         }}
-        className="NewThreadButton flex items-center p-3 font-semibold text-background bg-primary rounded-full shadow-lg hover:bg-accent hover:shadow-xl transform hover:scale-105 transition duration-300 mt-3"
+        className="NewThreadButton flex items-center p-2 sm:p-3 font-semibold text-background bg-primary rounded-full shadow-lg hover:bg-accent hover:shadow-xl transform hover:scale-105 transition duration-300 mt-3"
         aria-label="New Message"
       >
-        <FaPen className="mr-3 text-lg" />
-        <span className="font-medium tracking-wide">New Message</span>
+        <FaPen className="text-base sm:text-lg" />
+        <span className="hidden sm:inline font-medium tracking-wide ml-3">
+          New Message
+        </span>
       </button>
 
       {isConnectModalOpen && (
@@ -117,73 +119,101 @@ export const NewMessage: FC = () => {
           isOpen={isPostSelectionModalOpen}
           onClose={() => closeModal(setIsPostSelectionModalOpen)}
         >
-          <div className="space-y-8 p-8 max-w-2xl mx-auto">
-            <h2 className="text-2xl font-bold text-center text-text">
-              Create New Content
+          <div
+            className="space-y-8 p-8 max-w-2xl mx-auto overflow-y-auto max-h-[80vh]
+            scrollbar scrollbar-w-2
+            scrollbar-thumb-accent hover:scrollbar-thumb-primary
+            scrollbar-track-secondary/10
+            scrollbar-thumb-rounded-full scrollbar-track-rounded-full
+            transition-colors duration-200 ease-in-out
+            dark:scrollbar-thumb-accent/50 dark:hover:scrollbar-thumb-primary/70
+            dark:scrollbar-track-secondary/5"
+          >
+            <div className="flex justify-center items-center mb-2">
+              <div className="relative w-16 h-16 flex items-center justify-center group">
+                {/* Outer glowing ring */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-primary/30 to-accent/30 rounded-full blur-md animate-pulse"></div>
+
+                {/* Inner gradient background */}
+                <div className="absolute inset-2 bg-gradient-to-br from-background via-secondary to-background rounded-full"></div>
+
+                {/* Glass effect overlay */}
+                <div className="absolute inset-2 glass-morphism rounded-full"></div>
+
+                {/* The ℏ symbol */}
+                <span
+                  className="text-6xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent hover:scale-110 transition-all duration-300 cursor-default select-none z-10"
+                  style={{ fontFamily: "Arial, sans-serif" }}
+                >
+                  ℏ
+                </span>
+
+                {/* Animated border */}
+                <div className="absolute inset-0 border-2 border-primary rounded-full animate-ping"></div>
+
+                {/* Hover effect ring */}
+                <div className="absolute inset-0  rounded-full group-hover:border-primary transition-all duration-500"></div>
+
+                {/* Particle effects */}
+                <div className="absolute inset-0 bg-gradient-overlay rounded-full opacity-50"></div>
+              </div>
+            </div>
+            <h2 className="text-3xl font-bold text-center mt-8 mb-12 text-primary  bg-gradient-to-r from-primary to-accent bg-clip-text  animate-gradient-x transform hover:scale-105 transition-all duration-300">
+              Create New Web3 Content
             </h2>
             <div className="space-y-6">
-              <div className="flex items-start p-6 bg-background-secondary rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300">
+              <div className="flex items-start p-6 bg-background-secondary rounded-xl border border-primary shadow-md hover:shadow-xl hover:border-background-tertiary transform hover:scale-[1.02] transition-all duration-300">
                 <div className="flex-shrink-0 mt-1">
                   <FaCommentDots className="text-primary text-2xl" />
                 </div>
                 <div className="ml-4 flex-grow">
                   <h3 className="text-xl font-semibold text-text">Post</h3>
                   <p className="text-text-secondary mt-1">
-                    Share your thoughts with the community using a public post.
-                    It's a simple and cost-effective way to broadcast your
-                    message on Hedera, with a posting fee of only $0.0001.
-                    However, posts do not support interactive features like
-                    replies or likes.
+                    Quick and simple way to share your thoughts. Posts are
+                    public but don't support replies or likes.<br></br>
+                    Hedera Network Fee: $0.0001
                   </p>
                   <button
                     onClick={() => handlePostTypeSelection("post")}
-                    className="mt-4 inline-flex items-center px-4 py-2 bg-primary text-background font-semibold rounded-lg hover:bg-accent hover:shadow-md transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                    className="mt-4 inline-flex items-center px-4 py-2 bg-primary text-background font-semibold rounded-lg hover:bg-accent shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50"
                   >
                     Create Post
                   </button>
                 </div>
               </div>
 
-              <div className="flex items-start p-6 bg-background-secondary rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300">
+              <div className="flex items-start p-6 bg-background-secondary rounded-xl border border-primary shadow-md hover:shadow-xl hover:border-text/20 dark:border-text/5 dark:hover:border-text/10 transform hover:scale-[1.02] transition-all duration-300">
                 <div className="flex-shrink-0 mt-1">
                   <FaComments className="text-primary text-2xl" />
                 </div>
                 <div className="ml-4 flex-grow">
                   <h3 className="text-xl font-semibold text-text">Thread</h3>
                   <p className="text-text-secondary mt-1">
-                    Start a discussion by creating a thread. Threads allow for
-                    interaction through likes, dislikes, and comments. Creating
-                    a thread costs $0.0104, which includes fees for creating the
-                    topic, injecting thread structure information, publishing to
-                    the explorer, adding the topic to your profile, and sending
-                    the initial message.
+                    Start a discussion with likes, dislikes, and comments
+                    enabled.<br></br> Hedera Network Fee: $0.0104
                   </p>
                   <button
                     onClick={() => handlePostTypeSelection("thread")}
-                    className="mt-4 inline-flex items-center px-4 py-2 bg-primary text-background font-semibold rounded-lg hover:bg-accent hover:shadow-md transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                    className="mt-4 inline-flex items-center px-4 py-2 bg-primary text-background font-semibold rounded-lg hover:bg-accent shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50"
                   >
                     Create Thread
                   </button>
                 </div>
               </div>
 
-              <div className="flex items-start p-6 bg-background-secondary rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300">
+              <div className="flex items-start p-6 bg-background-secondary rounded-xl border border-primary shadow-md hover:shadow-xl hover:border-text/20 dark:border-text/5 dark:hover:border-text/10 transform hover:scale-[1.02] transition-all duration-300">
                 <div className="flex-shrink-0 mt-1">
                   <FaPoll className="text-primary text-2xl" />
                 </div>
                 <div className="ml-4 flex-grow">
                   <h3 className="text-xl font-semibold text-text">Poll</h3>
                   <p className="text-text-secondary mt-1">
-                    Initiate a voting process by creating a poll. Polls allow
-                    for community participation through voting on specific
-                    topics. Creating a poll costs $0.0104, which covers fees for
-                    creating the topic, injecting poll structure information,
-                    publishing to the explorer, adding the topic to your
-                    profile, and sending the initial message.
+                    Create a poll to gather community votes on a topic.<br></br>
+                    Hedera Network Fee: $0.0104
                   </p>
                   <button
                     onClick={() => handlePostTypeSelection("poll")}
-                    className="mt-4 inline-flex items-center px-4 py-2 bg-primary text-background font-semibold rounded-lg hover:bg-accent hover:shadow-md transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                    className="mt-4 inline-flex items-center px-4 py-2 bg-primary text-background font-semibold rounded-lg hover:bg-accent shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50"
                   >
                     Create Poll
                   </button>

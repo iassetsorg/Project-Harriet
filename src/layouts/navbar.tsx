@@ -92,7 +92,7 @@ const Navbar: React.FC = () => {
     <nav className="py-3 px-6 bg-background">
       {/* Main navigation container */}
       <div className="container mx-auto flex justify-between items-center">
-        {/* Logo and branding section */}
+        {/* Left section - Logo and branding */}
         <div className="flex items-center">
           <img
             src={process.env.PUBLIC_URL + "/ibird1.png"}
@@ -107,7 +107,7 @@ const Navbar: React.FC = () => {
           </span>
         </div>
 
-        {/* Action buttons section */}
+        {/* Right section - Action buttons */}
         <div className="flex items-center">
           <button
             onClick={openMenuModal}
@@ -115,7 +115,6 @@ const Navbar: React.FC = () => {
           >
             <BsLightningCharge className="text-3xl" />
           </button>
-
           <Wallet />
         </div>
 

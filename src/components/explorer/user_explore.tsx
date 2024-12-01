@@ -132,15 +132,22 @@ function UserExplorer({ userAddress }: UserExplorerProps) {
   );
 
   return (
-    <div className="">
-      <h1 className="text-2xl mt-5 ml-5 font-semibold text-text mb-4">
+    <div className="bg-background rounded-xl py-1">
+      <h1 className="text-2xl mt-1 ml-8 font-semibold text-text mb-4">
         Messages
       </h1>
 
       <div
         ref={scrollRef}
         onScroll={handleScroll}
-        className="relative w-full h-screen overflow-y-scroll bg-background p-6 text-text shadow-xl"
+        className="relative w-full h-screen overflow-y-scroll   text-text shadow-xl
+          scrollbar scrollbar-w-2
+          scrollbar-thumb-accent hover:scrollbar-thumb-primary
+          scrollbar-track-secondary/10
+          scrollbar-thumb-rounded-full scrollbar-track-rounded-full
+          transition-colors duration-200 ease-in-out
+          dark:scrollbar-thumb-accent/50 dark:hover:scrollbar-thumb-primary/70
+          dark:scrollbar-track-secondary/5"
       >
         {/* Pull to refresh indicator */}
         {isRefreshing && (
