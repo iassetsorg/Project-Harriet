@@ -5,6 +5,9 @@
   "private": true,
   "dependencies": {
     "@buidlerlabs/hashgraph-react-wallets": "^2.1.2",
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/core": "^6.2.0",
+    "@capacitor/ios": "^6.2.0",
     "@fortawesome/free-solid-svg-icons": "^6.4.2",
     "@giphy/js-fetch-api": "^5.6.0",
     "@giphy/react-components": "^9.8.0",
@@ -67,6 +70,7 @@
     ]
   },
   "devDependencies": {
+    "@capacitor/cli": "^6.2.0",
     "gh-pages": "^6.0.0",
     "tailwind-scrollbar": "^3.1.0",
     "tailwindcss": "^3.3.3"

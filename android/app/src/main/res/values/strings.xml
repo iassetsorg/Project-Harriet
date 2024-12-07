@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ibird</string>
+    <string name="title_activity_main">ibird</string>
+    <string name="package_name">com.ibird.app</string>
+    <string name="custom_url_scheme">com.ibird.app</string>
+</resources>
