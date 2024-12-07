@@ -316,7 +316,7 @@ const ReplayPoll: React.FC<ReplayProps> = ({
   };
 
   const generateShareLink = () => {
-    return `${window.location.origin}/Polls/${topicId}`;
+    return `https://ibird.io/Polls/${topicId}`;
   };
 
   const copyShareLink = () => {

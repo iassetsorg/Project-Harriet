@@ -62,7 +62,7 @@ const Modal: FC<ModalProps> = ({
   return createPortal(
     <div
       className={`fixed inset-0 flex items-center justify-center ${
-        !removeZIndex ? "z-[99999]" : ""
+        !removeZIndex ? "z-[99999]" : "z-[10]"
       }`}
     >
       {/* Semi-transparent backdrop */}
@@ -73,7 +73,7 @@ const Modal: FC<ModalProps> = ({
       {/* Modal container with positioning */}
       <div
         className={`relative max-w-3xl mx-auto ${
-          !removeZIndex ? "z-[100000]" : ""
+          !removeZIndex ? "z-[100000]" : "z-[11]"
         }`}
       >
         <div className="relative bg-background rounded-lg shadow-xl text-text overflow-hidden">
@@ -81,7 +81,7 @@ const Modal: FC<ModalProps> = ({
           {!hideCloseButton && (
             <div
               className={`absolute top-4 right-4 ${
-                !removeZIndex ? "z-[100001]" : ""
+                !removeZIndex ? "z-[100001]" : "z-[12]"
               }`}
             >
               <button

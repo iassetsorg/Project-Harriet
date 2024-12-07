@@ -69,7 +69,7 @@ function ReadPost({
    */
   const generateShareLink = (sequence_number: string) => {
     const encodedMessage = encodeURIComponent(message);
-    const shareLink = `${window.location.origin}/Posts/${sequence_number}`;
+    const shareLink = `https://ibird.io/Posts/${sequence_number}`;
     return shareLink;
   };
 

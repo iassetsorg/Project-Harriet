@@ -322,7 +322,7 @@ const Replay: React.FC<ReplayProps> = ({
   };
 
   const generateShareLink = () => {
-    return `${window.location.origin}/Threads/${topicId}`;
+    return `https://ibird.io/Threads/${topicId}`;
   };
   const copyShareLink = () => {
     const link = generateShareLink();
