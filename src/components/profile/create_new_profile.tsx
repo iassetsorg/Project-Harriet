@@ -43,6 +43,8 @@ import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { MdFileDownloadDone, MdOutlinePermMedia } from "react-icons/md";
 import { RiDeleteBinLine, RiCheckLine, RiRefreshLine } from "react-icons/ri";
 import { Buffer } from "buffer";
+import ReactCrop, { Crop } from "react-image-crop";
+import "react-image-crop/dist/ReactCrop.css";
 
 import useSendMessage from "../../hooks/use_send_message";
 import useCreateTopic from "../../hooks/use_create_topic";
@@ -53,6 +55,7 @@ import {
   useWatchTransactionReceipt,
 } from "@buidlerlabs/hashgraph-react-wallets";
 import { useRefreshTrigger } from "../../hooks/use_refresh_trigger";
+import EmojiPickerPopup from "../../common/EmojiPickerPopup";
 
 /**
  * StepStatus Interface
@@ -114,6 +117,8 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
   const [isEditing, setIsEditing] = useState(true); // Edit mode flag
   const [picturePreview, setPicturePreview] = useState<string | null>(null); // Picture preview URL
 
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
   const [stepStatuses, setStepStatuses] = useState<ProfileStepStatuses>({
     userMessagesTopic: { status: "idle", disabled: false },
     uploadPicture: picture ? { status: "idle", disabled: true } : undefined,
@@ -133,13 +138,26 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
 
   const { triggerRefresh } = useRefreshTrigger();
 
+  const [crop, setCrop] = useState<Crop>({
+    unit: "%",
+    width: 50,
+    x: 25,
+    y: 25,
+    height: 50,
+  });
+  const [showCropper, setShowCropper] = useState(false);
+  const [tempImage, setTempImage] = useState<string | null>(null);
+  const cropImageRef = useRef<HTMLImageElement>(null);
+
   /**
    * Clears the selected profile picture
    * Resets related states and input
    */
-  const clearImage = () => {
+  const clearPicture = () => {
     setPicture(null);
     setPicturePreview(null);
+    setTempImage(null);
+    resetCrop();
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -155,24 +173,29 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
    */
   const handlePictureChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
-    setPicture(file);
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPicturePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-      setStepStatuses((prev) => ({
-        ...prev,
-        uploadPicture: { status: "idle", disabled: false },
-      }));
-    } else {
-      setPicturePreview(null);
-      setStepStatuses((prev) => ({
-        ...prev,
-        uploadPicture: undefined,
-      }));
+    if (!file) {
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      return;
     }
+
+    const maxSize = 100 * 1024 * 1024; // 100MB
+    if (file.size > maxSize) {
+      toast.error("The file exceeds 100MB.");
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      return;
+    }
+
+    resetCrop();
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setTempImage(reader.result as string);
+      setShowCropper(true);
+    };
+    reader.readAsDataURL(file);
   };
 
   /**
@@ -587,16 +610,7 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
    * Shows progress of profile creation steps
    */
   const renderProcessingSteps = () => (
-    <div
-      className="p-6 overflow-y-auto max-h-[80vh]
-      scrollbar scrollbar-w-2
-      scrollbar-thumb-accent hover:scrollbar-thumb-primary
-      scrollbar-track-secondary/10
-      scrollbar-thumb-rounded-full scrollbar-track-rounded-full
-      transition-colors duration-200 ease-in-out
-      dark:scrollbar-thumb-accent/50 dark:hover:scrollbar-thumb-primary/70
-      dark:scrollbar-track-secondary/5"
-    >
+    <div className="p-6 overflow-y-auto max-h-[80vh]">
       <h1 className="text-xl font-semibold text-text mb-4">
         Creating Your Profile
       </h1>
@@ -689,7 +703,7 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
   const renderEditForm = () => (
     <div className="flex flex-col max-h-[80vh] bg-background rounded-xl overflow-hidden">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-text/10">
+      <div className="px-6 py-4 border-b border-primary">
         <h3 className="text-xl font-semibold text-primary">Create Profile</h3>
         <p className="text-sm text-text/60 mt-1">
           Fill in your profile details to get started
@@ -697,55 +711,72 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
       </div>
 
       {/* Scrollable Content Area */}
-      <div
-        className="flex-1 overflow-y-auto
-        scrollbar scrollbar-w-2
-        scrollbar-thumb-accent hover:scrollbar-thumb-primary
-        scrollbar-track-secondary/10
-        scrollbar-thumb-rounded-full scrollbar-track-rounded-full
-        transition-colors duration-200 ease-in-out
-        dark:scrollbar-thumb-accent/50 dark:hover:scrollbar-thumb-primary/70
-        dark:scrollbar-track-secondary/5"
-      >
+      <div className="flex-1 overflow-y-auto">
         <div className="p-6 space-y-6">
-          {/* Profile Picture Upload */}
-          <div className="flex justify-center">
-            <div className="relative group">
-              <div
-                className={`w-24 h-24 rounded-full overflow-hidden border-2 
-                ${
-                  picturePreview
-                    ? "border-primary"
-                    : "border-dashed border-text/20"
-                }`}
-              >
-                {picturePreview ? (
-                  <img
-                    src={picturePreview}
-                    alt="Profile Preview"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-secondary/20">
-                    <MdOutlinePermMedia className="text-3xl text-text/40" />
+          {/* Profile Picture Section */}
+          <div className="space-y-4">
+            <div className="flex flex-col items-center">
+              {picturePreview ? (
+                <>
+                  {/* Image Preview - Centered */}
+                  <div className="w-32 h-32 rounded-full overflow-hidden bg-secondary mb-4">
+                    <img
+                      src={picturePreview}
+                      alt="Profile Preview"
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                )}
-              </div>
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handlePictureChange}
-                className="hidden"
-                accept="image/*"
-              />
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="absolute bottom-0 right-0 bg-primary hover:bg-accent text-background
-                  p-2 rounded-full shadow-lg transition-all duration-200"
-              >
-                <MdOutlinePermMedia className="text-lg" />
-              </button>
+
+                  {/* Controls - Below image */}
+                  <div className="flex gap-2 justify-center mt-4">
+                    <label
+                      htmlFor="pictureUpload"
+                      className="w-10 h-10 flex items-center justify-center rounded-full 
+                        bg-primary hover:bg-accent text-background cursor-pointer 
+                        transition-all duration-200"
+                      title="Change Picture"
+                    >
+                      <MdOutlinePermMedia className="text-xl" />
+                    </label>
+                    <button
+                      onClick={clearPicture}
+                      className="w-10 h-10 flex items-center justify-center rounded-full
+                        bg-error/10 hover:bg-error text-error hover:text-background 
+                        transition-all duration-200"
+                      title="Remove Picture"
+                    >
+                      <RiDeleteBinLine className="text-xl" />
+                    </button>
+                  </div>
+                </>
+              ) : (
+                // Upload new picture button - Centered
+                <label
+                  htmlFor="pictureUpload"
+                  className="flex flex-col items-center gap-3 p-6 cursor-pointer rounded-xl
+                    border-2 border-dashed border-primary/50 hover:border-primary
+                    transition-all duration-200 w-full max-w-xs"
+                >
+                  <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+                    <MdOutlinePermMedia className="text-4xl text-primary" />
+                  </div>
+                  <div className="text-center">
+                    <p className="font-medium text-text">Add Profile Picture</p>
+                    <p className="text-sm text-text/50">Up to 100MB</p>
+                  </div>
+                </label>
+              )}
             </div>
+
+            {/* Hidden file input */}
+            <input
+              type="file"
+              id="pictureUpload"
+              ref={fileInputRef}
+              className="hidden"
+              accept="image/*"
+              onChange={handlePictureChange}
+            />
           </div>
 
           {/* Form Fields */}
@@ -766,27 +797,30 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
               />
             </div>
 
-            {/* Bio Input */}
+            {/* Bio Input - Updated with emoji picker */}
             <div>
               <label className="block text-sm font-medium text-text/80 mb-1.5">
                 Bio
               </label>
-              <textarea
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-lg bg-secondary text-text
-                  border-2 border-transparent focus:border-primary transition-colors
-                  duration-200 outline-none resize-none min-h-[120px]
-                  scrollbar scrollbar-w-2
-                  scrollbar-thumb-accent hover:scrollbar-thumb-primary
-                  scrollbar-track-secondary/10
-                  scrollbar-thumb-rounded-full scrollbar-track-rounded-full
-                  transition-colors duration-200 ease-in-out
-                  dark:scrollbar-thumb-accent/50 dark:hover:scrollbar-thumb-primary/70
-                  dark:scrollbar-track-secondary/5"
-                placeholder="Tell us about yourself"
-                rows={5}
-              />
+              <div className="relative">
+                <textarea
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-lg bg-secondary text-text
+                    border-2 border-transparent focus:border-primary transition-colors
+                    duration-200 outline-none resize-none min-h-[120px]"
+                  placeholder="About yourself"
+                  rows={5}
+                />
+                <button
+                  onClick={() => setShowEmojiPicker(true)}
+                  className="absolute right-2 bottom-2 p-2 rounded-full
+                    hover:bg-primary/10 text-text/60 hover:text-primary
+                    transition-colors duration-200"
+                >
+                  😊
+                </button>
+              </div>
             </div>
 
             {/* Website Input */}
@@ -808,8 +842,65 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
         </div>
       </div>
 
+      {/* Add Image Cropper Modal */}
+      {showCropper && tempImage && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-background p-6 rounded-xl max-w-2xl w-full mx-4">
+            <h3 className="text-lg font-semibold text-text mb-4">
+              Crop Profile Picture
+            </h3>
+            <div className="relative max-h-[60vh] overflow-hidden">
+              <ReactCrop
+                crop={crop}
+                onChange={(c) => setCrop(c)}
+                aspect={1}
+                circularCrop
+                className="rounded-xl"
+                style={
+                  {
+                    "--ReactCrop-crop-border": "3px solid #fff",
+                    "--ReactCrop-crop-outline": "1px solid rgba(0,0,0,0.5)",
+                    "--ReactCrop-crop-handles-border-color": "#fff",
+                    "--ReactCrop-crop-handles-background-color": "#2563eb",
+                    "--ReactCrop-crop-area-border-color": "#fff",
+                  } as React.CSSProperties
+                }
+              >
+                <img
+                  ref={cropImageRef}
+                  src={tempImage}
+                  alt="Crop preview"
+                  className="max-w-full max-h-[50vh] object-contain"
+                />
+              </ReactCrop>
+            </div>
+            <div className="flex justify-end space-x-3 mt-4">
+              <button
+                onClick={() => {
+                  setShowCropper(false);
+                  setTempImage(null);
+                  resetCrop();
+                  if (fileInputRef.current) {
+                    fileInputRef.current.value = "";
+                  }
+                }}
+                className="px-4 py-2 rounded-lg bg-secondary text-text hover:bg-error transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCropComplete}
+                className="px-4 py-2 rounded-lg bg-primary text-background hover:bg-accent transition-colors"
+              >
+                Apply Crop
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Bottom Controls */}
-      <div className="border-t border-text/10 bg-background/95 backdrop-blur-sm">
+      <div className="border-t border-primary bg-background/95 backdrop-blur-sm">
         <div className="px-6 py-4 flex justify-end">
           <button
             onClick={handleStartProfileCreation}
@@ -825,8 +916,78 @@ const CreateNewProfile = ({ onClose }: { onClose: () => void }) => {
           </button>
         </div>
       </div>
+
+      {/* Add EmojiPickerPopup */}
+      {showEmojiPicker && (
+        <EmojiPickerPopup
+          onEmojiClick={(emojiData) => onEmojiClick(emojiData)}
+          onClose={() => setShowEmojiPicker(false)}
+          position="bottom"
+        />
+      )}
     </div>
   );
+
+  // Add emoji handler
+  const onEmojiClick = (emojiData: { emoji: string }) => {
+    setBio((prevBio) => prevBio + emojiData.emoji);
+    setShowEmojiPicker(false);
+  };
+
+  const resetCrop = () => {
+    setCrop({
+      unit: "%",
+      width: 50,
+      x: 25,
+      y: 25,
+      height: 50,
+    });
+  };
+
+  const handleCropComplete = async () => {
+    if (!cropImageRef.current || !crop || !tempImage) return;
+
+    const canvas = document.createElement("canvas");
+    const scaleX =
+      cropImageRef.current.naturalWidth / cropImageRef.current.width;
+    const scaleY =
+      cropImageRef.current.naturalHeight / cropImageRef.current.height;
+
+    canvas.width = crop.width || 0;
+    canvas.height = crop.height || 0;
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) return;
+
+    ctx.drawImage(
+      cropImageRef.current,
+      (crop.x || 0) * scaleX,
+      (crop.y || 0) * scaleY,
+      (crop.width || 0) * scaleX,
+      (crop.height || 0) * scaleY,
+      0,
+      0,
+      crop.width || 0,
+      crop.height || 0
+    );
+
+    canvas.toBlob(
+      (blob) => {
+        if (blob) {
+          const croppedFile = new File([blob], "cropped-profile.jpg", {
+            type: "image/jpeg",
+          });
+          setPicture(croppedFile);
+          setPicturePreview(URL.createObjectURL(croppedFile));
+        }
+      },
+      "image/jpeg",
+      1
+    );
+
+    setShowCropper(false);
+    setTempImage(null);
+  };
 
   return (
     <div className="max-w-md w-full mx-auto bg-background rounded-lg shadow-xl p-3 text-text">

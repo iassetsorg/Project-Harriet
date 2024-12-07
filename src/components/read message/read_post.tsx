@@ -128,11 +128,11 @@ function ReadPost({
   };
 
   return (
-    <div className="max-w-4xl mx-auto bg-background text-text px-4 sm:px-6">
+    <div className="max-w-4xl mx-auto bg-background text-text pr-2 pl-3 sm:px-6">
       <div className="theme-card">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 transition-colors hover:opacity-90">
           <UserProfile userAccountId={sender} />
-          <span className="text-sm text-gray-500 mt-2 sm:mt-0">
+          <span className="text-sm text-gray-500 mt-4 sm:mt-0">
             {formatTimestamp(consensus_timestamp?.toString() || "")}
           </span>
         </div>

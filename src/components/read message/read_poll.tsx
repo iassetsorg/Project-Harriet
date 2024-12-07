@@ -167,7 +167,7 @@ function ReadPoll({ topicId }: { topicId?: string }) {
   };
 
   return (
-    <div className="max-w-4xl mx-auto bg-background text-text px-4 sm:px-6">
+    <div className="max-w-4xl mx-auto bg-background text-text pr-2 pl-3 sm:px-6">
       {loading && allMessages.length === 0 && (
         <div className="flex flex-col justify-center items-center min-h-[400px] space-y-4">
           <Spinner />
@@ -257,7 +257,7 @@ function ReadPoll({ topicId }: { topicId?: string }) {
                   <div key={idx} className="theme-card backdrop-blur-sm">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 transition-colors hover:opacity-90">
                       <UserProfile userAccountId={messageDetails.author} />
-                      <span className="text-sm text-primary/60 mt-2 sm:mt-0">
+                      <span className="text-sm text-primary/60 mt-4 sm:mt-0">
                         {formatTimestamp(
                           messageDetails.consensus_timestamp || ""
                         )}
@@ -271,186 +271,14 @@ function ReadPoll({ topicId }: { topicId?: string }) {
                         />
                       </p>
 
-                      {/* Enhanced Choice options with multiple winners support */}
-                      <div className="space-y-4 w-full max-w-2xl mx-auto">
-                        {[1, 2, 3, 4, 5].map((num) => {
-                          const choiceKey =
-                            `Choice${num}` as keyof typeof messageDetails;
-                          const votesKey =
-                            `Choice${num}Votes` as keyof typeof messageDetails;
-
-                          if (!messageDetails[choiceKey]) return null;
-
-                          const votes = messageDetails[votesKey] as number;
-                          const percentage = getVotePercentage(
-                            votes,
-                            totalVotes
-                          );
-                          const isSelected = selectedChoice === `Choice${num}`;
-                          const isWinner = isWinningChoice(
-                            votes,
-                            mostVotedChoice
-                          );
-
-                          return (
-                            <button
-                              key={num}
-                              className={`
-                                relative w-full flex items-center transition-all duration-300 transform
-                                ${
-                                  isSelected
-                                    ? "scale-[1.02] shadow-lg"
-                                    : "hover:scale-[1.01]"
-                                }
-                                ${
-                                  isSelected
-                                    ? "ring-2 ring-primary"
-                                    : "ring-1 ring-primary/10"
-                                }
-                                ${
-                                  isWinner
-                                    ? "bg-gradient-to-r from-success/20 via-success/10 to-transparent"
-                                    : "bg-secondary/5"
-                                }
-                                hover:bg-secondary/10 rounded-xl overflow-hidden
-                                group cursor-pointer
-                              `}
-                              onClick={() => handleChoiceSelect(`Choice${num}`)}
-                            >
-                              {/* Enhanced Progress Bar */}
-                              <div
-                                className={`
-                                  absolute left-0 top-0 h-full transition-all duration-700 ease-out
-                                  ${
-                                    isWinner
-                                      ? "bg-gradient-to-r from-success/30 via-success/20 to-transparent"
-                                      : "bg-gradient-to-r from-primary/20 to-primary/10"
-                                  }
-                                `}
-                                style={{
-                                  width: `${percentage}%`,
-                                  transform: isSelected
-                                    ? "scaleX(1.02)"
-                                    : "scaleX(1)",
-                                }}
-                              />
-
-                              {/* Choice Content with Enhanced Visibility */}
-                              <div className="relative flex items-center w-full px-6 py-4">
-                                {/* Winner Trophy Icon - Different for tied winners */}
-                                {isWinner && (
-                                  <div
-                                    className={`
-                                    absolute -left-1 -top-1 p-1.5 rounded-br-lg shadow-lg transform -rotate-12
-                                    ${
-                                      isWinner
-                                        ? "bg-success text-white animate-bounce-subtle"
-                                        : ""
-                                    }
-                                  `}
-                                  >
-                                    <svg
-                                      className="w-4 h-4"
-                                      fill="currentColor"
-                                      viewBox="0 0 20 20"
-                                    >
-                                      <path d="M10 1l2.928 6.377 6.072.556-4.5 4.5 1.072 6.567L10 16l-5.572 3-1.072-6.567-4.5-4.5 6.072-.556L10 1z" />
-                                    </svg>
-                                  </div>
-                                )}
-
-                                <div className="flex-1">
-                                  <span
-                                    className={`
-                                    font-medium text-base
-                                    ${
-                                      isWinner
-                                        ? "text-success font-semibold"
-                                        : isSelected
-                                        ? "text-primary"
-                                        : "text-text"
-                                    }
-                                    group-hover:text-primary transition-colors duration-200
-                                  `}
-                                  >
-                                    {messageDetails[choiceKey]}
-                                  </span>
-                                </div>
-
-                                {/* Enhanced Vote Stats */}
-                                <div className="flex items-center gap-3">
-                                  {/* Percentage Badge */}
-                                  <div
-                                    className={`
-                                    px-3 py-1.5 rounded-full text-sm font-semibold
-                                    ${
-                                      isWinner
-                                        ? "bg-success text-white scale-110"
-                                        : isSelected
-                                        ? "bg-primary text-white"
-                                        : "bg-primary/10 text-primary/80"
-                                    }
-                                    group-hover:bg-primary group-hover:text-white
-                                    transition-all duration-200 transform
-                                    ${isWinner ? "animate-pulse-subtle" : ""}
-                                  `}
-                                  >
-                                    {percentage.toFixed(1)}%
-                                  </div>
-
-                                  {/* Vote Count */}
-                                  <span
-                                    className={`
-                                    text-sm font-medium min-w-[60px] text-right
-                                    ${
-                                      isWinner
-                                        ? "text-success"
-                                        : "text-primary/80"
-                                    }
-                                  `}
-                                  >
-                                    {votes.toLocaleString()} votes
-                                  </span>
-
-                                  {/* Status Indicator */}
-                                  {(isSelected || isWinner) && (
-                                    <div
-                                      className={`
-                                      ml-2 flex items-center justify-center w-6 h-6
-                                      rounded-full transition-all duration-200
-                                      ${
-                                        isWinner
-                                          ? "bg-success text-white"
-                                          : "bg-primary text-white"
-                                      }
-                                      ${isSelected ? "animate-pulse" : ""}
-                                    `}
-                                    >
-                                      <svg
-                                        className="w-4 h-4"
-                                        fill="currentColor"
-                                        viewBox="0 0 20 20"
-                                      >
-                                        <path
-                                          fillRule="evenodd"
-                                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                          clipRule="evenodd"
-                                        />
-                                      </svg>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            </button>
-                          );
-                        })}
-
-                        {/* Simplified Total Votes Display */}
-                        <div className="pt-6 flex justify-center">
-                          <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-xl bg-secondary/5 hover:bg-secondary/10 transition-all duration-200">
-                            <div className="flex items-center gap-2">
+                      {/* Enhanced Poll Container with Better Visual Hierarchy */}
+                      <div className="space-y-6 w-full max-w-2xl mx-auto bg-gradient-to-b from-secondary/10 to-secondary/5 p-8 rounded-3xl backdrop-blur-md shadow-xl border border-primary">
+                        {/* Modernized Header with Better Visual Balance */}
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-primary">
+                          <div className="flex items-start gap-4">
+                            <div className="p-3 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 backdrop-blur-sm">
                               <svg
-                                className="w-5 h-5 text-primary/60"
+                                className="w-6 h-6 text-primary"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
@@ -459,17 +287,212 @@ function ReadPoll({ topicId }: { topicId?: string }) {
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
                                   strokeWidth={1.5}
-                                  d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+                                  d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"
                                 />
                               </svg>
-                              <span className="text-lg font-semibold text-primary">
+                            </div>
+                            <div className="space-y-1">
+                              <h3 className="text-xl font-bold text-primary">
+                                Community Poll
+                              </h3>
+                              <p className="text-sm text-primary/60 font-medium">
+                                Share your opinion by casting a vote
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Enhanced Vote Counter */}
+                          <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-primary/15 to-primary/5 backdrop-blur-sm border border-primary">
+                            <div className="p-1.5 rounded-xl bg-primary/20">
+                              <svg
+                                className="w-5 h-5 text-primary"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={1.5}
+                                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                              </svg>
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-lg font-bold text-primary leading-none">
                                 {totalVotes.toLocaleString()}
                               </span>
-                              <span className="text-sm text-primary/60 font-medium">
-                                votes
+                              <span className="text-xs text-primary/60 font-medium">
+                                total votes
                               </span>
                             </div>
                           </div>
+                        </div>
+
+                        {/* Enhanced Choice Options with Better Spacing */}
+                        <div className="space-y-4">
+                          {[1, 2, 3, 4, 5].map((num) => {
+                            const choiceKey =
+                              `Choice${num}` as keyof typeof messageDetails;
+                            const votesKey =
+                              `Choice${num}Votes` as keyof typeof messageDetails;
+
+                            if (!messageDetails[choiceKey]) return null;
+
+                            const votes = messageDetails[votesKey] as number;
+                            const percentage = getVotePercentage(
+                              votes,
+                              totalVotes
+                            );
+                            const isSelected =
+                              selectedChoice === `Choice${num}`;
+                            const isWinner = isWinningChoice(
+                              votes,
+                              mostVotedChoice
+                            );
+
+                            return (
+                              <button
+                                key={num}
+                                className={`
+                                  relative w-full flex items-center transition-all duration-300 transform
+                                  ${
+                                    isSelected
+                                      ? "scale-[1.02] shadow-xl"
+                                      : "hover:scale-[1.01]"
+                                  }
+                                  ${
+                                    isSelected
+                                      ? "ring-2 ring-primary border-primary"
+                                      : "ring-1 ring-primary border-primary"
+                                  }
+                                  ${
+                                    isWinner
+                                      ? "bg-gradient-to-r from-success/20 via-success/10 to-transparent"
+                                      : "bg-gradient-to-r from-white/10 to-transparent"
+                                  }
+                                  hover:bg-white/10 rounded-2xl overflow-hidden
+                                  group cursor-pointer border
+                                `}
+                                onClick={() =>
+                                  handleChoiceSelect(`Choice${num}`)
+                                }
+                              >
+                                {/* Improved Progress Bar */}
+                                <div
+                                  className={`
+                                    absolute left-0 top-0 h-full transition-all duration-700 ease-out
+                                    ${
+                                      isWinner
+                                        ? "bg-gradient-to-r from-success/30 via-success/20 to-transparent"
+                                        : "bg-gradient-to-r from-primary/20 via-primary/10 to-transparent"
+                                    }
+                                  `}
+                                  style={{
+                                    width: `${percentage}%`,
+                                    transform: isSelected
+                                      ? "scaleX(1.02)"
+                                      : "scaleX(1)",
+                                  }}
+                                />
+
+                                {/* Enhanced Option Content */}
+                                <div className="relative flex items-center w-full px-6 py-4">
+                                  {/* Improved Winner Badge */}
+                                  {isWinner && (
+                                    <div className="absolute -left-1 -top-1 p-2 rounded-br-2xl bg-success shadow-lg transform -rotate-12 animate-bounce-subtle">
+                                      <svg
+                                        className="w-4 h-4 text-white"
+                                        fill="currentColor"
+                                        viewBox="0 0 20 20"
+                                      >
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                      </svg>
+                                    </div>
+                                  )}
+
+                                  {/* Option Number Badge */}
+                                  <div
+                                    className={`
+                                    flex items-center justify-center w-8 h-8 rounded-full mr-4
+                                    ${
+                                      isWinner
+                                        ? "bg-success/20"
+                                        : isSelected
+                                        ? "bg-primary/20"
+                                        : "bg-primary/10"
+                                    }
+                                    transition-colors duration-200
+                                  `}
+                                  >
+                                    <span
+                                      className={`
+                                      text-sm font-semibold
+                                      ${
+                                        isWinner
+                                          ? "text-success"
+                                          : "text-primary"
+                                      }
+                                    `}
+                                    >
+                                      {num}
+                                    </span>
+                                  </div>
+
+                                  {/* Enhanced Option Text */}
+                                  <div className="flex-1">
+                                    <span
+                                      className={`
+                                        text-base font-semibold
+                                        ${
+                                          isWinner
+                                            ? "text-success"
+                                            : isSelected
+                                            ? "text-primary"
+                                            : "text-text"
+                                        }
+                                        group-hover:text-primary transition-colors duration-200
+                                      `}
+                                    >
+                                      {messageDetails[choiceKey]}
+                                    </span>
+                                  </div>
+
+                                  {/* Improved Vote Stats */}
+                                  <div className="flex items-center gap-4">
+                                    <div
+                                      className={`
+                                        px-4 py-2 rounded-full text-sm font-semibold
+                                        ${
+                                          isWinner
+                                            ? "bg-success/20 text-success"
+                                            : isSelected
+                                            ? "bg-primary/20 text-primary"
+                                            : "bg-primary/10 text-primary/80"
+                                        }
+                                        group-hover:bg-primary/20 group-hover:text-primary
+                                        transition-all duration-200
+                                      `}
+                                    >
+                                      {percentage.toFixed(1)}%
+                                    </div>
+                                    <span
+                                      className={`
+                                        text-sm font-medium min-w-[80px] text-right
+                                        ${
+                                          isWinner
+                                            ? "text-success"
+                                            : "text-primary/80"
+                                        }
+                                      `}
+                                    >
+                                      {votes.toLocaleString()} votes
+                                    </span>
+                                  </div>
+                                </div>
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
 

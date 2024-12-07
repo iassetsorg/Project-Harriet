@@ -65,16 +65,7 @@ const Profile: React.FC = () => {
 
   return (
     <div className="relative flex flex-col w-full h-[calc(100vh-4rem)]">
-      <div
-        className="flex-1 overflow-y-auto w-full bg-background text-text
-          scrollbar scrollbar-w-2
-          scrollbar-thumb-accent hover:scrollbar-thumb-primary
-          scrollbar-track-secondary/10
-          scrollbar-thumb-rounded-full scrollbar-track-rounded-full
-          transition-colors duration-200 ease-in-out
-          dark:scrollbar-thumb-accent/50 dark:hover:scrollbar-thumb-primary/70
-          dark:scrollbar-track-secondary/5"
-      >
+      <div className="flex-1 overflow-y-auto w-full bg-background text-text">
         <div className="flex flex-col items-center w-full">
           <div className="w-full max-w-4xl p-6">
             {/* Loading State

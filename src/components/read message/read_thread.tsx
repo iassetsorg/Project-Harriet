@@ -124,7 +124,7 @@ function ReadThread({ topicId }: { topicId?: string }) {
   };
 
   return (
-    <div className="max-w-4xl mx-auto bg-background text-text px-4 sm:px-6">
+    <div className="max-w-4xl mx-auto bg-background text-text pr-2 pl-3 sm:px-6">
       {loading && allMessages.length === 0 && (
         <div className="flex flex-col justify-center items-center min-h-[400px] space-y-4">
           <Spinner />
@@ -184,7 +184,7 @@ function ReadThread({ topicId }: { topicId?: string }) {
                 <div key={idx} className="theme-card">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 transition-colors hover:opacity-90">
                     <UserProfile userAccountId={messageDetails.sender} />
-                    <span className="text-sm text-gray-500 mt-2 sm:mt-0">
+                    <span className="text-sm text-gray-500 mt-4 sm:mt-0">
                       {formatTimestamp(
                         messageDetails.consensus_timestamp || ""
                       )}
@@ -418,7 +418,7 @@ function CommentItem({
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2">
         <UserProfile userAccountId={reply.sender} />
-        <span className="text-sm text-gray-500 mt-2 sm:mt-0">
+        <span className="text-sm text-gray-500 mt-4 sm:mt-0">
           {formatTimestamp(reply.consensus_timestamp || "")}
         </span>
       </div>

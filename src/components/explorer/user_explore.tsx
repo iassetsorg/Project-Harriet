@@ -140,14 +140,8 @@ function UserExplorer({ userAddress }: UserExplorerProps) {
       <div
         ref={scrollRef}
         onScroll={handleScroll}
-        className="relative w-full h-screen overflow-y-scroll   text-text shadow-xl
-          scrollbar scrollbar-w-2
-          scrollbar-thumb-accent hover:scrollbar-thumb-primary
-          scrollbar-track-secondary/10
-          scrollbar-thumb-rounded-full scrollbar-track-rounded-full
-          transition-colors duration-200 ease-in-out
-          dark:scrollbar-thumb-accent/50 dark:hover:scrollbar-thumb-primary/70
-          dark:scrollbar-track-secondary/5"
+        className="relative w-full h-screen text-text shadow-xl
+        overflow-y-scroll"
       >
         {/* Pull to refresh indicator */}
         {isRefreshing && (

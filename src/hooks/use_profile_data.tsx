@@ -8,6 +8,8 @@
  * @returns Object with profileData, isLoading, and error values
  */
 import { useState, useEffect } from "react";
+import eventService from "../services/event_service";
+import { useRefreshTrigger } from "./use_refresh_trigger";
 
 /**
  * Represents the structure of a user's profile data
@@ -42,7 +44,7 @@ const useProfileData = (signingAccount: string) => {
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-
+  const { refreshTrigger, triggerRefresh } = useRefreshTrigger();
   /**
    * Decodes a Base64 encoded string using TextDecoder
    * @param {string} base64String - The Base64 encoded string to decode
@@ -169,11 +171,20 @@ const useProfileData = (signingAccount: string) => {
    * Effect hook to trigger profile data fetch when signing account changes
    * Runs only when signingAccount is available and changes
    */
+  // Subscribe to refresh events
+  useEffect(() => {
+    const unsubscribe = eventService.subscribe("refreshExplorer", () => {
+      triggerRefresh(); // This will trigger a global refresh
+    });
+
+    return () => unsubscribe(); // Add cleanup function
+  }, [triggerRefresh]);
+
   useEffect(() => {
     if (signingAccount) {
       fetchProfileData();
     }
-  }, [signingAccount]);
+  }, [signingAccount, refreshTrigger]);
 
   return { profileData, isLoading, error };
 };

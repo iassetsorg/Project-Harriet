@@ -9,6 +9,9 @@ import useUploadToArweave from "../media/use_upload_to_arweave";
 import { useAccountId } from "@buidlerlabs/hashgraph-react-wallets";
 import { useRefreshTrigger } from "../../hooks/use_refresh_trigger";
 import eventService from "../../services/event_service";
+import { BsEmojiSmile } from "react-icons/bs";
+import EmojiPickerPopup from "../../common/EmojiPickerPopup";
+
 const explorerTopic = process.env.REACT_APP_EXPLORER_TOPIC || "";
 
 /**
@@ -88,6 +91,7 @@ const SendNewThread = ({ onClose }: { onClose: () => void }) => {
   });
 
   const [uploadedMediaId, setUploadedMediaId] = useState<string | null>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   /**
    * Clears the selected file and resets related state
@@ -353,6 +357,11 @@ const SendNewThread = ({ onClose }: { onClose: () => void }) => {
     }
   };
 
+  const onEmojiClick = (emojiData: { emoji: string }) => {
+    setMessage((prevMessage) => prevMessage + emojiData.emoji);
+    setShowEmojiPicker(false);
+  };
+
   /**
    * Renders a single step button with appropriate status indicators
    * @param {keyof ThreadStepStatuses} step - The step identifier
@@ -434,16 +443,7 @@ const SendNewThread = ({ onClose }: { onClose: () => void }) => {
    * @returns {JSX.Element}
    */
   const renderProcessingSteps = () => (
-    <div
-      className="p-6 overflow-y-auto max-h-[80vh]
-      scrollbar scrollbar-w-2
-      scrollbar-thumb-accent hover:scrollbar-thumb-primary
-      scrollbar-track-secondary/10
-      scrollbar-thumb-rounded-full scrollbar-track-rounded-full
-      transition-colors duration-200 ease-in-out
-      dark:scrollbar-thumb-accent/50 dark:hover:scrollbar-thumb-primary/70
-      dark:scrollbar-track-secondary/5"
-    >
+    <div className="p-6 overflow-y-auto max-h-[80vh]">
       <h1 className="text-xl font-semibold text-text mb-4">Create Thread</h1>
 
       {/* Message and Media Preview */}
@@ -503,42 +503,78 @@ const SendNewThread = ({ onClose }: { onClose: () => void }) => {
   const renderEditForm = () => (
     <div className="flex flex-col max-h-[80vh] bg-background rounded-xl overflow-hidden">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-text/10">
-        <h3 className="text-xl font-semibold text-primary">Create Thread</h3>
-        <p className="text-sm text-text/60 mt-1">
-          Start a new conversation with the community
-        </p>
+      <div className="px-6 py-4 border-b border-primary flex items-center">
+        <div>
+          <h3 className="text-xl font-semibold text-primary">
+            Create a Thread
+          </h3>
+          <p className="text-sm text-text/60 mt-1">
+            Start a conversation with the community
+          </p>
+        </div>
       </div>
 
       {/* Scrollable Content Area */}
-      <div
-        className="flex-1 overflow-y-auto
-        scrollbar scrollbar-w-2
-        scrollbar-thumb-accent hover:scrollbar-thumb-primary
-        scrollbar-track-secondary/10
-        scrollbar-thumb-rounded-full scrollbar-track-rounded-full
-        transition-colors duration-200 ease-in-out
-        dark:scrollbar-thumb-accent/50 dark:hover:scrollbar-thumb-primary/70
-        dark:scrollbar-track-secondary/5"
-      >
+      <div className="flex-1 overflow-y-auto">
         {/* Compose Area */}
         <div className="p-6">
           <div className="relative mb-4">
             <textarea
-              className="w-full bg-transparent text-text text-lg border-none
-                focus:ring-0 outline-none resize-none h-auto custom-scrollbar
-                placeholder:text-text/40"
+              className="w-full bg-transparent text-text text-lg border border-primary
+                focus:ring-1 focus:ring-primary outline-none resize-none h-auto
+                placeholder:text-text/40 rounded-xl p-4"
               placeholder="What's on your mind?"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               maxLength={850}
-              rows={3}
+              rows={5}
               style={{
-                minHeight: "120px",
-                maxHeight: "300px",
+                minHeight: "160px",
+                maxHeight: "400px",
                 overflow: "auto",
               }}
             />
+
+            {/* Emoji and Media buttons */}
+            <div className="absolute bottom-3 left-3 flex gap-2">
+              {/* Emoji Button */}
+              <button
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                className="p-2 hover:bg-primary/10 rounded-full transition-colors group"
+              >
+                <BsEmojiSmile className="text-xl text-primary group-hover:text-accent" />
+              </button>
+
+              {/* Media Upload */}
+              <label
+                htmlFor="fileUpload"
+                className="p-2 hover:bg-primary/10 rounded-full transition-colors group cursor-pointer"
+              >
+                <MdOutlinePermMedia className="text-xl text-primary group-hover:text-accent" />
+                <input
+                  type="file"
+                  id="fileUpload"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={(e) => {
+                    if (e.target.files?.[0]) {
+                      setFile(e.target.files[0]);
+                      e.target.value = "";
+                    }
+                  }}
+                />
+              </label>
+            </div>
+
+            {/* Replace the old emoji picker with EmojiPickerPopup */}
+            {showEmojiPicker && (
+              <EmojiPickerPopup
+                onEmojiClick={onEmojiClick}
+                onClose={() => setShowEmojiPicker(false)}
+                position="bottom"
+              />
+            )}
+
             {/* Character limit warning */}
             {message.length > 800 && (
               <div
@@ -549,11 +585,12 @@ const SendNewThread = ({ onClose }: { onClose: () => void }) => {
               </div>
             )}
           </div>
-          {/* Media Section */}
+
+          {/* Media Section - Keep only the preview part */}
           <div className="space-y-4">
             {/* Media Preview */}
             {file && (
-              <div className="rounded-xl overflow-hidden bg-secondary/20">
+              <div className="rounded-xl overflow-hidden border border-primary">
                 {/* Image Preview */}
                 <div className="relative">
                   <img
@@ -564,7 +601,7 @@ const SendNewThread = ({ onClose }: { onClose: () => void }) => {
                 </div>
 
                 {/* File Info and Remove Button */}
-                <div className="p-3 border-t border-text/5">
+                <div className="p-3 border-t border-primary">
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0 mr-4">
                       <p
@@ -591,53 +628,12 @@ const SendNewThread = ({ onClose }: { onClose: () => void }) => {
                 </div>
               </div>
             )}
-
-            {/* Media Upload Button (only show if no file) */}
-            {!file && (
-              <div className="mt-4">
-                <label
-                  htmlFor="fileUpload"
-                  className="group cursor-pointer block w-full border-2 border-dashed 
-                      border-text/10 rounded-xl hover:border-primary/50 
-                      transition-all duration-200"
-                >
-                  <div className="flex flex-col items-center justify-center py-8 px-4">
-                    <div
-                      className="w-12 h-12 rounded-full bg-primary/10 flex items-center 
-                        justify-center group-hover:scale-110 transition-transform duration-200"
-                    >
-                      <MdOutlinePermMedia className="text-2xl text-primary" />
-                    </div>
-                    <p className="mt-2 text-sm font-medium text-text">
-                      Add Media
-                    </p>
-                    <p className="text-xs text-text/50 mt-1">Up to 100MB</p>
-                  </div>
-                  <input
-                    type="file"
-                    id="fileUpload"
-                    className="hidden"
-                    accept="image/*"
-                    onChange={(e) => {
-                      if (e.target.files?.[0]) {
-                        setFile(e.target.files[0]);
-                        e.target.value = "";
-                        setStepStatuses((prev) => ({
-                          ...prev,
-                          arweave: { status: "idle", disabled: true },
-                        }));
-                      }
-                    }}
-                  />
-                </label>
-              </div>
-            )}
           </div>
         </div>
       </div>
 
       {/* Bottom Controls */}
-      <div className="border-t border-text/10 bg-background/95 backdrop-blur-sm">
+      <div className="border-t border-primary bg-background/95 backdrop-blur-sm">
         <div className="px-6 py-4 flex items-center justify-between">
           {/* Character Count */}
           <div
@@ -659,7 +655,7 @@ const SendNewThread = ({ onClose }: { onClose: () => void }) => {
             className={`px-8 py-2.5 font-semibold rounded-full transition-all 
                 duration-200 hover:shadow-lg active:scale-98 ${
                   !message.trim()
-                    ? "bg-primary/30 text-text/30 cursor-not-allowed"
+                    ? "bg-primary text-text cursor-not-allowed"
                     : "bg-primary hover:bg-accent text-background"
                 }`}
           >

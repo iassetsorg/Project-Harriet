@@ -34,10 +34,246 @@
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <title>iBird | Web3 Social Media</title>
     <base href="/" />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap");
+
+      .preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          135deg,
+          #000000 0%,
+          #1a1a1a 75%,
+          #242424 100%
+        );
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease-out;
+        overflow: hidden;
+      }
+      .preloader::before {
+        content: "";
+        position: absolute;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.05) 0%,
+          transparent 50%
+        );
+        animation: gradientMove 15s infinite linear;
+      }
+      .preloader-symbol {
+        font-size: 5.5rem;
+        color: #fff;
+        animation: pulse 1.5s infinite ease-in-out;
+        margin-bottom: 3.5rem;
+        text-shadow: 0 0 25px rgba(255, 255, 255, 0.6);
+        position: relative;
+        z-index: 2;
+      }
+      .preloader-text-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.2rem;
+        position: relative;
+        z-index: 2;
+      }
+      .preloader-text {
+        font-family: "Space Grotesk", sans-serif;
+        color: #fff;
+        font-size: 2rem;
+        font-weight: 500;
+        max-width: 800px;
+        text-align: center;
+        line-height: 1.4;
+        perspective: 1000px;
+      }
+      .preloader-text span {
+        display: inline-block;
+        opacity: 0;
+        transform-origin: 50% 50% -20px;
+        transform: rotateX(-90deg);
+        animation: wordRotate 0.8s forwards;
+        text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        margin: 0 0.2rem;
+      }
+      .preloader-tagline {
+        font-family: "Space Grotesk", sans-serif;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 1.1rem;
+        font-weight: 300;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.8s forwards;
+        animation-delay: 1.5s;
+        position: relative;
+      }
+      .preloader-tagline::after {
+        display: none;
+      }
+      .preloader-tagline .highlight {
+        background: none;
+        -webkit-background-clip: initial;
+        -webkit-text-fill-color: initial;
+        color: #00ffcc;
+        text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+        position: relative;
+        display: inline-block;
+      }
+      .preloader-tagline .highlight::after {
+        content: "";
+        position: absolute;
+        bottom: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #00ffcc, transparent);
+        opacity: 0.5;
+      }
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.2);
+          opacity: 0.7;
+          filter: brightness(1.2);
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      @keyframes wordRotate {
+        to {
+          opacity: 1;
+          transform: rotateX(0);
+        }
+      }
+      @keyframes fadeInUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes gradientMove {
+        0% {
+          transform: translate(-50%, -50%) rotate(0deg);
+        }
+        100% {
+          transform: translate(-50%, -50%) rotate(360deg);
+        }
+      }
+      .highlight {
+        color: #00ffcc;
+        text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+      }
+      @media (max-width: 768px) {
+        .preloader-symbol {
+          font-size: 4.5rem;
+          margin-bottom: 2.5rem;
+        }
+        .preloader-text {
+          font-size: 1.5rem;
+          padding: 0 1.5rem;
+          line-height: 1.3;
+        }
+        .preloader-text span {
+          margin: 0 0.1rem;
+        }
+        .preloader-tagline {
+          font-size: 0.9rem;
+          padding: 0 2rem;
+          text-align: center;
+          letter-spacing: 2px;
+          line-height: 1.6;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .preloader-symbol {
+          font-size: 4rem;
+          margin-bottom: 2rem;
+        }
+        .preloader-text {
+          font-size: 1.3rem;
+          padding: 0 1rem;
+        }
+        .preloader-text-container {
+          gap: 1rem;
+        }
+        .preloader-tagline {
+          font-size: 0.8rem;
+          letter-spacing: 1.5px;
+          padding: 0 1.5rem;
+        }
+        .preloader-tagline .highlight::after {
+          bottom: -6px;
+          height: 1px;
+        }
+      }
+
+      @media (max-height: 600px) {
+        .preloader-symbol {
+          margin-bottom: 1.5rem;
+        }
+        .preloader-text-container {
+          gap: 0.8rem;
+        }
+      }
+    </style>
   </head>
   <body>
+    <div class="preloader" id="preloader">
+      <div class="preloader-symbol">ℏ</div>
+      <div class="preloader-text-container">
+        <div class="preloader-text">
+          <span style="animation-delay: 0.1s">Welcome</span>
+          <span style="animation-delay: 0.2s">to the</span>
+          <span style="animation-delay: 0.3s" class="highlight">Future</span>
+          <span style="animation-delay: 0.4s">of</span>
+          <span style="animation-delay: 0.5s" class="highlight">Social</span>
+          <span style="animation-delay: 0.6s">Connection</span>
+        </div>
+        <div class="preloader-tagline">
+          Community-Driven • Open-Source • Built on
+          <span class="highlight">Hedera</span>
+        </div>
+      </div>
+    </div>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <script>
+      // Wait for both the initial load and React app to be ready
+      window.addEventListener("load", function () {
+        const checkReactReady = setInterval(() => {
+          const rootElement = document.getElementById("root");
+          if (rootElement && rootElement.children.length > 0) {
+            clearInterval(checkReactReady);
+            // Add additional 4 second delay after everything is ready
+            setTimeout(() => {
+              const preloader = document.getElementById("preloader");
+              preloader.classList.add("fade-out");
+              setTimeout(() => {
+                preloader.style.display = "none";
+              }, 500);
+            }, 5000);
+          }
+        }, 100);
+      });
+    </script>
     <base href="/" />
     <!-- Your updated content -->
   </body>

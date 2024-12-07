@@ -14,7 +14,6 @@ import { CiLocationOn } from "react-icons/ci";
 import { IoIosInformationCircleOutline } from "react-icons/io";
 import UserExplorer from "../explorer/user_explore";
 import ReadMediaFile from "../media/read_media_file";
-import Modal from "../../common/modal";
 
 interface UserProfileProps {
   userAccountId: string; // The unique identifier for the user account

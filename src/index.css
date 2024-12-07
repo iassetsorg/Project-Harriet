@@ -5,13 +5,40 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global scrollbar style */
+::-webkit-scrollbar {
+  width: 2px !important;
+}
+
+@media (min-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 4px !important;
+  }
+}
+
+::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-primary) !important;
+  border-radius: 20px !important;
+}
+
 /* Mobile-specific styles for NewThreadButton
  * Applies fixed positioning at the bottom-right corner
  * with specific margin spacing for mobile views
  */
 @media (max-width: 768px) {
   .NewThreadButton {
-    @apply fixed bottom-0 right-0 mb-16 mr-8;
+    @apply fixed bottom-0 right-0 mb-14 mr-6;
+    filter: drop-shadow(0 0 10px rgba(37, 99, 235, 0.2));
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .NewThreadButton .mobile-icon-shadow {
+    font-size: 1.25rem;
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.7));
   }
 }
 
@@ -22,6 +49,7 @@
 @media (min-width: 769px) {
   .NewThreadButton {
     @apply fixed bottom-0 left-1 mb-4 ml-0.5;
+    filter: drop-shadow(0 0 10px rgba(37, 99, 235, 0.2));
   }
 }
 
@@ -42,7 +70,7 @@
   --color-secondary: #f1f5f9;
   --color-accent: #3b82f6;
   --color-error: #ef4444;
-  --color-success: #10b981;
+  --color-success: #048a3e;
   --color-waiting: #f59e0b;
   --shadow-color: 217 92% 45%;
   --shadow-strength: 8%;
@@ -87,7 +115,7 @@
   --color-secondary: #082f49;
   --color-accent: #38bdf8;
   --color-error: #ef4444;
-  --color-success: #10b981;
+  --color-success: #048a3e;
   --color-waiting: #f59e0b;
   --shadow-color: 199 95% 74%;
   --shadow-strength: 10%;
@@ -109,7 +137,7 @@
   --color-secondary: #fff7ed;
   --color-accent: #fb923c;
   --color-error: #ef4444;
-  --color-success: #10b981;
+  --color-success: #048a3e;
   --color-waiting: #f59e0b;
   --shadow-color: 25 95% 53%;
   --shadow-strength: 8%;
@@ -131,7 +159,7 @@
   --color-secondary: #dcfce7;
   --color-accent: #22c55e;
   --color-error: #ef4444;
-  --color-success: #15803d;
+  --color-success: #048a3e;
   --color-waiting: #f59e0b;
   --shadow-color: 142 84% 45%;
   --shadow-strength: 8%;
@@ -249,4 +277,577 @@ button:hover {
 }
 body {
   overflow: hidden;
+}
+
+/* Add these new animations and styles */
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.animate-ripple {
+  animation: ripple 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Add new hover state for NewThreadButton */
+.NewThreadButton:active {
+  transform: scale(0.95);
+}
+
+.NewThreadButton::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(45deg, var(--color-primary), var(--color-accent));
+  filter: blur(8px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 9999px;
+  z-index: -1;
+}
+
+.NewThreadButton:hover::after {
+  opacity: 0.4;
+}
+
+/* Mobile icon enhancements */
+.mobile-icon-shadow {
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5));
+}
+
+/* Add floating animation */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Update hover effects for mobile */
+@media (hover: hover) {
+  .NewThreadButton:hover {
+    transform: scale(1.05);
+  }
+}
+
+/* Active state for mobile */
+@media (hover: none) {
+  .NewThreadButton:active {
+    transform: scale(0.95);
+    transition: transform 0.1s;
+  }
+
+  .NewThreadButton:active .mobile-icon-shadow {
+    transform: scale(0.9);
+  }
+}
+
+/* Add these new animation keyframes and utilities */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Add these new animations */
+@keyframes spin-slower {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin-slow-reverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes slide-right {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes slide-left {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes float-particle-1 {
+  0%,
+  100% {
+    transform: translate(12px, -12px);
+  }
+  50% {
+    transform: translate(-12px, 12px);
+  }
+}
+
+@keyframes float-particle-2 {
+  0%,
+  100% {
+    transform: translate(-12px, -12px);
+  }
+  50% {
+    transform: translate(12px, 12px);
+  }
+}
+
+@keyframes float-particle-3 {
+  0%,
+  100% {
+    transform: translate(0, 12px);
+  }
+  50% {
+    transform: translate(0, -12px);
+  }
+}
+
+/* Add these new utility classes */
+.animate-spin-slower {
+  animation: spin-slower 12s linear infinite;
+}
+
+.animate-spin-slow-reverse {
+  animation: spin-slow-reverse 10s linear infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 3s linear infinite;
+  background-size: 200% auto;
+}
+
+.animate-slide-right {
+  animation: slide-right 3s linear infinite;
+}
+
+.animate-slide-left {
+  animation: slide-left 3s linear infinite;
+}
+
+.animate-float-particle-1 {
+  animation: float-particle-1 3s ease-in-out infinite;
+}
+
+.animate-float-particle-2 {
+  animation: float-particle-2 4s ease-in-out infinite;
+}
+
+.animate-float-particle-3 {
+  animation: float-particle-3 5s ease-in-out infinite;
+}
+
+.bg-gradient-radial {
+  background-image: radial-gradient(var(--tw-gradient-stops));
+}
+
+.bg-gradient-conic {
+  background-image: conic-gradient(var(--tw-gradient-stops));
+}
+
+.animate-gradient-x {
+  background-size: 200% auto;
+  animation: shimmer 3s linear infinite;
+}
+
+/* New Hedera-specific animations */
+@keyframes network-flow {
+  0% {
+    transform: rotate(0deg) scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+    opacity: 0.3;
+  }
+}
+
+@keyframes network-flow-reverse {
+  0% {
+    transform: rotate(360deg) scale(1.1);
+    opacity: 0.2;
+  }
+  50% {
+    transform: rotate(180deg) scale(1);
+    opacity: 0.4;
+  }
+  100% {
+    transform: rotate(0deg) scale(1.1);
+    opacity: 0.2;
+  }
+}
+
+@keyframes hexagon-shift {
+  0% {
+    transform: translateX(-10px) translateY(-10px);
+  }
+  50% {
+    transform: translateX(10px) translateY(10px);
+  }
+  100% {
+    transform: translateX(-10px) translateY(-10px);
+  }
+}
+
+@keyframes nodes-pulse {
+  0% {
+    opacity: 0.5;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0.5;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes connection-flow {
+  0% {
+    transform: translateX(-10px) translateY(-10px) rotate(0deg);
+  }
+  100% {
+    transform: translateX(10px) translateY(10px) rotate(360deg);
+  }
+}
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 5px var(--color-primary), 0 0 10px var(--color-accent);
+  }
+  50% {
+    box-shadow: 0 0 15px var(--color-primary), 0 0 20px var(--color-accent);
+  }
+  100% {
+    box-shadow: 0 0 5px var(--color-primary), 0 0 10px var(--color-accent);
+  }
+}
+
+/* New utility classes */
+.animate-network-flow {
+  animation: network-flow 20s linear infinite;
+}
+
+.animate-network-flow-reverse {
+  animation: network-flow-reverse 15s linear infinite;
+}
+
+.animate-hexagon-shift {
+  animation: hexagon-shift 6s ease-in-out infinite;
+}
+
+.animate-nodes-pulse {
+  animation: nodes-pulse 4s ease-in-out infinite;
+}
+
+.animate-connection-flow {
+  animation: connection-flow 8s linear infinite;
+}
+
+.animate-glow {
+  animation: glow 3s ease-in-out infinite;
+}
+
+/* New particle animation */
+@keyframes float-particle-4 {
+  0%,
+  100% {
+    transform: translate(-12px, 12px);
+  }
+  50% {
+    transform: translate(12px, -12px);
+  }
+}
+
+.animate-float-particle-4 {
+  animation: float-particle-4 4.5s ease-in-out infinite;
+}
+
+/* Shadow effects */
+.shadow-glow-primary {
+  box-shadow: 0 0 15px var(--color-primary);
+}
+
+.shadow-glow-accent {
+  box-shadow: 0 0 15px var(--color-accent);
+}
+
+/* Background patterns */
+.bg-network-pattern {
+  background-image: radial-gradient(
+    circle at 50% 50%,
+    var(--color-primary) 1px,
+    transparent 1px
+  );
+  background-size: 20px 20px;
+}
+
+.bg-hexagon-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23ffffff' d='M12 2l10 6v8l-10 6-10-6V8z' fill-opacity='0.2'/%3E%3C/svg%3E");
+  background-size: 24px 24px;
+}
+
+.bg-connection-lines {
+  background-image: linear-gradient(
+    45deg,
+    var(--color-primary) 25%,
+    transparent 25%,
+    transparent 75%,
+    var(--color-accent) 75%
+  );
+  background-size: 4px 4px;
+}
+
+.bg-node-pattern {
+  background-image: radial-gradient(
+    circle at center,
+    var(--color-accent) 1px,
+    transparent 1px
+  );
+  background-size: 10px 10px;
+}
+
+/* Title-specific animations */
+@keyframes gradient-x-reverse {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-10px) translateX(5px);
+  }
+}
+
+@keyframes float-slower {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(10px) translateX(-5px);
+  }
+}
+
+/* New utility classes */
+.animate-gradient-x-reverse {
+  animation: gradient-x-reverse 4s linear infinite;
+  background-size: 200% auto;
+}
+
+.animate-float-slow {
+  animation: float-slow 4s ease-in-out infinite;
+}
+
+.animate-float-slower {
+  animation: float-slower 5s ease-in-out infinite;
+}
+
+/* Enhanced Hedera symbol animations */
+@keyframes shimmer-slow {
+  0% {
+    background-position: -200% center;
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    background-position: 200% center;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse-slow {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes pulse-slower {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.95);
+  }
+}
+
+/* New utility classes */
+.animate-shimmer-slow {
+  animation: shimmer-slow 4s ease-in-out infinite;
+  background-size: 200% auto;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+
+.animate-pulse-slower {
+  animation: pulse-slower 4s ease-in-out infinite;
+}
+
+/* Enhanced shadow utilities */
+.shadow-inner-glow {
+  box-shadow: inset 0 0 20px var(--color-primary),
+    inset 0 0 40px var(--color-accent);
+}
+
+.text-shadow-glow {
+  text-shadow: 0 0 10px var(--color-primary), 0 0 20px var(--color-accent);
+}
+
+/* Clean, minimal styles */
+.glass-morphism-subtle {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+}
+
+.bg-gradient-radial {
+  background-image: radial-gradient(circle at center, var(--tw-gradient-stops));
+}
+
+/* Smooth transitions */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+@keyframes broadcast-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@layer utilities {
+  .animate-broadcast-ring-1 {
+    animation: broadcast-ring 2s ease-out infinite;
+  }
+
+  .animate-broadcast-ring-2 {
+    animation: broadcast-ring 2s ease-out infinite;
+    animation-delay: 0.6s;
+  }
+
+  .animate-broadcast-ring-3 {
+    animation: broadcast-ring 2s ease-out infinite;
+    animation-delay: 1.2s;
+  }
+}
+
+/* Style emoji picker */
+.EmojiPickerReact {
+  --epr-bg-color: var(--color-background) !important;
+  --epr-category-label-bg-color: var(--color-background) !important;
+  --epr-hover-bg-color: var(--color-primary) !important;
+  --epr-focus-bg-color: var(--color-primary) !important;
+  --epr-highlight-color: var(--color-accent) !important;
+  --epr-search-border-color: var(--color-primary) !important;
+  --epr-category-label-text-color: var(--color-text) !important;
+  border-color: var(--color-primary) !important;
+}
+
+.EmojiPickerReact .epr-search {
+  background-color: var(--color-background) !important;
+  border-color: var(--color-primary) !important;
 }

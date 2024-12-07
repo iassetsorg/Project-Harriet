@@ -4,12 +4,11 @@
  * between different views.
  */
 
-import React from "react";
+import React, { useState } from "react";
 import { WalletProvider } from "./wallet/WalletContext";
 import { useWalletContext } from "./wallet/WalletContext";
 import { useAccountId } from "@buidlerlabs/hashgraph-react-wallets";
 import useProfileData from "./hooks/use_profile_data";
-import Wallet from "./wallet/wallet";
 
 import Navbar from "./layouts/navbar";
 
@@ -40,20 +39,56 @@ import NotFoundPage from "./components/404";
 const ProfileCheck = ({ children }: { children: React.ReactNode }) => {
   const { isConnected } = useWalletContext();
   const { data: accountId } = useAccountId();
-  const { profileData, isLoading } = useProfileData(accountId);
+  const { profileData, isLoading } = useProfileData(accountId || "");
   const navigate = useNavigate();
   const location = useLocation();
+  const [hasDelayed, setHasDelayed] = useState(false);
 
+  // Handle the initial delay after connection
   React.useEffect(() => {
-    if (
-      !isLoading &&
-      isConnected &&
-      !profileData &&
-      location.pathname !== "/Profile"
-    ) {
-      navigate("/Profile");
+    if (isConnected && accountId && !hasDelayed) {
+      const timer = setTimeout(() => {
+        setHasDelayed(true);
+      }, 3000);
+      return () => clearTimeout(timer);
     }
-  }, [isConnected, profileData, isLoading, navigate, location]);
+  }, [isConnected, accountId, hasDelayed]);
+
+  // Handle profile check and navigation
+  React.useEffect(() => {
+    console.log("Profile check running:", {
+      isConnected,
+      accountId,
+      hasDelayed,
+      isLoading,
+      hasProfile: !!profileData,
+      currentPath: location.pathname,
+      profileData,
+    });
+
+    // Only proceed if we have delayed, have an accountId and the wallet is connected
+    if (isConnected && accountId && hasDelayed && !isLoading) {
+      // If no profile data exists and not already on profile page, redirect
+      if (!profileData && location.pathname !== "/Profile") {
+        navigate("/Profile");
+      }
+    }
+  }, [
+    isConnected,
+    accountId,
+    profileData,
+    isLoading,
+    navigate,
+    location,
+    hasDelayed,
+  ]);
+
+  // Reset hasDelayed when wallet disconnects
+  React.useEffect(() => {
+    if (!isConnected) {
+      setHasDelayed(false);
+    }
+  }, [isConnected]);
 
   return <>{children}</>;
 };

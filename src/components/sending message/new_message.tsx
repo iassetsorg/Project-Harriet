@@ -98,13 +98,38 @@ export const NewMessage: FC = () => {
             openModal(setIsPostSelectionModalOpen);
           }
         }}
-        className="NewThreadButton flex items-center p-2 sm:p-3 font-semibold text-background bg-primary rounded-full shadow-lg hover:bg-accent hover:shadow-xl transform hover:scale-105 transition duration-300 mt-3"
+        className="NewThreadButton group flex items-center justify-center p-1.5 sm:p-2.5 font-semibold text-background 
+        bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary
+        rounded-full shadow-lg hover:shadow-xl 
+        transform hover:scale-105 transition-all duration-300 mt-3
+        relative overflow-hidden
+        sm:w-auto w-12 h-12 sm:h-auto"
         aria-label="New Message"
       >
-        <FaPen className="text-base sm:text-lg" />
-        <span className="hidden sm:inline font-medium tracking-wide ml-3">
-          New Message
-        </span>
+        {/* Ripple effect container */}
+        <div className="absolute inset-0 bg-white/20 group-hover:animate-ripple"></div>
+
+        {/* Icon container with animation */}
+        <div className="relative z-10 flex items-center justify-center">
+          <div className="relative">
+            {/* Mobile pulse effect */}
+            <div className="absolute inset-0 bg-white/30 rounded-full scale-150 animate-ping sm:hidden"></div>
+
+            <FaPen
+              className="text-lg sm:text-base relative z-10 
+              group-hover:rotate-12 transition-transform duration-300
+              sm:mr-0 mobile-icon-shadow"
+            />
+          </div>
+          <span className="hidden sm:inline font-medium tracking-wide ml-3 group-hover:translate-x-0.5 transition-transform duration-300">
+            New Message
+          </span>
+        </div>
+
+        {/* Glowing effect */}
+        <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 blur-md"></div>
+        </div>
       </button>
 
       {isConnectModalOpen && (
@@ -119,48 +144,56 @@ export const NewMessage: FC = () => {
           isOpen={isPostSelectionModalOpen}
           onClose={() => closeModal(setIsPostSelectionModalOpen)}
         >
-          <div
-            className="space-y-8 p-8 max-w-2xl mx-auto overflow-y-auto max-h-[80vh]
-            scrollbar scrollbar-w-2
-            scrollbar-thumb-accent hover:scrollbar-thumb-primary
-            scrollbar-track-secondary/10
-            scrollbar-thumb-rounded-full scrollbar-track-rounded-full
-            transition-colors duration-200 ease-in-out
-            dark:scrollbar-thumb-accent/50 dark:hover:scrollbar-thumb-primary/70
-            dark:scrollbar-track-secondary/5"
-          >
+          <div className="space-y-8 p-8 max-w-2xl mx-auto overflow-y-auto max-h-[80vh]">
+            {/* Enhanced Logo Animation */}
             <div className="flex justify-center items-center mb-2">
-              <div className="relative w-16 h-16 flex items-center justify-center group">
-                {/* Outer glowing ring */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-primary/30 to-accent/30 rounded-full blur-md animate-pulse"></div>
+              <div className="relative w-12 h-12 flex items-center justify-center group perspective-1000">
+                {/* Broadcasting Rings */}
+                <div className="absolute inset-0">
+                  <div className="absolute inset-0 animate-broadcast-ring-1 rounded-full border border-primary"></div>
+                  <div className="absolute inset-0 animate-broadcast-ring-2 rounded-full border border-accent"></div>
+                  <div className="absolute inset-0 animate-broadcast-ring-3 rounded-full border border-primary"></div>
+                </div>
 
-                {/* Inner gradient background */}
-                <div className="absolute inset-2 bg-gradient-to-br from-background via-secondary to-background rounded-full"></div>
+                {/* 3D Transform Container */}
+                <div className="relative w-full h-full transition-transform duration-500 transform-style-3d group-hover:rotate-y-180">
+                  {/* Front Face */}
+                  <div className="absolute w-full h-full backface-hidden">
+                    {/* Center Symbol */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent z-10">
+                        ℏ
+                      </span>
+                    </div>
 
-                {/* Glass effect overlay */}
-                <div className="absolute inset-2 glass-morphism rounded-full"></div>
+                    {/* Glowing Effect */}
+                    <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-accent/20 rounded-full blur-lg group-hover:opacity-100 transition-opacity"></div>
+                  </div>
 
-                {/* The ℏ symbol */}
-                <span
-                  className="text-6xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent hover:scale-110 transition-all duration-300 cursor-default select-none z-10"
-                  style={{ fontFamily: "Arial, sans-serif" }}
-                >
-                  ℏ
-                </span>
-
-                {/* Animated border */}
-                <div className="absolute inset-0 border-2 border-primary rounded-full animate-ping"></div>
-
-                {/* Hover effect ring */}
-                <div className="absolute inset-0  rounded-full group-hover:border-primary transition-all duration-500"></div>
-
-                {/* Particle effects */}
-                <div className="absolute inset-0 bg-gradient-overlay rounded-full opacity-50"></div>
+                  {/* Back Face */}
+                  <div className="absolute w-full h-full backface-hidden rotate-y-180">
+                    <div className="w-full h-full rounded-full bg-gradient-to-tr from-primary to-accent animate-pulse"></div>
+                  </div>
+                </div>
               </div>
             </div>
-            <h2 className="text-3xl font-bold text-center mt-8 mb-12 text-primary  bg-gradient-to-r from-primary to-accent bg-clip-text  animate-gradient-x transform hover:scale-105 transition-all duration-300">
-              Create New Web3 Content
-            </h2>
+
+            {/* Enhanced Title with Floating Effect */}
+            <div className="relative">
+              <h2 className="text-xl font-bold text-center mt-12 mb-12">
+                <span className="relative inline-block animate-float">
+                  <span className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 blur-lg"></span>
+                  <span className="relative bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                    Create New Web3 Content
+                  </span>
+                </span>
+              </h2>
+
+              {/* Decorative Elements */}
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
+              <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-transparent via-accent to-transparent"></div>
+            </div>
+
             <div className="space-y-6">
               <div className="flex items-start p-6 bg-background-secondary rounded-xl border border-primary shadow-md hover:shadow-xl hover:border-background-tertiary transform hover:scale-[1.02] transition-all duration-300">
                 <div className="flex-shrink-0 mt-1">
