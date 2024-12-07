@@ -18,6 +18,7 @@ import { createPortal } from "react-dom";
  * @property {React.ReactNode} children - Content to be displayed inside the modal
  * @property {boolean} hideCloseButton - Optional flag to hide the close button
  * @property {() => void} onCloseClick - Optional additional callback for close button click
+ * @property {boolean} removeZIndex - Optional flag to remove the z-index behavior
  */
 interface ModalProps {
   isOpen: boolean;
@@ -25,6 +26,7 @@ interface ModalProps {
   children: React.ReactNode;
   hideCloseButton?: boolean;
   onCloseClick?: () => void;
+  removeZIndex?: boolean;
 }
 
 const Modal: FC<ModalProps> = ({
@@ -33,6 +35,7 @@ const Modal: FC<ModalProps> = ({
   children,
   hideCloseButton = false,
   onCloseClick,
+  removeZIndex = false,
 }) => {
   // Track modal state internally
   const [modalOpen, setModalOpen] = useState(isOpen);
@@ -57,18 +60,30 @@ const Modal: FC<ModalProps> = ({
   if (!modalOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 flex items-center justify-center z-[99999]">
+    <div
+      className={`fixed inset-0 flex items-center justify-center ${
+        !removeZIndex ? "z-[99999]" : ""
+      }`}
+    >
       {/* Semi-transparent backdrop */}
       <div className="fixed inset-0">
         <div className="absolute inset-0 bg-gray-700 opacity-75"></div>
       </div>
 
       {/* Modal container with positioning */}
-      <div className="z-[100000] relative max-w-3xl mx-auto">
+      <div
+        className={`relative max-w-3xl mx-auto ${
+          !removeZIndex ? "z-[100000]" : ""
+        }`}
+      >
         <div className="relative bg-background rounded-lg shadow-xl text-text overflow-hidden">
           {/* Animated close button with hover effects */}
           {!hideCloseButton && (
-            <div className="absolute top-4 right-4 z-[100001]">
+            <div
+              className={`absolute top-4 right-4 ${
+                !removeZIndex ? "z-[100001]" : ""
+              }`}
+            >
               <button
                 type="button"
                 className="group relative rounded-full w-7 h-7 bg-secondary/50 hover:bg-red-500 text-text/50 hover:text-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-red-500/50 backdrop-blur-sm hover:scale-110 flex items-center justify-center"

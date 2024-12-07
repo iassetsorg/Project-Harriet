@@ -65,7 +65,12 @@ const ConnectModal: React.FC<ConnectModalProps> = ({ isOpen, onClose }) => {
   ];
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} hideCloseButton={false}>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      hideCloseButton={false}
+      removeZIndex={true}
+    >
       <div className="flex flex-col items-center p-8 bg-background text-text w-full max-w-sm mx-auto">
         {isLoading && (
           <div className="absolute inset-0 bg-background/90 backdrop-blur-sm flex items-center justify-center z-20">
