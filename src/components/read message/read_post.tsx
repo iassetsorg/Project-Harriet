@@ -4,10 +4,11 @@
  * Supports tipping, sharing, and blockchain transaction viewing functionality.
  */
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FiShare2, FiHash } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { BsCurrencyDollar } from "react-icons/bs";
+import Repost from "../replay/repost";
 
 import Modal from "../../common/modal";
 import Tip from "../tip/tip";
@@ -17,40 +18,51 @@ import LinkAndHashtagReader from "../../common/link_and_hashtag_reader";
 import ConnectModal from "../../wallet/ConnectModal";
 import { useWalletContext } from "../../wallet/WalletContext";
 import { useAccountId } from "@buidlerlabs/hashgraph-react-wallets";
+import { formatTimestamp } from "../../common/formatTimestamp";
+import useGetPostData from "../../hooks/use_get_post_data";
 
 /**
  * Interface for ReadPost component props
  */
 interface ReadPostProps {
-  /** Account ID of the post sender */
-  sender: string;
-  /** Text content of the post */
-  message: string;
-  /** Optional IPFS CID for attached media */
-  media?: string;
   /** Unique sequence number for the post */
   sequence_number: string;
-  /** Hedera transaction ID for the post */
-  message_id: string;
-  /** Timestamp when consensus was reached */
-  consensus_timestamp?: string;
 }
 
 /**
  * ReadPost component displays a single post with all its associated content and interactions
  */
-function ReadPost({
-  sender,
-  message,
-  media,
-  sequence_number,
-  message_id,
-  consensus_timestamp,
-}: ReadPostProps) {
+function ReadPost({ sequence_number }: ReadPostProps) {
+  const { postData, loading, error } = useGetPostData(sequence_number);
   const { isConnected } = useWalletContext();
   const { data: accountId } = useAccountId();
 
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
+  const [isTipModalOpen, setIsTipModalOpen] = useState(false);
+  const [selectedAuthor, setSelectedAuthor] = useState("");
+  const [selectedTopicId, setSelectedTopicId] = useState("");
+
+  // Return loading state
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto bg-background text-text pr-2 pl-3 sm:px-6">
+        <div className="theme-card animate-pulse">
+          <div className="h-20 bg-gray-300/20 rounded"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Return error state
+  if (error || !postData) {
+    return (
+      <div className="max-w-4xl mx-auto bg-background text-text pr-2 pl-3 sm:px-6">
+        <div className="theme-card">
+          <div className="text-red-500">Failed to load post</div>
+        </div>
+      </div>
+    );
+  }
 
   /**
    * Opens the wallet connection modal
@@ -68,7 +80,7 @@ function ReadPost({
    * @returns Full URL to the post
    */
   const generateShareLink = (sequence_number: string) => {
-    const encodedMessage = encodeURIComponent(message);
+    const encodedMessage = encodeURIComponent(postData?.Message || "");
     const shareLink = `https://ibird.io/Posts/${sequence_number}`;
     return shareLink;
   };
@@ -90,10 +102,6 @@ function ReadPost({
   const closeTipModal = () => {
     setIsTipModalOpen(false);
   };
-
-  const [isTipModalOpen, setIsTipModalOpen] = useState(false);
-  const [selectedAuthor, setSelectedAuthor] = useState("");
-  const [selectedTopicId, setSelectedTopicId] = useState("");
 
   /**
    * Handles the tipping action for a post
@@ -119,33 +127,26 @@ function ReadPost({
    * @param timestamp - Unix timestamp in seconds
    * @returns Formatted date string
    */
-  const formatTimestamp = (timestamp: string) => {
-    const date = new Date(Number(timestamp) * 1000);
-    return new Intl.DateTimeFormat("en-US", {
-      dateStyle: "medium",
-      timeStyle: "short",
-    }).format(date);
-  };
 
   return (
     <div className="max-w-4xl mx-auto bg-background text-text pr-2 pl-3 sm:px-6">
       <div className="theme-card">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 transition-colors hover:opacity-90">
-          <UserProfile userAccountId={sender} />
-          <span className="text-sm text-gray-500 mt-4 sm:mt-0">
-            {formatTimestamp(consensus_timestamp?.toString() || "")}
+        <div className="flex items-center justify-between mb-4 transition-colors hover:opacity-90">
+          <UserProfile userAccountId={postData?.sender || ""} />
+          <span className="text-sm text-gray-500">
+            {formatTimestamp(postData?.consensus_timestamp?.toString() || "")}
           </span>
         </div>
 
         <div className="mb-4">
           <p className="mb-3 text-text whitespace-pre-line text-lg leading-relaxed hover:text-primary transition-colors">
-            <LinkAndHashtagReader message={message} />
+            <LinkAndHashtagReader message={postData?.Message || ""} />
           </p>
 
-          {media && (
+          {postData?.Media && (
             <div className="mt-4 rounded-xl overflow-hidden">
               <div className="w-full max-w-md mx-auto">
-                <ReadMediaFile cid={media} />
+                <ReadMediaFile cid={postData?.Media} />
               </div>
             </div>
           )}
@@ -153,10 +154,12 @@ function ReadPost({
 
         <div className="flex flex-wrap items-center mt-4 pt-3 theme-divider">
           <div className="flex items-center gap-4">
+            <Repost contentType={"Post"} source={sequence_number} />
+
             <button
               className="group flex items-center gap-2 hover:text-primary transition-colors"
               onClick={() =>
-                handleTip(sender.toString(), sequence_number.toString())
+                handleTip(postData?.sender?.toString() || "", sequence_number)
               }
             >
               <BsCurrencyDollar className="w-5 h-5" />
@@ -164,13 +167,13 @@ function ReadPost({
 
             <button
               className="group flex items-center gap-2 hover:text-primary transition-colors"
-              onClick={() => copyShareLink(sequence_number.toString())}
+              onClick={() => copyShareLink(sequence_number)}
             >
               <FiShare2 className="w-5 h-5" />
             </button>
 
             <a
-              href={`https://hashscan.io/mainnet/transaction/${message_id}`}
+              href={`https://hashscan.io/mainnet/transaction/${postData?.message_id}`}
               target="blank"
               className="group flex items-center gap-2 hover:text-primary transition-colors"
             >

@@ -68,13 +68,16 @@ function UserExplorer({ userAddress }: UserExplorerProps) {
    * Intersection Observer callback
    * Handles infinite scroll loading when user reaches bottom of content
    */
-  const handleObserver = (entries: IntersectionObserverEntry[]) => {
-    const target = entries[0];
-    if (target.isIntersecting && nextLink) {
-      setIsLoadingMore(true);
-      fetchMessages(nextLink);
-    }
-  };
+  const handleObserver = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const target = entries[0];
+      if (target.isIntersecting && nextLink && !isLoadingMore) {
+        setIsLoadingMore(true);
+        fetchMessages(nextLink);
+      }
+    },
+    [nextLink, fetchMessages, isLoadingMore]
+  );
 
   /**
    * Sets up the Intersection Observer
@@ -83,8 +86,8 @@ function UserExplorer({ userAddress }: UserExplorerProps) {
   useEffect(() => {
     const option = {
       root: null,
-      rootMargin: "0px",
-      threshold: 0.8, // Trigger when 80% of the page is visible
+      rootMargin: "100px", // Increased margin to trigger earlier
+      threshold: 0.5, // Reduced threshold to trigger sooner
     };
 
     const observer = new IntersectionObserver(handleObserver, option);
@@ -93,7 +96,7 @@ function UserExplorer({ userAddress }: UserExplorerProps) {
     return () => {
       if (observerRef.current) observer.unobserve(observerRef.current);
     };
-  }, [nextLink]);
+  }, [handleObserver]);
 
   /**
    * Updates allMessages state when new messages are fetched
@@ -180,9 +183,7 @@ function UserExplorer({ userAddress }: UserExplorerProps) {
                 <div>
                   {message.Type === "Post" && (
                     <ReadPost
-                      {...commonProps}
-                      message={message.Message}
-                      media={message.Media}
+                      sequence_number={message.sequence_number.toString()}
                     />
                   )}
                   {message.Type === "Thread" && (
@@ -197,12 +198,12 @@ function UserExplorer({ userAddress }: UserExplorerProps) {
           })}
         </TransitionGroup>
 
-        {/* Intersection observer target element */}
-        <div ref={observerRef}></div>
+        {/* Move the observer ref higher in the DOM */}
+        <div ref={observerRef} className="h-10" />
 
         {/* Loading indicator for next page */}
-        {isLoadingMore && (
-          <div className="flex items-center justify-center mt-4">
+        {isLoadingMore && nextLink && (
+          <div className="flex items-center justify-center py-4">
             <Spinner />
           </div>
         )}

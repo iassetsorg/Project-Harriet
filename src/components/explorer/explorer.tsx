@@ -13,6 +13,7 @@ import Spinner from "../../common/Spinner";
 import ReadThread from "../read message/read_thread";
 import ReadPost from "../read message/read_post";
 import ReadPoll from "../read message/read_poll";
+import ReadRepost from "../read message/read_repost";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import eventService from "../../services/event_service";
 import { useRefreshTrigger } from "../../hooks/use_refresh_trigger";
@@ -75,12 +76,12 @@ function Explorer() {
   const handleObserver = useCallback(
     (entries: IntersectionObserverEntry[]) => {
       const target = entries[0];
-      if (target.isIntersecting && nextLink) {
+      if (target.isIntersecting && nextLink && !isLoading) {
         setIsLoading(true);
         fetchMessages(nextLink);
       }
     },
-    [nextLink, fetchMessages]
+    [nextLink, fetchMessages, isLoading]
   );
 
   /**
@@ -90,8 +91,8 @@ function Explorer() {
   useEffect(() => {
     const option = {
       root: null,
-      rootMargin: "0px",
-      threshold: 0.8, // Trigger when 80% of the page is visible
+      rootMargin: "100px",
+      threshold: 0.5,
     };
 
     const observer = new IntersectionObserver(handleObserver, option);
@@ -173,9 +174,7 @@ function Explorer() {
               <div>
                 {message.Type === "Post" && (
                   <ReadPost
-                    {...commonProps}
-                    message={message.Message}
-                    media={message.Media}
+                    sequence_number={message.sequence_number.toString()}
                   />
                 )}
                 {message.Type === "Thread" && (
@@ -184,18 +183,27 @@ function Explorer() {
                 {message.Type === "Poll" && (
                   <ReadPoll {...commonProps} topicId={message.Poll} />
                 )}
+                {message.Type === "Repost" && (
+                  <ReadRepost
+                    {...commonProps}
+                    contentType={message.ContentType}
+                    source={message.Source}
+                    rePoster={message.sender}
+                    timestamp={message.consensus_timestamp?.toString() || "0"}
+                  />
+                )}
               </div>
             </CSSTransition>
           );
         })}
       </TransitionGroup>
 
-      {/* Intersection observer target element */}
-      <div ref={observerRef}></div>
+      {/* Move the observer ref higher in the DOM */}
+      <div ref={observerRef} className="h-10" />
 
       {/* Loading indicator for next page */}
-      {isLoading && (
-        <div className="flex items-center justify-center mt-4">
+      {isLoading && nextLink && (
+        <div className="flex items-center justify-center py-4">
           <Spinner />
         </div>
       )}

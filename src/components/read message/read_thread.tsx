@@ -7,6 +7,8 @@ import UserProfile from "../profile/user_profile";
 import ReadMediaFile from "../media/read_media_file";
 import LinkAndHashtagReader from "../../common/link_and_hashtag_reader";
 import { useRefreshTrigger } from "../../hooks/use_refresh_trigger";
+import Repost from "../replay/repost";
+import { formatTimestamp } from "../../common/formatTimestamp";
 
 /**
  * Interface representing a reply/comment structure in the thread
@@ -66,19 +68,6 @@ function ReadThread({ topicId }: { topicId?: string }) {
     fetchNextMessages();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
-
-  /**
-   * Formats a Unix timestamp into a human-readable date/time string
-   * @param {string} timestamp - Unix timestamp in seconds
-   * @returns {string} Formatted date string in user's locale
-   */
-  const formatTimestamp = (timestamp: string) => {
-    const date = new Date(Number(timestamp) * 1000); // Convert to milliseconds
-    return new Intl.DateTimeFormat("en-US", {
-      dateStyle: "medium",
-      timeStyle: "short",
-    }).format(date);
-  };
 
   /**
    * Recursively builds a tree structure of replies for a given parent message
@@ -182,9 +171,9 @@ function ReadThread({ topicId }: { topicId?: string }) {
             try {
               return (
                 <div key={idx} className="theme-card">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 transition-colors hover:opacity-90">
+                  <div className="flex items-center justify-between mb-4 transition-colors hover:opacity-90">
                     <UserProfile userAccountId={messageDetails.sender} />
-                    <span className="text-sm text-gray-500 mt-4 sm:mt-0">
+                    <span className="text-sm text-gray-500">
                       {formatTimestamp(
                         messageDetails.consensus_timestamp || ""
                       )}
@@ -210,6 +199,7 @@ function ReadThread({ topicId }: { topicId?: string }) {
                       <div className="w-full">
                         <div className="flex flex-wrap items-center gap-6">
                           <div className="flex items-center gap-4">
+                            <Repost contentType={"Thread"} source={topicId} />
                             {/* Like indicator */}
                             <div className="flex items-center gap-2">
                               <svg
@@ -416,9 +406,9 @@ function CommentItem({
       className={`theme-comment ${level > 1 ? "theme-comment-nested" : ""}`}
       style={{ marginLeft: `${indentation}px` }}
     >
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2">
+      <div className="flex items-center justify-between mb-2">
         <UserProfile userAccountId={reply.sender} />
-        <span className="text-sm text-gray-500 mt-4 sm:mt-0">
+        <span className="text-sm text-gray-500">
           {formatTimestamp(reply.consensus_timestamp || "")}
         </span>
       </div>

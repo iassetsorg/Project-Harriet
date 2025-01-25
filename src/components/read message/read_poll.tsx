@@ -8,7 +8,8 @@ import ReplayPoll from "../replay/replay_to_poll";
 import UserProfile from "../profile/user_profile";
 import LinkAndHashtagReader from "../../common/link_and_hashtag_reader";
 import { useRefreshTrigger } from "../../hooks/use_refresh_trigger";
-
+import Repost from "../replay/repost";
+import { formatTimestamp } from "../../common/formatTimestamp";
 /**
  * Interface representing a reply message structure
  * @interface Reply
@@ -83,19 +84,6 @@ function ReadPoll({ topicId }: { topicId?: string }) {
   }, [messages]);
 
   /**
-   * Formats a consensus timestamp into a human-readable date string
-   * @param {string} timestamp - Unix timestamp in seconds
-   * @returns {string} Formatted date string
-   */
-  const formatTimestamp = (timestamp: string) => {
-    const date = new Date(Number(timestamp) * 1000); // Convert to milliseconds
-    return new Intl.DateTimeFormat("en-US", {
-      dateStyle: "medium",
-      timeStyle: "short",
-    }).format(date);
-  };
-
-  /**
    * Builds a nested structure of replies for a given parent message
    * @param {string} parentSequenceNumber - Sequence number of parent message
    * @returns {any[]} Array of nested reply objects
@@ -167,7 +155,7 @@ function ReadPoll({ topicId }: { topicId?: string }) {
   };
 
   return (
-    <div className="max-w-4xl mx-auto bg-background text-text pr-2 pl-3 sm:px-6">
+    <div className="max-w-4xl mx-auto bg-background text-text px-2 sm:px-6">
       {loading && allMessages.length === 0 && (
         <div className="flex flex-col justify-center items-center min-h-[400px] space-y-4">
           <Spinner />
@@ -197,7 +185,7 @@ function ReadPoll({ topicId }: { topicId?: string }) {
       )}
 
       {!loading && (
-        <div className="space-y-8">
+        <div className="space-y-4 sm:space-y-8">
           {allMessages.map((message, idx) => {
             if (
               message.Reply_to ||
@@ -254,31 +242,34 @@ function ReadPoll({ topicId }: { topicId?: string }) {
                 );
 
                 return (
-                  <div key={idx} className="theme-card backdrop-blur-sm">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 transition-colors hover:opacity-90">
+                  <div
+                    key={idx}
+                    className="theme-card backdrop-blur-sm p-3 sm:p-6"
+                  >
+                    <div className="flex items-center justify-between mb-3 sm:mb-4 transition-colors hover:opacity-90">
                       <UserProfile userAccountId={messageDetails.author} />
-                      <span className="text-sm text-primary/60 mt-4 sm:mt-0">
+                      <span className="text-sm text-gray-500">
                         {formatTimestamp(
                           messageDetails.consensus_timestamp || ""
                         )}
                       </span>
                     </div>
 
-                    <div className="mb-4">
-                      <p className="mb-6 text-text whitespace-pre-line text-lg leading-relaxed hover:text-primary transition-colors">
+                    <div className="mb-3 sm:mb-4">
+                      <p className="mb-4 sm:mb-6 text-text whitespace-pre-line text-base sm:text-lg leading-relaxed hover:text-primary transition-colors">
                         <LinkAndHashtagReader
                           message={messageDetails.message}
                         />
                       </p>
 
-                      {/* Enhanced Poll Container with Better Visual Hierarchy */}
-                      <div className="space-y-6 w-full max-w-2xl mx-auto bg-gradient-to-b from-secondary/10 to-secondary/5 p-8 rounded-3xl backdrop-blur-md shadow-xl border border-primary">
-                        {/* Modernized Header with Better Visual Balance */}
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-primary">
-                          <div className="flex items-start gap-4">
-                            <div className="p-3 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 backdrop-blur-sm">
+                      {/* Enhanced Poll Container with Better Mobile Layout */}
+                      <div className="space-y-4 sm:space-y-6 w-full max-w-2xl mx-auto bg-gradient-to-b from-secondary/10 to-secondary/5 p-4 sm:p-8 rounded-2xl sm:rounded-3xl backdrop-blur-md shadow-xl border border-primary">
+                        {/* Modernized Header with Better Mobile Balance */}
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 pb-4 sm:pb-6 border-b border-primary">
+                          <div className="flex items-start gap-3 sm:gap-4">
+                            <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 backdrop-blur-sm">
                               <svg
-                                className="w-6 h-6 text-primary"
+                                className="w-5 h-5 sm:w-6 sm:h-6 text-primary"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
@@ -291,21 +282,21 @@ function ReadPoll({ topicId }: { topicId?: string }) {
                                 />
                               </svg>
                             </div>
-                            <div className="space-y-1">
-                              <h3 className="text-xl font-bold text-primary">
+                            <div className="space-y-0.5 sm:space-y-1">
+                              <h3 className="text-lg sm:text-xl font-bold text-primary">
                                 Community Poll
                               </h3>
-                              <p className="text-sm text-primary/60 font-medium">
+                              <p className="text-xs sm:text-sm text-primary/60 font-medium">
                                 Share your opinion by casting a vote
                               </p>
                             </div>
                           </div>
 
-                          {/* Enhanced Vote Counter */}
-                          <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-primary/15 to-primary/5 backdrop-blur-sm border border-primary">
-                            <div className="p-1.5 rounded-xl bg-primary/20">
+                          {/* Enhanced Vote Counter for Mobile */}
+                          <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-gradient-to-r from-primary/15 to-primary/5 backdrop-blur-sm border border-primary">
+                            <div className="p-1 sm:p-1.5 rounded-lg sm:rounded-xl bg-primary/20">
                               <svg
-                                className="w-5 h-5 text-primary"
+                                className="w-4 h-4 sm:w-5 sm:h-5 text-primary"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
@@ -319,18 +310,18 @@ function ReadPoll({ topicId }: { topicId?: string }) {
                               </svg>
                             </div>
                             <div className="flex flex-col">
-                              <span className="text-lg font-bold text-primary leading-none">
+                              <span className="text-base sm:text-lg font-bold text-primary leading-none">
                                 {totalVotes.toLocaleString()}
                               </span>
-                              <span className="text-xs text-primary/60 font-medium">
+                              <span className="text-[10px] sm:text-xs text-primary/60 font-medium">
                                 total votes
                               </span>
                             </div>
                           </div>
                         </div>
 
-                        {/* Enhanced Choice Options with Better Spacing */}
-                        <div className="space-y-4">
+                        {/* Enhanced Choice Options with Better Mobile Spacing */}
+                        <div className="space-y-3 sm:space-y-4">
                           {[1, 2, 3, 4, 5].map((num) => {
                             const choiceKey =
                               `Choice${num}` as keyof typeof messageDetails;
@@ -371,7 +362,7 @@ function ReadPoll({ topicId }: { topicId?: string }) {
                                       ? "bg-gradient-to-r from-success/20 via-success/10 to-transparent"
                                       : "bg-gradient-to-r from-white/10 to-transparent"
                                   }
-                                  hover:bg-white/10 rounded-2xl overflow-hidden
+                                  hover:bg-white/10 rounded-xl sm:rounded-2xl overflow-hidden
                                   group cursor-pointer border
                                 `}
                                 onClick={() =>
@@ -385,6 +376,8 @@ function ReadPoll({ topicId }: { topicId?: string }) {
                                     ${
                                       isWinner
                                         ? "bg-gradient-to-r from-success/30 via-success/20 to-transparent"
+                                        : isSelected
+                                        ? "bg-gradient-to-r from-primary/40 via-primary/30 to-primary/5"
                                         : "bg-gradient-to-r from-primary/20 via-primary/10 to-transparent"
                                     }
                                   `}
@@ -396,13 +389,28 @@ function ReadPoll({ topicId }: { topicId?: string }) {
                                   }}
                                 />
 
-                                {/* Enhanced Option Content */}
-                                <div className="relative flex items-center w-full px-6 py-4">
-                                  {/* Improved Winner Badge */}
+                                {/* Enhanced Option Content for Mobile */}
+                                <div
+                                  className={`
+                                  relative flex flex-col sm:flex-row items-start sm:items-center w-full 
+                                  px-3 sm:px-6 py-4 sm:py-5 gap-3 sm:gap-0
+                                  ${
+                                    isSelected
+                                      ? "bg-primary/5 rounded-r-xl"
+                                      : ""
+                                  }
+                                `}
+                                >
+                                  {/* Selected Option Indicator */}
+                                  {isSelected && (
+                                    <div className="absolute -left-0.5 top-0 bottom-0 w-1.5 bg-primary rounded-r-full animate-pulse" />
+                                  )}
+
+                                  {/* Improved Winner Badge - Adjusted position and z-index */}
                                   {isWinner && (
-                                    <div className="absolute -left-1 -top-1 p-2 rounded-br-2xl bg-success shadow-lg transform -rotate-12 animate-bounce-subtle">
+                                    <div className="absolute -left-2 -top-2 p-2 rounded-br-2xl bg-success shadow-lg transform -rotate-12 animate-bounce-subtle z-10">
                                       <svg
-                                        className="w-4 h-4 text-white"
+                                        className="w-3 h-3 sm:w-4 sm:h-4 text-white drop-shadow-md"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                       >
@@ -411,82 +419,108 @@ function ReadPoll({ topicId }: { topicId?: string }) {
                                     </div>
                                   )}
 
-                                  {/* Option Number Badge */}
-                                  <div
-                                    className={`
-                                    flex items-center justify-center w-8 h-8 rounded-full mr-4
-                                    ${
-                                      isWinner
-                                        ? "bg-success/20"
-                                        : isSelected
-                                        ? "bg-primary/20"
-                                        : "bg-primary/10"
-                                    }
-                                    transition-colors duration-200
-                                  `}
-                                  >
-                                    <span
-                                      className={`
-                                      text-sm font-semibold
-                                      ${
-                                        isWinner
-                                          ? "text-success"
-                                          : "text-primary"
-                                      }
-                                    `}
-                                    >
-                                      {num}
-                                    </span>
-                                  </div>
-
-                                  {/* Enhanced Option Text */}
-                                  <div className="flex-1">
-                                    <span
-                                      className={`
-                                        text-base font-semibold
-                                        ${
-                                          isWinner
-                                            ? "text-success"
-                                            : isSelected
-                                            ? "text-primary"
-                                            : "text-text"
-                                        }
-                                        group-hover:text-primary transition-colors duration-200
-                                      `}
-                                    >
-                                      {messageDetails[choiceKey]}
-                                    </span>
-                                  </div>
-
-                                  {/* Improved Vote Stats */}
-                                  <div className="flex items-center gap-4">
+                                  <div className="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0 w-full sm:w-auto">
+                                    {/* Option Number Badge - Added z-index */}
                                     <div
                                       className={`
-                                        px-4 py-2 rounded-full text-sm font-semibold
+                                        flex-shrink-0 flex items-center justify-center w-7 h-7 sm:w-9 sm:h-9 rounded-full
+                                        shadow-sm backdrop-blur-sm
                                         ${
                                           isWinner
-                                            ? "bg-success/20 text-success"
+                                            ? "bg-success/20 ring-1 ring-success/30"
                                             : isSelected
-                                            ? "bg-primary/20 text-primary"
+                                            ? "bg-primary ring-2 ring-primary/30 scale-110"
+                                            : "bg-primary/10"
+                                        }
+                                        transition-all duration-300 ease-in-out relative z-20
+                                        group-hover:scale-110 group-hover:shadow-md
+                                      `}
+                                    >
+                                      {isSelected && (
+                                        <div className="absolute inset-0 rounded-full bg-primary animate-ping opacity-20" />
+                                      )}
+                                      <span
+                                        className={`
+                                          text-sm sm:text-base font-semibold
+                                          ${
+                                            isWinner
+                                              ? "text-success"
+                                              : isSelected
+                                              ? "text-secondary"
+                                              : "text-primary"
+                                          }
+                                          transition-colors duration-300
+                                        `}
+                                      >
+                                        {num}
+                                      </span>
+                                    </div>
+
+                                    {/* Enhanced Option Text for Mobile */}
+                                    <div className="min-w-0 flex-1">
+                                      <span
+                                        className={`
+                                          text-sm sm:text-base font-semibold break-words leading-relaxed
+                                          ${
+                                            isWinner
+                                              ? "text-success"
+                                              : isSelected
+                                              ? "text-primary"
+                                              : "text-text"
+                                          }
+                                          group-hover:text-primary transition-all duration-300
+                                        `}
+                                      >
+                                        {messageDetails[choiceKey]}
+                                      </span>
+                                      {isSelected && (
+                                        <div className="mt-0.5 text-xs text-primary/60 font-medium animate-fadeIn">
+                                          Your vote
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  {/* Improved Vote Stats for Mobile */}
+                                  <div className="flex items-center gap-3 sm:gap-4 ml-10 sm:ml-auto mt-1 sm:mt-0">
+                                    <div
+                                      className={`
+                                        flex-shrink-0 px-3 sm:px-4 py-1.5 sm:py-2 
+                                        rounded-full text-xs sm:text-sm font-semibold
+                                        shadow-sm backdrop-blur-sm
+                                        ${
+                                          isWinner
+                                            ? "bg-success/20 text-success ring-1 ring-success/30"
+                                            : isSelected
+                                            ? "bg-primary text-secondary ring-2 ring-primary/30"
                                             : "bg-primary/10 text-primary/80"
                                         }
                                         group-hover:bg-primary/20 group-hover:text-primary
-                                        transition-all duration-200
+                                        transition-all duration-300 ease-in-out
+                                        group-hover:scale-105 group-hover:shadow-md
+                                        ${isSelected ? "scale-110" : ""}
                                       `}
                                     >
                                       {percentage.toFixed(1)}%
                                     </div>
                                     <span
                                       className={`
-                                        text-sm font-medium min-w-[80px] text-right
+                                        flex-shrink-0 text-xs sm:text-sm font-medium 
+                                        min-w-[60px] sm:min-w-[80px] text-right
+                                        transition-colors duration-300
                                         ${
                                           isWinner
                                             ? "text-success"
+                                            : isSelected
+                                            ? "text-primary font-semibold"
                                             : "text-primary/80"
                                         }
                                       `}
                                     >
-                                      {votes.toLocaleString()} votes
+                                      {votes.toLocaleString()}
+                                      <span className="text-[10px] sm:text-xs ml-1 opacity-60">
+                                        votes
+                                      </span>
                                     </span>
                                   </div>
                                 </div>
@@ -505,137 +539,144 @@ function ReadPoll({ topicId }: { topicId?: string }) {
                       )}
                     </div>
 
-                    {/* Enhanced Interaction Bar */}
-                    <div className="flex flex-wrap items-center mt-4 pt-3 theme-divider">
+                    {/* Enhanced Interaction Bar for Mobile */}
+                    <div className="flex flex-wrap items-center mt-3 sm:mt-4 pt-3 theme-divider">
                       {topicId && (
                         <div className="w-full">
-                          <div className="flex flex-wrap items-center gap-6">
-                            <div className="flex items-center gap-4">
-                              {/* Enhanced Like Button */}
-                              <div className="flex items-center gap-2 transition-transform hover:scale-110">
-                                <svg
-                                  className={`w-5 h-5 ${
-                                    messageDetails.likes > 0
-                                      ? "text-emerald-400"
-                                      : "text-emerald-500"
-                                  } transition-colors duration-200`}
-                                  viewBox="0 0 24 24"
-                                  fill={
-                                    messageDetails.likes > 0
-                                      ? "currentColor"
-                                      : "none"
-                                  }
-                                  stroke="currentColor"
-                                  strokeWidth={1.5}
-                                >
-                                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                                </svg>
-                                <span
-                                  className={`text-sm font-medium ${
-                                    messageDetails.likes > 0
-                                      ? "text-emerald-400"
-                                      : "text-emerald-500"
-                                  }`}
-                                >
-                                  {messageDetails.likes > 0
-                                    ? messageDetails.likes.toLocaleString()
-                                    : "0"}
-                                </span>
-                              </div>
+                          <div className="flex flex-wrap items-center gap-3 sm:gap-6">
+                            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+                              <Repost contentType={"Poll"} source={topicId} />
 
-                              {/* Enhanced Dislike Button */}
-                              <div className="flex items-center gap-2 transition-transform hover:scale-110">
-                                <svg
-                                  className={`w-5 h-5 ${
-                                    messageDetails.dislikes > 0
-                                      ? "text-rose-400"
-                                      : "text-rose-500"
-                                  } transition-colors duration-200`}
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth={1.5}
-                                >
-                                  <path d="M10.88 21.94l5.53-5.54c.37-.37.58-.88.58-1.41V5c0-1.1-.9-2-2-2H6c-.8 0-1.52.48-1.83 1.21L.91 11.82C.06 13.8 1.51 16 3.66 16h5.65l-.95 4.58c-.1.5.05 1.01.41 1.37.59.58 1.53.58 2.11-.01zM21 3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2s2-.9 2-2V5c0-1.1-.9-2-2-2z" />
-                                </svg>
-                                <span
-                                  className={`text-sm font-medium ${
-                                    messageDetails.dislikes > 0
-                                      ? "text-rose-400"
-                                      : "text-rose-500"
-                                  }`}
-                                >
-                                  {messageDetails.dislikes > 0
-                                    ? messageDetails.dislikes.toLocaleString()
-                                    : "0"}
-                                </span>
-                              </div>
+                              {/* Enhanced Like/Dislike/Comments Buttons for Mobile */}
+                              <div className="flex items-center gap-3 sm:gap-4">
+                                {/* Enhanced Like Button */}
+                                <div className="flex items-center gap-2 transition-transform hover:scale-110">
+                                  <svg
+                                    className={`w-5 h-5 ${
+                                      messageDetails.likes > 0
+                                        ? "text-emerald-400"
+                                        : "text-emerald-500"
+                                    } transition-colors duration-200`}
+                                    viewBox="0 0 24 24"
+                                    fill={
+                                      messageDetails.likes > 0
+                                        ? "currentColor"
+                                        : "none"
+                                    }
+                                    stroke="currentColor"
+                                    strokeWidth={1.5}
+                                  >
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                                  </svg>
+                                  <span
+                                    className={`text-sm font-medium ${
+                                      messageDetails.likes > 0
+                                        ? "text-emerald-400"
+                                        : "text-emerald-500"
+                                    }`}
+                                  >
+                                    {messageDetails.likes > 0
+                                      ? messageDetails.likes.toLocaleString()
+                                      : "0"}
+                                  </span>
+                                </div>
 
-                              {/* Enhanced Comments Button */}
-                              <button
-                                onClick={() =>
-                                  toggleComments(messageDetails.sequence_number)
-                                }
-                                className={`
-                                  group flex items-center gap-2 px-4 py-2 rounded-full
-                                  transition-all duration-200
-                                  ${
-                                    messageDetails.comments > 0
-                                      ? "bg-blue-100/10 hover:bg-blue-100/20"
-                                      : "opacity-70 hover:opacity-100"
+                                {/* Enhanced Dislike Button */}
+                                <div className="flex items-center gap-2 transition-transform hover:scale-110">
+                                  <svg
+                                    className={`w-5 h-5 ${
+                                      messageDetails.dislikes > 0
+                                        ? "text-rose-400"
+                                        : "text-rose-500"
+                                    } transition-colors duration-200`}
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth={1.5}
+                                  >
+                                    <path d="M10.88 21.94l5.53-5.54c.37-.37.58-.88.58-1.41V5c0-1.1-.9-2-2-2H6c-.8 0-1.52.48-1.83 1.21L.91 11.82C.06 13.8 1.51 16 3.66 16h5.65l-.95 4.58c-.1.5.05 1.01.41 1.37.59.58 1.53.58 2.11-.01zM21 3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2s2-.9 2-2V5c0-1.1-.9-2-2-2z" />
+                                  </svg>
+                                  <span
+                                    className={`text-sm font-medium ${
+                                      messageDetails.dislikes > 0
+                                        ? "text-rose-400"
+                                        : "text-rose-500"
+                                    }`}
+                                  >
+                                    {messageDetails.dislikes > 0
+                                      ? messageDetails.dislikes.toLocaleString()
+                                      : "0"}
+                                  </span>
+                                </div>
+
+                                {/* Enhanced Comments Button */}
+                                <button
+                                  onClick={() =>
+                                    toggleComments(
+                                      messageDetails.sequence_number
+                                    )
                                   }
-                                  focus:outline-none focus:ring-2 focus:ring-blue-500/20
-                                `}
-                                title={
-                                  messageDetails.comments > 0
-                                    ? `View ${messageDetails.comments} comments`
-                                    : "No comments yet"
-                                }
-                              >
-                                <svg
-                                  className={`w-4 h-4 ${
+                                  className={`
+                                    group flex items-center gap-2 px-4 py-2 rounded-full
+                                    transition-all duration-200
+                                    ${
+                                      messageDetails.comments > 0
+                                        ? "bg-blue-100/10 hover:bg-blue-100/20"
+                                        : "opacity-70 hover:opacity-100"
+                                    }
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500/20
+                                  `}
+                                  title={
                                     messageDetails.comments > 0
-                                      ? "text-blue-400 group-hover:text-blue-500"
-                                      : "text-blue-500"
-                                  } transition-colors duration-200`}
-                                  fill={
-                                    messageDetails.comments > 0
-                                      ? "currentColor"
-                                      : "none"
+                                      ? `View ${messageDetails.comments} comments`
+                                      : "No comments yet"
                                   }
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
                                 >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                                  />
-                                </svg>
-                                <span
-                                  className={`text-sm font-medium ${
-                                    messageDetails.comments > 0
-                                      ? "text-blue-400 group-hover:text-blue-500"
-                                      : "text-blue-500"
-                                  } transition-colors duration-200`}
-                                >
-                                  {messageDetails.comments > 0
-                                    ? `${messageDetails.comments.toLocaleString()} Comments`
-                                    : "No Comments"}
-                                </span>
-                              </button>
+                                  <svg
+                                    className={`w-4 h-4 ${
+                                      messageDetails.comments > 0
+                                        ? "text-blue-400 group-hover:text-blue-500"
+                                        : "text-blue-500"
+                                    } transition-colors duration-200`}
+                                    fill={
+                                      messageDetails.comments > 0
+                                        ? "currentColor"
+                                        : "none"
+                                    }
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                                    />
+                                  </svg>
+                                  <span
+                                    className={`text-sm font-medium ${
+                                      messageDetails.comments > 0
+                                        ? "text-blue-400 group-hover:text-blue-500"
+                                        : "text-blue-500"
+                                    } transition-colors duration-200`}
+                                  >
+                                    {messageDetails.comments > 0
+                                      ? `${messageDetails.comments.toLocaleString()} Comments`
+                                      : "No Comments"}
+                                  </span>
+                                </button>
+                              </div>
                             </div>
 
-                            {/* Enhanced Reply Button */}
-                            <div className="ml-auto">
+                            {/* Enhanced Reply Button for Mobile */}
+                            <div className="w-full sm:w-auto sm:ml-auto mt-3 sm:mt-0">
                               <ReplayPoll
                                 sequenceNumber={messageDetails.sequence_number}
                                 topicId={topicId}
                                 author={messageDetails.author}
                                 message_id={message.message_id}
                                 Choice={selectedChoice}
-                                className="inline-flex items-center px-4 py-2 mt-2 sm:mt-0 rounded-lg bg-primary text-white hover:bg-primary/90 transition-all duration-200 font-medium transform hover:scale-105"
+                                className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition-all duration-200 font-medium transform hover:scale-105 text-sm sm:text-base"
                               />
                             </div>
                           </div>
@@ -722,9 +763,9 @@ function CommentItem({
       className={`theme-comment ${level > 1 ? "theme-comment-nested" : ""}`}
       style={{ marginLeft: `${indentation}px` }}
     >
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2">
+      <div className="flex items-center justify-between mb-2">
         <UserProfile userAccountId={reply.sender} />
-        <span className="text-sm text-gray-500 mt-2 sm:mt-0">
+        <span className="text-sm text-gray-500">
           {formatTimestamp(reply.consensus_timestamp || "")}
         </span>
       </div>

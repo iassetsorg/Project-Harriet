@@ -104,10 +104,9 @@ const ThemeToggle: React.FC = () => {
   return (
     <button
       onClick={cycleTheme}
-      className="flex items-center justify-center gap-2 text-background bg-primary rounded-xl hover:bg-accent transition duration-300 py-2 px-4"
+      className="flex items-center justify-center text-background bg-primary rounded-xl hover:bg-accent transition duration-300 p-2 mr-2"
     >
       {getThemeIcon()}
-      <span>{getThemeText()}</span>
     </button>
   );
 };

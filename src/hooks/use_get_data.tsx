@@ -69,6 +69,9 @@ interface Message {
   Choice4?: string;
   Choice5?: string;
   consensus_timestamp?: string;
+  Source?: string;
+  Repost?: string;
+  ContentType?: string;
 }
 
 /**
@@ -164,6 +167,9 @@ const useGetData = (
                 Choice3,
                 Choice4,
                 Choice5,
+                Source,
+                Repost,
+                ContentType,
               } = JSON.parse(decodedMessage);
 
               return {
@@ -198,6 +204,9 @@ const useGetData = (
                 sequence_number: message.sequence_number,
                 message: decodedMessage,
                 consensus_timestamp: message.consensus_timestamp,
+                Source,
+                Repost,
+                ContentType,
               };
             } catch (error) {
               console.warn("Invalid message format:", decodedMessage);

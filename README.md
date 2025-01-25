@@ -51,7 +51,8 @@ iBird consists of two main components:
    ├── Universal Explorer (0.0.4976953)
    │   ├── Posts
    │   ├── Thread References
-   │   └── Poll References
+   │   ├── Poll References
+   │   └── Repost References
    │
    └── User Profiles
        ├── Profile Topic
@@ -59,7 +60,8 @@ iBird consists of two main components:
        └── User Messages Topic
            ├── Personal Posts
            ├── Thread Participations
-           └── Poll Participations
+           ├── Poll Participations
+           └── Repost Participations
    ```
 
 3. **NFT Profile System**
@@ -236,6 +238,26 @@ iBird consists of two main components:
           | Fee Type     | Amount  |
           | ------------ | ------- |
           | Sending Vote | $0.0001 |
+
+    - **Reposts**
+
+      - Reposts allow users to share and amplify existing content. When a user reposts, a reference is created in the Explore Topic.
+      - Repost Reference in Explore Topic:
+
+        ```json
+        {
+          "Type": "Repost",
+          "ContentType": "Thread",
+          "Source": "0.0.5706419"
+        }
+        ```
+
+      - Total Network Fee: $0.0002
+
+        | Fee Type                | Amount  |
+        | ----------------------- | ------- |
+        | Publishing on Explore   | $0.0001 |
+        | Adding To User Messages | $0.0001 |
 
 3.  **Media Storage**
 

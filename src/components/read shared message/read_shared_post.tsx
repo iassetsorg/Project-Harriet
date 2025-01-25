@@ -9,9 +9,7 @@
 import React from "react";
 import Modal from "../../common/modal";
 import { useNavigate, useParams } from "react-router-dom";
-import useGetPostData from "../../hooks/use_get_post_data";
 import ReadPost from "../read message/read_post";
-import UserProfile from "../profile/user_profile";
 
 /**
  * ReadSharedPost function component
@@ -20,9 +18,6 @@ import UserProfile from "../profile/user_profile";
 function ReadSharedPost() {
   // Extract sequence number from URL parameters
   const sequence_Number = useParams().sequenceNumber;
-
-  // Fetch post data using custom hook
-  const { postData, loading, error } = useGetPostData(sequence_Number);
   const navigate = useNavigate();
 
   /**
@@ -36,28 +31,7 @@ function ReadSharedPost() {
   return (
     <Modal isOpen={true} onClose={closeModal}>
       <div className="bg-background p-4 rounded-lg">
-        {/* Conditional rendering based on fetch status */}
-        {error ? (
-          // Display error message if fetch failed
-          <p>{error}</p>
-        ) : loading ? (
-          // Display loading state while fetching
-          <p>Loading...</p>
-        ) : (
-          // Render post content if data is available
-          postData && (
-            <div>
-              <ReadPost
-                sender={postData.sender || "Unknown Sender"}
-                message={postData.Message || "No message content available"}
-                media={postData.Media || ""}
-                message_id={postData.message_id || ""}
-                sequence_number={sequence_Number || ""}
-                consensus_timestamp={postData.consensus_timestamp || ""}
-              />
-            </div>
-          )
-        )}
+        {sequence_Number && <ReadPost sequence_number={sequence_Number} />}
       </div>
     </Modal>
   );

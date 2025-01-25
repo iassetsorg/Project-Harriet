@@ -7,7 +7,7 @@
 
 /* Global scrollbar style */
 ::-webkit-scrollbar {
-  width: 2px !important;
+  width: 3px !important;
 }
 
 @media (min-width: 768px) {
@@ -93,7 +93,7 @@
   --color-secondary: #252836;
   --color-accent: #c4cefa;
   --color-error: #ef4444;
-  --color-success: #048a3e;
+  --color-success: #0fc85f;
   --color-waiting: #f59e0b;
   --shadow-color: 250 95% 65%;
   --shadow-strength: 10%;

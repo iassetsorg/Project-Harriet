@@ -8,12 +8,16 @@ import axios from "axios";
  * @property {number} totalPosts - Total number of posts in the topic
  * @property {number} totalThreads - Total number of threads in the topic
  * @property {number} totalPolls - Total number of polls in the topic
+ * @property {number} totalReposts - Total number of reposts in the topic
+ * @property {number} totalUsers - Total number of users in the topic
  */
 interface TopicData {
   totalMessages: number;
   totalPosts: number;
   totalThreads: number;
   totalPolls: number;
+  totalReposts: number;
+  totalUsers: number;
 }
 
 /**
@@ -74,7 +78,18 @@ const useGetAnalyticsData = (topicId: string) => {
         ) {
           const messageData = response.data.messages[0];
           const decodedMessage = JSON.parse(decodeBase64(messageData.message));
-          setTopicData(decodedMessage);
+
+          // Ensure all properties exist with default values if missing
+          const normalizedData: TopicData = {
+            totalMessages: decodedMessage.total_messages || 0,
+            totalPosts: decodedMessage.total_posts || 0,
+            totalThreads: decodedMessage.total_threads || 0,
+            totalPolls: decodedMessage.total_polls || 0,
+            totalReposts: decodedMessage.total_reposts || 0,
+            totalUsers: decodedMessage.total_users || 0,
+          };
+
+          setTopicData(normalizedData);
         } else {
           setError("No data found");
         }
