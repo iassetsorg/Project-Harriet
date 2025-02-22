@@ -18,7 +18,7 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <nav className="py-3 px-6 bg-background">
+    <nav className="px-6 bg-background">
       {/* Main navigation container */}
       <div className="container mx-auto flex justify-between items-center">
         {/* Left section - Logo and branding */}
