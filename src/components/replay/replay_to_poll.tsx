@@ -25,6 +25,24 @@ import useUploadToArweave from "../media/use_upload_to_arweave";
 import { useRefreshTrigger } from "../../hooks/use_refresh_trigger";
 import EmojiPickerPopup from "../../common/EmojiPickerPopup";
 import { BsEmojiSmile } from "react-icons/bs";
+
+/**
+ * Formats a number to a more readable format (e.g., 1000 -> 1K, 1500 -> 1.5K, 1000000 -> 1M)
+ * @param {number} num - The number to format
+ * @returns {string} The formatted number as a string
+ */
+const formatNumber = (num: number): string => {
+  if (num === 0) return "0";
+
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(num % 1000000 < 100000 ? 0 : 1) + "M";
+  } else if (num >= 1000) {
+    return (num / 1000).toFixed(num % 1000 < 100 ? 0 : 1) + "K";
+  }
+
+  return num.toString();
+};
+
 /**
  * Interface for the props required by the ReplayPoll component
  */
@@ -36,6 +54,8 @@ interface ReplayProps {
   Choice?: string; // Selected poll choice
   showVoteButton?: boolean; // Whether to display the vote button
   className?: string; // Optional CSS classes
+  likesCount?: number; // Number of likes
+  dislikesCount?: number; // Number of dislikes
 }
 
 /**
@@ -69,6 +89,8 @@ const ReplayPoll: React.FC<ReplayProps> = ({
   message_id,
   Choice,
   showVoteButton = true,
+  likesCount,
+  dislikesCount,
 }) => {
   const { send } = useSendMessage();
   const { isConnected } = useWalletContext();
@@ -665,7 +687,7 @@ const ReplayPoll: React.FC<ReplayProps> = ({
     <>
       <div className="flex">
         <button
-          className="bg-secondary hover:bg-background text-text py-1 px-2 rounded-lg mt-2 ml-2 flex items-center"
+          className="bg-secondary hover:bg-background text-text py-1 px-3 rounded-lg mt-2 ml-2 flex items-center gap-1"
           onClick={() => {
             setStepStatuses((prev) => ({
               ...prev,
@@ -675,9 +697,10 @@ const ReplayPoll: React.FC<ReplayProps> = ({
           }}
         >
           <AiOutlineLike className="text-text" />
+          <span>{formatNumber(likesCount || 0)}</span>
         </button>
         <button
-          className="bg-secondary hover:bg-background text-text py-1 px-2 rounded-lg ml-2 mt-2 flex items-center"
+          className="bg-secondary hover:bg-background text-text py-1 px-3 rounded-lg ml-2 mt-2 flex items-center gap-1"
           onClick={() => {
             setStepStatuses((prev) => ({
               ...prev,
@@ -687,6 +710,7 @@ const ReplayPoll: React.FC<ReplayProps> = ({
           }}
         >
           <AiOutlineDislike className="text-text" />
+          <span>{formatNumber(dislikesCount || 0)}</span>
         </button>
         <button
           className="bg-secondary hover:bg-background text-text  py-1 px-2 rounded-lg mt-2 ml-2 flex items-center"

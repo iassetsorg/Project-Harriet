@@ -26,6 +26,23 @@ import { useRefreshTrigger } from "../../hooks/use_refresh_trigger";
 import EmojiPickerPopup from "../../common/EmojiPickerPopup";
 
 /**
+ * Formats a number to a more readable format (e.g., 1000 -> 1K, 1500 -> 1.5K, 1000000 -> 1M)
+ * @param {number} num - The number to format
+ * @returns {string} The formatted number as a string
+ */
+const formatNumber = (num: number): string => {
+  if (num === 0) return "0";
+
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(num % 1000000 < 100000 ? 0 : 1) + "M";
+  } else if (num >= 1000) {
+    return (num / 1000).toFixed(num % 1000 < 100 ? 0 : 1) + "K";
+  }
+
+  return num.toString();
+};
+
+/**
  * Interface for the core properties required by the Replay component
  * @interface ReplayProps
  * @property {number} sequenceNumber - The sequence number of the message being replied to
@@ -40,6 +57,8 @@ interface ReplayProps {
   author?: string | null | undefined;
   message_id: string;
   className?: string;
+  likesCount?: number;
+  dislikesCount?: number;
 }
 
 /**
@@ -80,6 +99,8 @@ const Replay: React.FC<ReplayProps> = ({
   topicId,
   author,
   message_id,
+  likesCount,
+  dislikesCount,
 }) => {
   const { send } = useSendMessage();
   const { isConnected } = useWalletContext();
@@ -644,7 +665,7 @@ const Replay: React.FC<ReplayProps> = ({
     <>
       <div className="flex">
         <button
-          className="bg-secondary hover:bg-background text-text py-1 px-2 rounded-lg mt-2 ml-2 flex items-center"
+          className="bg-secondary hover:bg-background text-text py-1 px-3 rounded-lg mt-2 ml-2 flex items-center gap-1"
           onClick={() => {
             // Initialize step status for like
             setStepStatuses((prev) => ({
@@ -655,10 +676,11 @@ const Replay: React.FC<ReplayProps> = ({
           }}
         >
           <AiOutlineLike className="text-text" />
+          <span>{formatNumber(likesCount || 0)}</span>
         </button>
 
         <button
-          className="bg-secondary hover:bg-background text-text py-1 px-2 rounded-lg ml-2 mt-2 flex items-center"
+          className="bg-secondary hover:bg-background text-text py-1 px-3 rounded-lg ml-2 mt-2 flex items-center gap-1"
           onClick={() => {
             // Initialize step status for unlike
             setStepStatuses((prev) => ({
@@ -669,6 +691,7 @@ const Replay: React.FC<ReplayProps> = ({
           }}
         >
           <AiOutlineDislike className="text-text" />
+          <span>{formatNumber(dislikesCount || 0)}</span>
         </button>
 
         <button

@@ -27,7 +27,7 @@ const getMediaURL = (cid: string): string | null => {
   if (cid.startsWith("ipfs://")) {
     return `https://ipfs.io/ipfs/${cid.slice("ipfs://".length)}`;
   } else if (cid.startsWith("ar://")) {
-    return `https://akrd.net/${cid.slice("ar://".length)}`;
+    return `https://arweave.net/${cid.slice("ar://".length)}`;
   }
   console.error("Unsupported CID format:", cid);
   return null;

@@ -258,7 +258,7 @@ function ReadPoll({ topicId }: { topicId?: string }) {
                     <div className="mb-3 sm:mb-4">
                       <p className="mb-4 sm:mb-6 text-text whitespace-pre-line text-base sm:text-lg leading-relaxed hover:text-primary transition-colors">
                         <LinkAndHashtagReader
-                          message={messageDetails.message}
+                          message={messageDetails.message || ""}
                         />
                       </p>
 
@@ -549,66 +549,6 @@ function ReadPoll({ topicId }: { topicId?: string }) {
 
                               {/* Enhanced Like/Dislike/Comments Buttons for Mobile */}
                               <div className="flex items-center gap-3 sm:gap-4">
-                                {/* Enhanced Like Button */}
-                                <div className="flex items-center gap-2 transition-transform hover:scale-110">
-                                  <svg
-                                    className={`w-5 h-5 ${
-                                      messageDetails.likes > 0
-                                        ? "text-emerald-400"
-                                        : "text-emerald-500"
-                                    } transition-colors duration-200`}
-                                    viewBox="0 0 24 24"
-                                    fill={
-                                      messageDetails.likes > 0
-                                        ? "currentColor"
-                                        : "none"
-                                    }
-                                    stroke="currentColor"
-                                    strokeWidth={1.5}
-                                  >
-                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                                  </svg>
-                                  <span
-                                    className={`text-sm font-medium ${
-                                      messageDetails.likes > 0
-                                        ? "text-emerald-400"
-                                        : "text-emerald-500"
-                                    }`}
-                                  >
-                                    {messageDetails.likes > 0
-                                      ? messageDetails.likes.toLocaleString()
-                                      : "0"}
-                                  </span>
-                                </div>
-
-                                {/* Enhanced Dislike Button */}
-                                <div className="flex items-center gap-2 transition-transform hover:scale-110">
-                                  <svg
-                                    className={`w-5 h-5 ${
-                                      messageDetails.dislikes > 0
-                                        ? "text-rose-400"
-                                        : "text-rose-500"
-                                    } transition-colors duration-200`}
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth={1.5}
-                                  >
-                                    <path d="M10.88 21.94l5.53-5.54c.37-.37.58-.88.58-1.41V5c0-1.1-.9-2-2-2H6c-.8 0-1.52.48-1.83 1.21L.91 11.82C.06 13.8 1.51 16 3.66 16h5.65l-.95 4.58c-.1.5.05 1.01.41 1.37.59.58 1.53.58 2.11-.01zM21 3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2s2-.9 2-2V5c0-1.1-.9-2-2-2z" />
-                                  </svg>
-                                  <span
-                                    className={`text-sm font-medium ${
-                                      messageDetails.dislikes > 0
-                                        ? "text-rose-400"
-                                        : "text-rose-500"
-                                    }`}
-                                  >
-                                    {messageDetails.dislikes > 0
-                                      ? messageDetails.dislikes.toLocaleString()
-                                      : "0"}
-                                  </span>
-                                </div>
-
                                 {/* Enhanced Comments Button */}
                                 <button
                                   onClick={() =>
@@ -676,6 +616,8 @@ function ReadPoll({ topicId }: { topicId?: string }) {
                                 author={messageDetails.author}
                                 message_id={message.message_id}
                                 Choice={selectedChoice}
+                                likesCount={messageDetails.likes}
+                                dislikesCount={messageDetails.dislikes}
                                 className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition-all duration-200 font-medium transform hover:scale-105 text-sm sm:text-base"
                               />
                             </div>
@@ -756,23 +698,20 @@ function CommentItem({
   level: number;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const indentation = level * 4; // Adjust as needed for indentation
+  const indentation = Math.min(level * 16, 48); // Adjust indentation with a max limit
 
   return (
-    <div
-      className={`theme-comment ${level > 1 ? "theme-comment-nested" : ""}`}
-      style={{ marginLeft: `${indentation}px` }}
-    >
+    <div className="theme-comment" style={{ marginLeft: `${indentation}px` }}>
       <div className="flex items-center justify-between mb-2">
         <UserProfile userAccountId={reply.sender} />
-        <span className="text-sm text-gray-500">
+        <span className="text-xs text-gray-500">
           {formatTimestamp(reply.consensus_timestamp || "")}
         </span>
       </div>
 
       <div className="ml-2">
         <p className="whitespace-pre-line text-base mb-3">
-          <LinkAndHashtagReader message={reply.Message} />
+          <LinkAndHashtagReader message={reply.Message || ""} />
         </p>
         {reply.Media && (
           <div className="mt-4 rounded-xl overflow-hidden">
@@ -783,52 +722,8 @@ function CommentItem({
         )}
       </div>
 
-      <div className="mt-2 flex flex-wrap items-center gap-4">
-        {/* Like indicator */}
-        <div className="flex items-center gap-2">
-          <svg
-            className={`w-5 h-5 ${
-              reply.likes > 0 ? "text-emerald-400" : "text-emerald-500"
-            }`}
-            viewBox="0 0 24 24"
-            fill={reply.likes > 0 ? "currentColor" : "none"}
-            stroke="currentColor"
-            strokeWidth={1.5}
-          >
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-          </svg>
-          <span
-            className={`text-sm font-medium ${
-              reply.likes > 0 ? "text-emerald-400" : "text-emerald-500"
-            }`}
-          >
-            {reply.likes || 0}
-          </span>
-        </div>
-
-        {/* Dislike indicator */}
-        <div className="flex items-center gap-2">
-          <svg
-            className={`w-5 h-5 ${
-              reply.dislikes > 0 ? "text-rose-400" : "text-rose-500"
-            }`}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={1.5}
-          >
-            <path d="M10.88 21.94l5.53-5.54c.37-.37.58-.88.58-1.41V5c0-1.1-.9-2-2-2H6c-.8 0-1.52.48-1.83 1.21L.91 11.82C.06 13.8 1.51 16 3.66 16h5.65l-.95 4.58c-.1.5.05 1.01.41 1.37.59.58 1.53.58 2.11-.01zM21 3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2s2-.9 2-2V5c0-1.1-.9-2-2-2z" />
-          </svg>
-          <span
-            className={`text-sm font-medium ${
-              reply.dislikes > 0 ? "text-rose-400" : "text-rose-500"
-            }`}
-          >
-            {reply.dislikes || 0}
-          </span>
-        </div>
-
-        {/* Replies indicator */}
+      <div className="mt-2 flex flex-wrap items-center gap-3">
+        {/* Reply counter button */}
         <button
           onClick={() => setExpanded(!expanded)}
           className="flex items-center gap-2 text-blue-500 hover:text-blue-600 transition-colors"
@@ -851,16 +746,16 @@ function CommentItem({
           </span>
         </button>
 
-        {/* Reply button */}
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-primary hover:text-primary/80 transition-colors">
-          <ReplayPoll
-            sequenceNumber={reply.sequence_number}
-            topicId={topicId || ""}
-            author={reply.sender}
-            message_id={reply.sequence_number.toString()}
-            showVoteButton={false}
-          />
-        </div>
+        {/* Reply button with likes/dislikes */}
+        <ReplayPoll
+          sequenceNumber={reply.sequence_number}
+          topicId={topicId || ""}
+          author={reply.sender}
+          message_id={reply.sequence_number.toString()}
+          likesCount={reply.likes}
+          dislikesCount={reply.dislikes}
+          className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-primary hover:text-primary/80 transition-colors"
+        />
       </div>
 
       {/* Render nested replies */}
