@@ -43,6 +43,7 @@ export const defaultSEO: SEOConfig = {
     "Arweave",
   ],
   author: "iAssets",
+  canonical: "https://ibird.io",
   ogType: "website",
   ogImage: "/banner.png",
   ogImageAlt: "iBird - Web3 Social Media Platform",
