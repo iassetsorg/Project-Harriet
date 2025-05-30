@@ -17,6 +17,8 @@ import ReadRepost from "../read message/read_repost";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import eventService from "../../services/event_service";
 import { useRefreshTrigger } from "../../hooks/use_refresh_trigger";
+import SEOHead from "../common/SEOHead";
+import { generateSEOConfig } from "../../common/seo.config";
 
 /**
  * Explorer component fetches and displays messages with infinite scroll functionality.
@@ -131,83 +133,90 @@ function Explorer() {
     return () => unsubscribe();
   }, [triggerRefresh]);
 
+  // Generate SEO configuration for explore page
+  const exploreSEO = generateSEOConfig("explore");
+
   return (
-    <div
-      ref={scrollRef}
-      onScroll={handleScroll}
-      className="relative w-full h-[calc(100vh-4rem)] bg-background p-0 sm:p-6 text-text
-       overflow-y-scroll"
-    >
-      {/* Pull to refresh indicator */}
-      {isRefreshing && (
-        <div className="sticky top-0 z-10 -mt-6 pt-2 pb-2 bg-background">
-          <Spinner />
-        </div>
-      )}
+    <>
+      <SEOHead seoConfig={exploreSEO} />
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="relative w-full h-[calc(100vh-4rem)] bg-background p-0 sm:p-6 text-text
+         overflow-y-scroll"
+      >
+        {/* Pull to refresh indicator */}
+        {isRefreshing && (
+          <div className="sticky top-0 z-10 -mt-6 pt-2 pb-2 bg-background">
+            <Spinner />
+          </div>
+        )}
 
-      {/* Initial loading state */}
-      {loading && allMessages.length === 0 && (
-        <div className="flex h-full items-center justify-center">
-          <Spinner />
-        </div>
-      )}
+        {/* Initial loading state */}
+        {loading && allMessages.length === 0 && (
+          <div className="flex h-full items-center justify-center">
+            <Spinner />
+          </div>
+        )}
 
-      {/* Message list with transition animations */}
-      <TransitionGroup className="space-y-6">
-        {allMessages.map((message) => {
-          // Common props shared between all message types
-          const commonProps = {
-            key: message.message_id,
-            message_id: message.message_id,
-            sender: message.sender,
-            sequence_number: message.sequence_number.toString(),
-            consensus_timestamp: message.consensus_timestamp?.toString() || "0",
-          };
+        {/* Message list with transition animations */}
+        <TransitionGroup className="space-y-6">
+          {allMessages.map((message) => {
+            // Common props shared between all message types
+            const commonProps = {
+              key: message.message_id,
+              message_id: message.message_id,
+              sender: message.sender,
+              sequence_number: message.sequence_number.toString(),
+              consensus_timestamp:
+                message.consensus_timestamp?.toString() || "0",
+            };
 
-          // Render different components based on message type
-          return (
-            <CSSTransition
-              key={message.message_id}
-              timeout={300}
-              classNames="fade"
-            >
-              <div>
-                {message.Type === "Post" && (
-                  <ReadPost
-                    sequence_number={message.sequence_number.toString()}
-                  />
-                )}
-                {message.Type === "Thread" && (
-                  <ReadThread {...commonProps} topicId={message.Thread} />
-                )}
-                {message.Type === "Poll" && (
-                  <ReadPoll {...commonProps} topicId={message.Poll} />
-                )}
-                {message.Type === "Repost" && (
-                  <ReadRepost
-                    {...commonProps}
-                    contentType={message.ContentType}
-                    source={message.Source}
-                    rePoster={message.sender}
-                    timestamp={message.consensus_timestamp?.toString() || "0"}
-                  />
-                )}
-              </div>
-            </CSSTransition>
-          );
-        })}
-      </TransitionGroup>
+            // Render different components based on message type
+            return (
+              <CSSTransition
+                key={message.message_id}
+                timeout={300}
+                classNames="fade"
+              >
+                <div>
+                  {message.Type === "Post" && (
+                    <ReadPost
+                      sequence_number={message.sequence_number.toString()}
+                    />
+                  )}
+                  {message.Type === "Thread" && (
+                    <ReadThread {...commonProps} topicId={message.Thread} />
+                  )}
+                  {message.Type === "Poll" && (
+                    <ReadPoll {...commonProps} topicId={message.Poll} />
+                  )}
+                  {message.Type === "Repost" && (
+                    <ReadRepost
+                      {...commonProps}
+                      contentType={message.ContentType}
+                      source={message.Source}
+                      rePoster={message.sender}
+                      timestamp={message.consensus_timestamp?.toString() || "0"}
+                    />
+                  )}
+                </div>
+              </CSSTransition>
+            );
+          })}
+        </TransitionGroup>
 
-      {/* Move the observer ref higher in the DOM */}
-      <div ref={observerRef} className="h-10" />
+        {/* Move the observer ref higher in the DOM */}
+        <div ref={observerRef} className="h-10" />
 
-      {/* Loading indicator for next page */}
-      {isLoading && nextLink && (
-        <div className="flex items-center justify-center py-4">
-          <Spinner />
-        </div>
-      )}
-    </div>
+        {/* Loading indicator for next page */}
+        {isLoading && nextLink && (
+          <div className="flex items-center justify-center py-4">
+            <Spinner />
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 

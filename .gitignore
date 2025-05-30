@@ -4,6 +4,8 @@
 /node_modules
 /analytics
 /rewardEngine
+/memory-bank
+/docs
 /.pnp
 .pnp.js
 .prettierrc

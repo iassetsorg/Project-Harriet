@@ -5,22 +5,36 @@
     <link rel="icon" href="%PUBLIC_URL%/icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
+    <!-- SEO Meta Tags - Will be overridden by React Helmet for specific pages -->
     <meta
       name="description"
       content="Join iBird - the decentralized social media platform built on Hedera Hashgraph. Connect, share, and engage in a Web3 community-driven experience."
     />
     <meta
       name="keywords"
-      content="iBird, web3, social media, Hedera,HBAR, blockchain, decentralized, crypto, community, iAssets"
+      content="iBird, web3, social media, Hedera, HBAR, blockchain, decentralized, crypto, community, iAssets, NFT profiles, censorship resistant, creator economy"
     />
     <meta name="author" content="iAssets" />
+    <meta name="robots" content="index, follow" />
+    <meta name="googlebot" content="index, follow" />
+
+    <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="iBird | Web3 Social Media Platform" />
     <meta
       property="og:description"
       content="Join iBird - the decentralized social media platform built on Hedera Hashgraph. Connect, share, and engage in a Web3 community-driven experience."
     />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="%PUBLIC_URL%/icon.png" />
+    <meta property="og:url" content="https://ibird.io" />
+    <meta property="og:image" content="%PUBLIC_URL%/banner.png" />
+    <meta
+      property="og:image:alt"
+      content="iBird - Web3 Social Media Platform"
+    />
+    <meta property="og:site_name" content="iBird" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="iBird | Web3 Social Media Platform" />
     <meta
@@ -29,10 +43,59 @@
     />
     <meta name="twitter:site" content="@iAssetsOrg" />
     <meta name="twitter:creator" content="@iAssetsOrg" />
+    <meta name="twitter:image" content="%PUBLIC_URL%/banner.png" />
+
+    <!-- Additional Web App Meta Tags -->
+    <meta name="application-name" content="iBird" />
+    <meta name="apple-mobile-web-app-title" content="iBird" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- Security and Performance -->
+    <meta name="referrer" content="origin-when-cross-origin" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="upgrade-insecure-requests"
+    />
 
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <title>iBird | Web3 Social Media</title>
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "iBird",
+        "description": "Decentralized social media platform built on Hedera Hashgraph",
+        "url": "https://ibird.io",
+        "applicationCategory": "SocialNetworkingApplication",
+        "operatingSystem": "Web, iOS, Android",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "author": {
+          "@type": "Organization",
+          "name": "iAssets",
+          "url": "https://iassets.org"
+        },
+        "featureList": [
+          "Decentralized social media",
+          "NFT profiles",
+          "Creator tipping",
+          "Censorship resistance",
+          "Blockchain-based content"
+        ]
+      }
+    </script>
+
     <base href="/" />
     <style>
       @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap");

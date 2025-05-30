@@ -8,6 +8,8 @@ import Modal from "../../common/modal";
 import React, { useState } from "react";
 import ReadPoll from "../read message/read_poll";
 import { useNavigate, useParams } from "react-router-dom";
+import SEOHead from "../common/SEOHead";
+import { usePollSEO } from "../../hooks/use_seo";
 
 /**
  * ReadSharedPoll is a functional component that manages the display of a shared poll in a modal.
@@ -24,6 +26,9 @@ function ReadSharedPoll() {
   // Extract topicId from URL parameters, defaulting to empty string if not present
   const topicIdVar = useParams().topicId || "";
 
+  // Generate SEO configuration for poll
+  const { seoConfig } = usePollSEO();
+
   /**
    * Handles the modal close action
    * Closes the modal and navigates user to the Explore page
@@ -34,12 +39,15 @@ function ReadSharedPoll() {
   };
 
   return (
-    <Modal isOpen={isModalOpen} onClose={closeModal}>
-      {/* Container for the poll content with styling */}
-      <div className="bg-background p-4 rounded-lg">
-        <ReadPoll topicId={topicIdVar} />
-      </div>
-    </Modal>
+    <>
+      <SEOHead seoConfig={seoConfig} />
+      <Modal isOpen={isModalOpen} onClose={closeModal}>
+        {/* Container for the poll content with styling */}
+        <div className="bg-background p-4 rounded-lg">
+          <ReadPoll topicId={topicIdVar} />
+        </div>
+      </Modal>
+    </>
   );
 }
 

@@ -5,10 +5,13 @@
  */
 
 import React, { useState } from "react";
+import { HelmetProvider } from "react-helmet-async";
 import { WalletProvider } from "./wallet/WalletContext";
 import { useWalletContext } from "./wallet/WalletContext";
 import { useAccountId } from "@buidlerlabs/hashgraph-react-wallets";
 import useProfileData from "./hooks/use_profile_data";
+import SEOHead from "./components/common/SEOHead";
+import { defaultSEO } from "./common/seo.config";
 
 import Navbar from "./layouts/navbar";
 
@@ -100,40 +103,46 @@ const ProfileCheck = ({ children }: { children: React.ReactNode }) => {
  */
 const App = () => {
   return (
-    <WalletProvider>
-      <main className="bg-background">
-        <Router>
-          <ProfileCheck>
-            <Navbar />
-            <div className="flex ">
-              <Sidebar />
-              <Routes>
-                <Route path="/" element={<Navigate to="/Explore" replace />} />
-                <Route
-                  path="/Project-Harriet"
-                  element={<Navigate to="/Explore" replace />}
-                />
-                <Route path="/Explore" element={<Explorer />} />
-                <Route path="/Profile" element={<Profile />} />
-                <Route
-                  path="/Threads/:topicId"
-                  element={<ReadSharedThread />}
-                />
-                <Route path="/Polls/:topicId" element={<ReadSharedPoll />} />
-                <Route
-                  path="/Posts/:sequenceNumber"
-                  element={<ReadSharedPost />}
-                />
-                <Route path="*" element={<NotFoundPage />} />
-              </Routes>
-            </div>
+    <HelmetProvider>
+      <WalletProvider>
+        <main className="bg-background">
+          <SEOHead seoConfig={defaultSEO} />
+          <Router>
+            <ProfileCheck>
+              <Navbar />
+              <div className="flex ">
+                <Sidebar />
+                <Routes>
+                  <Route
+                    path="/"
+                    element={<Navigate to="/Explore" replace />}
+                  />
+                  <Route
+                    path="/Project-Harriet"
+                    element={<Navigate to="/Explore" replace />}
+                  />
+                  <Route path="/Explore" element={<Explorer />} />
+                  <Route path="/Profile" element={<Profile />} />
+                  <Route
+                    path="/Threads/:topicId"
+                    element={<ReadSharedThread />}
+                  />
+                  <Route path="/Polls/:topicId" element={<ReadSharedPoll />} />
+                  <Route
+                    path="/Posts/:sequenceNumber"
+                    element={<ReadSharedPost />}
+                  />
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </div>
 
-            <BottomBar />
-            <NewMessage />
-          </ProfileCheck>
-        </Router>
-      </main>
-    </WalletProvider>
+              <BottomBar />
+              <NewMessage />
+            </ProfileCheck>
+          </Router>
+        </main>
+      </WalletProvider>
+    </HelmetProvider>
   );
 };
 

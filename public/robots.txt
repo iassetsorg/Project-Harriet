@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /
+
+# Allow access to main pages
+Allow: /Explore
+Allow: /Profile
+Allow: /Threads/
+Allow: /Posts/
+Allow: /Polls/
+
+# Disallow access to API endpoints and internal directories
+Disallow: /api/
+Disallow: /static/js/
+Disallow: /static/css/
+
+# Allow media files
+Allow: /static/media/
+
+# Sitemap location
+Sitemap: https://ibird.io/sitemap.xml
+
+# Crawl delay (optional - be gentle with the server)
+Crawl-delay: 1 
