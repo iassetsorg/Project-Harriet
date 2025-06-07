@@ -4,16 +4,20 @@
  */
 
 import React, { useState, useEffect } from "react";
-import { MdDarkMode, MdLightMode } from "react-icons/md";
-import { IoWater } from "react-icons/io5";
-import { IoLeafOutline } from "react-icons/io5";
-import { IoSunnyOutline } from "react-icons/io5";
+import { MdDarkMode } from "react-icons/md";
+import { IoHeart, IoDiamond, IoWater } from "react-icons/io5";
+import { FaGem } from "react-icons/fa";
 
 /**
- * @typedef {('light'|'dark'|'blue'|'orange'|'green')} Theme
+ * @typedef {('dark'|'blue'|'lovely-red'|'gemmy-purple'|'sky-blue-diamond')} Theme
  * Defines the available theme options for the application
  */
-type Theme = "light" | "dark" | "blue" | "orange" | "green";
+type Theme =
+  | "dark"
+  | "blue"
+  | "lovely-red"
+  | "gemmy-purple"
+  | "sky-blue-diamond";
 
 /**
  * ThemeToggle component that manages and displays the current theme selection
@@ -26,10 +30,25 @@ const ThemeToggle: React.FC = () => {
   /**
    * State hook for managing the current theme
    * Initializes from localStorage or defaults to 'dark' theme
+   * Migrates old theme names to new ones
    */
-  const [theme, setTheme] = useState<Theme>(
-    (localStorage.getItem("theme") as Theme) || "dark"
-  );
+  const [theme, setTheme] = useState<Theme>(() => {
+    const savedTheme = localStorage.getItem("theme");
+
+    // Migration: Convert old theme names to new ones
+    const themeMap: Record<string, Theme> = {
+      light: "dark",
+      orange: "lovely-red",
+      green: "gemmy-purple",
+    };
+
+    if (savedTheme && themeMap[savedTheme]) {
+      localStorage.setItem("theme", themeMap[savedTheme]);
+      return themeMap[savedTheme];
+    }
+
+    return (savedTheme as Theme) || "dark";
+  });
 
   /**
    * Effect hook that handles theme changes
@@ -39,10 +58,10 @@ const ThemeToggle: React.FC = () => {
     // Remove all theme classes first
     document.documentElement.classList.remove(
       "dark",
-      "light",
       "blue",
-      "orange",
-      "green"
+      "lovely-red",
+      "gemmy-purple",
+      "sky-blue-diamond"
     );
     // Add the current theme class
     document.documentElement.classList.add(theme);
@@ -51,10 +70,16 @@ const ThemeToggle: React.FC = () => {
 
   /**
    * Cycles to the next theme in the predefined order
-   * Order: light → dark → blue → orange → green
+   * Order: dark → blue → lovely-red → gemmy-purple → sky-blue-diamond
    */
   const cycleTheme = () => {
-    const themeOrder: Theme[] = ["light", "dark", "blue", "orange", "green"];
+    const themeOrder: Theme[] = [
+      "dark",
+      "blue",
+      "lovely-red",
+      "gemmy-purple",
+      "sky-blue-diamond",
+    ];
     const currentIndex = themeOrder.indexOf(theme);
     const nextIndex = (currentIndex + 1) % themeOrder.length;
     setTheme(themeOrder[nextIndex]);
@@ -66,16 +91,16 @@ const ThemeToggle: React.FC = () => {
    */
   const getThemeIcon = () => {
     switch (theme) {
-      case "light":
-        return <MdLightMode className="text-2xl" />;
       case "dark":
         return <MdDarkMode className="text-2xl" />;
       case "blue":
         return <IoWater className="text-2xl" />;
-      case "orange":
-        return <IoSunnyOutline className="text-2xl" />;
-      case "green":
-        return <IoLeafOutline className="text-2xl" />;
+      case "lovely-red":
+        return <IoHeart className="text-2xl" />;
+      case "gemmy-purple":
+        return <FaGem className="text-2xl" />;
+      case "sky-blue-diamond":
+        return <IoDiamond className="text-2xl" />;
     }
   };
 
@@ -85,16 +110,16 @@ const ThemeToggle: React.FC = () => {
    */
   const getThemeText = () => {
     switch (theme) {
-      case "light":
-        return "Light";
       case "dark":
         return "Dark";
       case "blue":
-        return "Blue";
-      case "orange":
-        return "Orange";
-      case "green":
-        return "Green";
+        return "Deep Blue";
+      case "lovely-red":
+        return "Rose Pink";
+      case "gemmy-purple":
+        return "Gemmy Purple";
+      case "sky-blue-diamond":
+        return "Sky Blue Diamond";
     }
   };
 

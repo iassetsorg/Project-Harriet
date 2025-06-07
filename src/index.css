@@ -53,29 +53,23 @@
   }
 }
 
-/* Light Theme Configuration
- * Default theme with crisp and modern aesthetics
- * Variables defined:
- * - background: Light gray for clean appearance
- * - text: Deep blue for readability
- * - primary/secondary: Blue-based color scheme
- * - accent: Bright blue for highlights
- * - status colors: Error (red), Success (green), Waiting (amber)
- * - shadow/border/divider: Customizable strength values
+/* Default Theme Configuration (Dark Mode as Default)
+ * Setting dark theme as the default root theme
+ * Variables defined for dark mode aesthetic
  */
 :root {
-  --color-background: #fafafa;
-  --color-text: #1a237e;
-  --color-primary: #2563eb;
-  --color-secondary: #f1f5f9;
-  --color-accent: #3b82f6;
+  --color-background: #1f1d2b;
+  --color-text: #e2e8f0;
+  --color-primary: #a5b4fc;
+  --color-secondary: #252836;
+  --color-accent: #c4cefa;
   --color-error: #ef4444;
-  --color-success: #048a3e;
+  --color-success: #0fc85f;
   --color-waiting: #f59e0b;
-  --shadow-color: 217 92% 45%;
-  --shadow-strength: 8%;
-  --border-strength: 25%;
-  --divider-strength: 15%;
+  --shadow-color: 250 95% 65%;
+  --shadow-strength: 10%;
+  --border-strength: 35%;
+  --divider-strength: 20%;
 }
 
 /* Dark Theme Configuration
@@ -101,7 +95,7 @@
   --divider-strength: 20%;
 }
 
-/* Blue Theme Configuration
+/* Deep Blue Theme Configuration
  * Deep ocean and neon-inspired color scheme
  * Characteristics:
  * - Navy background with light blue text
@@ -123,48 +117,70 @@
   --divider-strength: 25%;
 }
 
-/* Orange Theme Configuration
- * Warm sunset gradient theme
- * Features:
- * - Beige background with deep orange text
- * - Orange-based accent colors
- * - Softer shadows for a warm appearance
+/* Red Rose Pinkish Theme Configuration
+ * Romantic rose garden inspired color scheme
+ * Characteristics:
+ * - Soft rose pink background with deep rose text
+ * - Rose and pink accents with romantic undertones
+ * - Gentle shadows for a dreamy appearance
  */
-.orange {
-  --color-background: #f8ecbe;
-  --color-text: #7c2d12;
-  --color-primary: #f97316;
-  --color-secondary: #fff7ed;
-  --color-accent: #fb923c;
-  --color-error: #ef4444;
-  --color-success: #048a3e;
-  --color-waiting: #f59e0b;
-  --shadow-color: 25 95% 53%;
-  --shadow-strength: 8%;
+.lovely-red {
+  --color-background: #fef7f7;
+  --color-text: #881337;
+  --color-primary: #e11d48;
+  --color-secondary: #fce7f3;
+  --color-accent: #ec4899;
+  --color-error: #be123c;
+  --color-success: #059669;
+  --color-waiting: #d97706;
+  --shadow-color: 330 81% 60%;
+  --shadow-strength: 10%;
   --border-strength: 25%;
-  --divider-strength: 20%;
+  --divider-strength: 16%;
 }
 
-/* Green Theme Configuration
- * Nature-inspired forest and spring theme
- * Characteristics:
- * - Mint background with forest green text
- * - Emerald accents
- * - Subtle borders and shadows
+/* Gemmy Purple Theme Configuration
+ * Mystical amethyst and royal purple color scheme
+ * Features:
+ * - Luxurious lavender background with deep violet text
+ * - Rich purple gem-like accents
+ * - Enhanced shadows for premium feel
  */
-.green {
-  --color-background: #f0fdf4;
-  --color-text: #064e3b;
-  --color-primary: #16a34a;
-  --color-secondary: #dcfce7;
-  --color-accent: #22c55e;
-  --color-error: #ef4444;
-  --color-success: #048a3e;
-  --color-waiting: #f59e0b;
-  --shadow-color: 142 84% 45%;
-  --shadow-strength: 8%;
-  --border-strength: 20%;
-  --divider-strength: 15%;
+.gemmy-purple {
+  --color-background: #faf5ff;
+  --color-text: #581c87;
+  --color-primary: #9333ea;
+  --color-secondary: #e9d5ff;
+  --color-accent: #a855f7;
+  --color-error: #dc2626;
+  --color-success: #059669;
+  --color-waiting: #d97706;
+  --shadow-color: 270 91% 65%;
+  --shadow-strength: 15%;
+  --border-strength: 32%;
+  --divider-strength: 22%;
+}
+
+/* Sky Blue Diamond Theme Configuration
+ * Crystal clear diamond blue color scheme
+ * Characteristics:
+ * - Pure sky background with deep sapphire text
+ * - Brilliant blue diamond accents
+ * - Crisp shadows for clarity and elegance
+ */
+.sky-blue-diamond {
+  --color-background: #f0f9ff;
+  --color-text: #0c4a6e;
+  --color-primary: #0284c7;
+  --color-secondary: #e0f2fe;
+  --color-accent: #0ea5e9;
+  --color-error: #dc2626;
+  --color-success: #059669;
+  --color-waiting: #d97706;
+  --shadow-color: 199 100% 85%;
+  --shadow-strength: 18%;
+  --border-strength: 35%;
+  --divider-strength: 25%;
 }
 
 /* Card Component Styles
